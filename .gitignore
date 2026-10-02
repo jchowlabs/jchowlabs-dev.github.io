@@ -1,0 +1,8 @@
+# Source deck + INTERNAL prep notes — never publish these.
+# The public /falcon-prep page serves the rendered images in
+# falcon-prep/slides/ instead.
+presentation/
+
+# Local tooling / OS cruft
+.claude/
+.DS_Store

@@ -1,0 +1,191 @@
+/* ============================================================
+   Falcon Deck — presentation prep viewer
+   Dark stage, slide shown as a card, simple nav dock,
+   and a voice-coach call button (ported from the orb page).
+   ============================================================ */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+
+body {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1c2230;
+  color: #e6e8ec;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ── Back-to-home ──────────────────────────────────────────── */
+.home-link {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 10;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #9aa4b6;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .07);
+  transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+.home-link:hover { color: #e6e8ec; background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .14); }
+.home-link svg { width: 18px; height: 18px; }
+
+/* ── Viewer layout ─────────────────────────────────────────── */
+.viewer {
+  position: relative;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 56px 32px 104px;   /* room for dock (bottom) + home link (top) */
+}
+
+/* ── Slide stage ───────────────────────────────────────────── */
+.stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slide {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #fff;                       /* avoids a flash before the image paints */
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .45), 0 2px 10px rgba(0, 0, 0, .3);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ── Nav dock (bottom center) ──────────────────────────────── */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(20, 25, 36, .72);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #cbd2de;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, transform .1s ease;
+}
+.nav-btn:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+.nav-btn:active { transform: scale(.92); }
+.nav-btn:disabled { opacity: .3; cursor: default; }
+.nav-btn svg { width: 18px; height: 18px; }
+.counter {
+  min-width: 58px;
+  text-align: center;
+  font-size: .85rem;
+  font-weight: 500;
+  color: #aab2c0;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+/* ── Voice coach button (ported from styles.css of the orb) ── */
+.call-btn {
+  position: fixed;
+  right: 28px;
+  bottom: 24px;
+  z-index: 9;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, .08);
+  background: #4caf72;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .18s ease, background .2s ease, color .2s ease, opacity .2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .34);
+}
+.call-btn:hover { transform: scale(1.06); }
+.call-btn:active { transform: scale(.97); }
+.call-btn:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+.call-icon { width: 24px; height: 24px; transition: transform .2s ease; }
+
+/* Pending = no agent configured yet: muted, still clickable (shows a hint) */
+.call-btn.pending { background: #3a4150; color: #aeb6c4; box-shadow: 0 8px 22px rgba(0, 0, 0, .3); }
+.call-btn.pending:hover { transform: scale(1.04); }
+
+/* Spinner (connecting) */
+.call-spinner {
+  display: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, .45);
+  border-top-color: #fff;
+  animation: call-spin .7s linear infinite;
+}
+@keyframes call-spin { to { transform: rotate(360deg); } }
+
+.call-btn[data-status="connecting"] { cursor: default; }
+.call-btn[data-status="connecting"] .call-icon { display: none; }
+.call-btn[data-status="connecting"] .call-spinner { display: block; }
+
+.call-btn[data-status="active"] { background: #e8564f; border-color: #e8564f; color: #fff; }
+.call-btn[data-status="active"] .call-icon { transform: rotate(135deg); }
+
+/* ── Toast (e.g. "voice coach coming soon") ────────────────── */
+.toast {
+  position: fixed;
+  right: 28px;
+  bottom: 92px;
+  z-index: 9;
+  max-width: 240px;
+  padding: 9px 13px;
+  font-size: .82rem;
+  line-height: 1.35;
+  color: #e6e8ec;
+  background: rgba(20, 25, 36, .92);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .4);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 640px) {
+  .viewer { padding: 52px 14px 96px; }
+  .call-btn { right: 16px; bottom: 20px; }
+  .toast { right: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .call-btn, .nav-btn, .home-link, .toast { transition: none; }
+}
