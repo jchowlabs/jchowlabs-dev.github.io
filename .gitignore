@@ -5,8 +5,9 @@
 examples/
 presentation/
 
-# Stray local duplicate of this repo (has its own .git) — do not track.
+# Stray local duplicates of this repo (their own .git) — do not track.
 Untitled/
+jchowlabs-dev.github.io/
 
 # Local tooling / OS cruft
 .claude/
