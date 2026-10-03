@@ -37,7 +37,7 @@
     .wrap { width: min(900px, 100%); }
 
     /* ── Header ────────────────────────────────────────────────── */
-    .head { text-align: center; margin-bottom: 44px; }
+    .head { text-align: center; margin-bottom: 36px; }
     .head h1 {
       margin: 0;
       font-size: clamp(3rem, 7vw, 4.25rem);
@@ -46,20 +46,15 @@
       color: #fff;
       line-height: 1;
     }
-    .head p {
-      margin: 14px 0 0;
-      font-size: clamp(1rem, 2.4vw, 1.2rem);
-      color: var(--muted);
-    }
 
     /* ── Vertical list of tool rows ────────────────────────────── */
-    .list { display: flex; flex-direction: column; gap: 18px; }
+    .list { display: flex; flex-direction: column; gap: 14px; }
 
     .card {
       display: flex;
       align-items: center;
-      gap: 26px;
-      padding: 24px 30px;
+      gap: 18px;
+      padding: 15px 24px;
       background: rgba(255, 255, 255, .028);
       border: 1px solid rgba(255, 255, 255, .07);
       border-radius: 16px;
@@ -78,18 +73,18 @@
     .meta { flex: 1 1 auto; min-width: 0; }
     .meta h2 {
       margin: 0;
-      font-size: clamp(1.15rem, 2.6vw, 1.35rem);
+      font-size: clamp(1.02rem, 2.6vw, 1.15rem);
       font-weight: 600;
       letter-spacing: -0.01em;
       color: var(--ink);
     }
-    .meta p { margin: 5px 0 0; font-size: clamp(.9rem, 2.2vw, 1rem); color: var(--muted); line-height: 1.45; }
+    .meta p { margin: 3px 0 0; font-size: clamp(.85rem, 2.2vw, .92rem); color: var(--muted); line-height: 1.4; }
 
     .arrow { flex: none; width: 22px; height: 22px; color: var(--muted); transition: transform .22s ease, color .22s ease; }
     .card:hover .arrow { color: var(--ink); transform: translateX(4px); }
 
     /* ── Badge: shared circular motif (colored sphere per tool) ── */
-    .badge { width: 76px; height: 76px; border-radius: 50%; flex: none; }
+    .badge { width: 52px; height: 52px; border-radius: 50%; flex: none; }
     .sphere {
       display: flex; align-items: center; justify-content: center;
       box-shadow:
@@ -98,7 +93,7 @@
         0 8px 20px rgba(0,0,0,.28),
         0 2px 6px rgba(0,0,0,.16);
     }
-    .sphere svg { width: 34px; height: 34px; }
+    .sphere svg { width: 24px; height: 24px; }
 
     /* Teacher = blue sphere + open-book glyph */
     .teacher-badge { background: radial-gradient(circle at 38% 30%, #7db2ff 0, #3f6fc9 60%, #2d4f96 100%); }
@@ -110,11 +105,11 @@
     /* ── Responsive ────────────────────────────────────────────── */
     @media (max-width: 560px) {
       body { padding: 40px 16px; }
-      .head { margin-bottom: 32px; }
-      .card { gap: 18px; padding: 18px 18px; }
-      .badge { width: 58px; height: 58px; }
-      .sphere svg { width: 27px; height: 27px; }
-      .arrow { width: 20px; height: 20px; }
+      .head { margin-bottom: 28px; }
+      .card { gap: 14px; padding: 13px 16px; }
+      .badge { width: 46px; height: 46px; }
+      .sphere svg { width: 22px; height: 22px; }
+      .arrow { width: 19px; height: 19px; }
     }
     @media (max-height: 640px) { body { justify-content: flex-start; } }
     @media (prefers-reduced-motion: reduce) {
@@ -126,8 +121,7 @@
   <main class="wrap">
 
     <header class="head">
-      <h1>Labs</h1>
-      <p>Internal tools and experiments.</p>
+      <h1>Tools</h1>
     </header>
 
     <nav class="list">
