@@ -34,13 +34,13 @@
       padding: 56px 24px;
     }
 
-    .wrap { width: min(540px, 100%); }
+    .wrap { width: min(480px, 100%); transform: translateY(-13vh); }
 
     /* ── Header ────────────────────────────────────────────────── */
     .head { text-align: center; margin-bottom: 32px; }
     .head h1 {
       margin: 0;
-      font-size: clamp(2.25rem, 5.25vw, 3.2rem);
+      font-size: clamp(1.95rem, 4.6vw, 2.8rem);
       font-weight: 700;
       letter-spacing: -0.03em;
       color: #fff;
@@ -49,7 +49,7 @@
     /* Subtle divider: a little wider than the column (centered on the viewport, so it
        can exceed the 540px column), fading over the outer ~20% on each side */
     .head-rule {
-      width: min(620px, 90vw);
+      width: min(540px, 90vw);
       height: 1px;
       margin: 20px 0 0;
       position: relative;
@@ -64,8 +64,8 @@
     .card {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 13px 22px;
+      gap: 15px;
+      padding: 12px 20px;
       background: rgba(255, 255, 255, .028);
       border: 1px solid rgba(255, 255, 255, .07);
       border-radius: 16px;
@@ -84,11 +84,11 @@
     /* Numbered circle (mirrors the "how it works" step markers in alliances) */
     .num {
       flex: none;
-      width: 40px; height: 40px;
+      width: 38px; height: 38px;
       border-radius: 50%;
       border: 1.5px solid rgba(230, 232, 236, .45);
       display: grid; place-items: center;
-      font-size: 1rem; font-weight: 600;
+      font-size: .95rem; font-weight: 600;
       color: var(--ink);
       font-variant-numeric: tabular-nums;
       transition: border-color .22s ease;
@@ -98,12 +98,12 @@
     .meta { flex: 1 1 auto; min-width: 0; }
     .meta h2 {
       margin: 0;
-      font-size: clamp(1.02rem, 2.6vw, 1.15rem);
+      font-size: clamp(.95rem, 2.4vw, 1.05rem);
       font-weight: 600;
       letter-spacing: -0.01em;
       color: var(--ink);
     }
-    .meta p { margin: 3px 0 0; font-size: clamp(.85rem, 2.2vw, .92rem); color: var(--muted); line-height: 1.4; }
+    .meta p { margin: 3px 0 0; font-size: clamp(.8rem, 2vw, .86rem); color: var(--muted); line-height: 1.4; }
 
     .arrow { flex: none; width: 22px; height: 22px; color: var(--muted); transition: transform .22s ease, color .22s ease; }
     .card:hover .arrow { color: var(--ink); transform: translateX(4px); }
@@ -111,12 +111,12 @@
     /* ── Responsive ────────────────────────────────────────────── */
     @media (max-width: 560px) {
       body { padding: 40px 16px; }
-      .head { margin-bottom: 26px; }
-      .card { gap: 13px; padding: 12px 16px; }
-      .num { width: 36px; height: 36px; font-size: .95rem; }
-      .arrow { width: 20px; height: 20px; }
+      .head { margin-bottom: 24px; }
+      .card { gap: 13px; padding: 11px 15px; }
+      .num { width: 34px; height: 34px; font-size: .9rem; }
+      .arrow { width: 19px; height: 19px; }
     }
-    @media (max-height: 640px) { body { justify-content: flex-start; } }
+    @media (max-height: 640px) { body { justify-content: flex-start; } .wrap { transform: none; } }
     @media (prefers-reduced-motion: reduce) {
       .card, .arrow, .num { transition: none; }
     }
