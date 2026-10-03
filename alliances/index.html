@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#14112a;color:#edecf8}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#1c2230;color:#e6e8ec}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Proofpoint Alliances Notebook</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -6,9 +6,9 @@
 /* Layout: a notebook. Home is an alphabetized tile grid; each partner opens as one long article
    (overview, use cases with diagrams, joint messaging, collapsed sales prep) with a sticky section bar. */
 :root{
-  --bg:#14112a; --surface:#1e1a3b; --surface-2:#262148; --ink:#edecf8; --ink-2:#bbb7d8; --ink-3:#8e8aaf;
-  --line:#342e60; --accent:#8fa3ff; --accent-ink:#14112a; --accent-soft:#2a2660;
-  --good:#5ad19a; --good-soft:#16372f; --warn:#f0a85a; --warn-soft:#3a2b1d;
+  --bg:#1c2230; --surface:#252c3d; --surface-2:#2f3747; --ink:#e6e8ec; --ink-2:#a7b0c2; --ink-3:#7c879c;
+  --line:#343e52; --accent:#5c9ced; --accent-ink:#1c2230; --accent-soft:#223349;
+  --good:#55c489; --good-soft:#17342a; --warn:#e9a95c; --warn-soft:#332717;
   --shadow:0 1px 2px rgba(0,0,0,.25),0 4px 14px rgba(0,0,0,.18);
   --f-display:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   --f-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -31,7 +31,7 @@ h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:
 .home-head{padding-block:56px 24px}
 .home-head h1{font-size:clamp(30px,5vw,46px);font-weight:700}
 .home-head p{margin:12px 0 0;color:var(--ink-2);font-size:17px;line-height:1.6}
-.home-head .hl{font-weight:600}.home-head .hl.c1{color:#8fa3ff}.home-head .hl.c2{color:#5ad19a}.home-head .hl.c3{color:#c6a0ff}
+.home-head .hl{font-weight:600}.home-head .hl.c1{color:#5c9ced}.home-head .hl.c2{color:#55c489}.home-head .hl.c3{color:#a78bf0}
 .stat{display:flex;gap:28px}
 .stat b{display:block;font-family:var(--f-display);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
 .stat span{font-size:13px;color:var(--ink-3)}
@@ -71,10 +71,10 @@ h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:
 .hint{margin:-6px 0 14px;color:var(--ink-3);font-size:14.5px}
 .bar nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .bar nav button{border:0;background:none;padding:6px 12px;border-radius:8px;font-size:14.5px;color:var(--ink-2);transition:background .2s,color .2s}
-.bar nav button:hover{background:#262148;color:var(--ink)}
-.bar nav button.on{background:#322c68;color:var(--ink);font-weight:600}
+.bar nav button:hover{background:#272f41;color:var(--ink)}
+.bar nav button.on{background:#333d52;color:var(--ink);font-weight:600}
 .bar-toggle{display:none;align-items:center;justify-content:center;margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:8px;padding:7px 11px}
-.bar-toggle:hover{background:#262148;color:var(--ink)}
+.bar-toggle:hover{background:#272f41;color:var(--ink)}
 .bar-toggle svg{display:block}
 .hero{padding-block:44px 8px}
 .hero h1{font-size:clamp(32px,5.6vw,54px);font-weight:700;margin:8px 0 14px}
@@ -200,7 +200,7 @@ details.src li::marker{color:var(--ink-3);font-weight:600}
   --va-grad-listening: radial-gradient(circle at 35% 35%, #38bdf8, #1d9fd8, #2563eb);
   --va-grad-error: radial-gradient(circle at 35% 35%, #e5e5e5, #a3a3a3);
   --va-mobile-shadow: 0 -6px 40px rgba(0,0,0,.18), 0 -1px 10px rgba(0,0,0,.10);
-  --va-mobile-bg: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px), #1e1a3b;
+  --va-mobile-bg: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px), #252c3d;
 }
 @keyframes va-blink{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes va-idle-pulse{0%,100%{box-shadow:0 0 0 4px rgba(37,99,235,.06)}50%{box-shadow:0 0 0 7px rgba(37,99,235,.09)}}
@@ -238,18 +238,18 @@ details.src li::marker{color:var(--ink-3);font-weight:600}
 .va-dock.speaking .va-dock-mic{background:var(--va-grad-speaking);animation:va-dock-speaking-rings 1.5s ease-out infinite}
 .va-dock.listening .va-dock-mic{background:var(--va-grad-listening);animation:va-dock-listening-rings 2.5s ease-in-out infinite}
 .va-dock-handle{display:flex;justify-content:center;width:100%;padding-bottom:10px}
-.va-dock-handle span{width:32px;height:4px;border-radius:2px;background:#4a4570}
+.va-dock-handle span{width:32px;height:4px;border-radius:2px;background:#404b5e}
 .va-dock-row{display:flex;align-items:center;justify-content:center;gap:18px;width:100%}
 .va-dock-label{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:.3px;white-space:nowrap}
 .va-dock-wave{display:flex;align-items:center;gap:2px;height:16px;padding-left:2px}
-.va-dock-wave span{display:block;width:2px;height:4px;background:#8e8aaf;border-radius:1px;transition:height .04s linear}
+.va-dock-wave span{display:block;width:2px;height:4px;background:#7c879c;border-radius:1px;transition:height .04s linear}
 .va-dock-close{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.06);font-size:16px;color:var(--ink-3);cursor:pointer;line-height:1;padding:0;margin-left:2px;transition:background .2s ease,color .2s ease}
 .va-dock-close:hover{background:rgba(255,255,255,.1);color:var(--ink-2)}
 
 /* ---- Mobile toast (bottom sheet) ---- */
 .va-toast{display:none}
 .va-toast-handle{display:none;justify-content:center;padding:6px 0 5px}
-.va-toast-handle span{width:36px;height:4px;border-radius:2px;background:#4a4570}
+.va-toast-handle span{width:36px;height:4px;border-radius:2px;background:#404b5e}
 .va-toast-close{display:none;background:none;border:none;font-size:22px;color:var(--ink-3);cursor:pointer;line-height:1;padding:4px;z-index:2;flex-shrink:0}
 .va-toast-close:hover{color:var(--ink-2)}
 .va-toast-card{display:flex;flex-direction:column;align-items:center;padding:10px 20px 12px;gap:10px;opacity:1}
