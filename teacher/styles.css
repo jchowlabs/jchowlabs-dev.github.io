@@ -16,6 +16,26 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Back-to-home (ported from the Falcon deck) ────────────── */
+.home-link {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 10;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #9aa4b6;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .07);
+  transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+.home-link:hover { color: #e6e8ec; background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .14); }
+.home-link svg { width: 18px; height: 18px; }
+
 /* ── Stage: centers the orb + pill in the viewport ─────────── */
 .stage {
   position: relative;

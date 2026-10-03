@@ -63,6 +63,10 @@ h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:
 .caveats h4{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--warn);font-weight:500;margin:0 0 6px}
 .caveats ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--ink-2);display:grid;gap:4px}
 .tile.soon{cursor:default}
+/* Back-to-home arrow (home view only; ported from the Falcon deck) */
+.home-link{position:fixed;top:18px;left:18px;z-index:10;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:#9aa4b6;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);transition:color .2s ease,background .2s ease,border-color .2s ease}
+.home-link:hover{color:#e6e8ec;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
+.home-link svg{width:18px;height:18px}
 
 /* ---------- partner ---------- */
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
@@ -327,6 +331,7 @@ function home(){
   const tiers=['All','Tier 1','Tier 2','Tier 3'];
   const list=all.filter(r=>(filterTier==='All'||r.tier===filterTier));
   app.innerHTML=`<div class="wrap">
+    <a class="home-link" href="../" aria-label="Back to jchowlabs"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></svg></a>
     <header class="home-head">
       <h1>Proofpoint Alliances</h1>
       <p>How Proofpoint works with each technology partner: <span class="hl c1">what we do together</span>, <span class="hl c2">what we say</span>, and <span class="hl c3">how it works</span>.</p>
