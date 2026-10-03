@@ -1,15 +1,21 @@
 /* ============================================================
-   Falcon Deck — presentation prep viewer
-   Dark stage, slide shown as a card, simple nav dock,
-   and a voice-coach call button (ported from the orb page).
+   Falcon Deck — presentation prep viewer (light theme)
+   Shares the site palette: bg #fafbfd · ink #141a3d · accent #2b4fd8.
+   Slides shown as bordered white cards; simple nav dock + a
+   voice-coach call button (ported from the orb page).
    ============================================================ */
+:root {
+  --bg: #fafbfd; --surface: #ffffff; --ink: #141a3d; --ink-2: #4a5273;
+  --ink-3: #7a819c; --line: #e4e7f0; --accent: #2b4fd8;
+  color-scheme: light;
+}
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 
 body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #1c2230;
-  color: #e6e8ec;
+  background: var(--bg);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
@@ -26,12 +32,12 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  color: #9aa4b6;
-  background: rgba(255, 255, 255, .04);
-  border: 1px solid rgba(255, 255, 255, .07);
+  color: var(--ink-2);
+  background: rgba(20, 26, 61, .04);
+  border: 1px solid var(--line);
   transition: color .2s ease, background .2s ease, border-color .2s ease;
 }
-.home-link:hover { color: #e6e8ec; background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .14); }
+.home-link:hover { color: var(--ink); background: rgba(20, 26, 61, .07); border-color: #c7cfe6; }
 .home-link svg { width: 18px; height: 18px; }
 
 /* ── Viewer layout ─────────────────────────────────────────── */
@@ -40,7 +46,7 @@ body {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 56px 32px 104px;   /* room for dock (bottom) + home link (top) */
+  padding: 56px 32px 104px;
 }
 
 /* ── Slide stage ───────────────────────────────────────────── */
@@ -58,8 +64,9 @@ body {
   height: auto;
   object-fit: contain;
   border-radius: 10px;
-  background: #fff;                       /* avoids a flash before the image paints */
-  box-shadow: 0 24px 60px rgba(0, 0, 0, .45), 0 2px 10px rgba(0, 0, 0, .3);
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 34px rgba(20, 26, 61, .12), 0 2px 8px rgba(20, 26, 61, .06);
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -75,9 +82,10 @@ body {
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  background: rgba(20, 25, 36, .72);
-  border: 1px solid rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, .82);
+  border: 1px solid var(--line);
   border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(20, 26, 61, .10);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -90,25 +98,25 @@ body {
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: #cbd2de;
+  color: var(--ink-2);
   cursor: pointer;
   transition: background .18s ease, color .18s ease, transform .1s ease;
 }
-.nav-btn:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+.nav-btn:hover { background: rgba(20, 26, 61, .06); color: var(--ink); }
 .nav-btn:active { transform: scale(.92); }
-.nav-btn:disabled { opacity: .3; cursor: default; }
+.nav-btn:disabled { opacity: .32; cursor: default; }
 .nav-btn svg { width: 18px; height: 18px; }
 .counter {
   min-width: 58px;
   text-align: center;
   font-size: .85rem;
   font-weight: 500;
-  color: #aab2c0;
+  color: var(--ink-3);
   font-variant-numeric: tabular-nums;
   user-select: none;
 }
 
-/* ── Voice coach button (ported from styles.css of the orb) ── */
+/* ── Voice coach button (ported from the orb page) ─────────── */
 .call-btn {
   position: fixed;
   right: 28px;
@@ -117,7 +125,7 @@ body {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, .08);
+  border: 1px solid rgba(0, 0, 0, .06);
   background: #4caf72;
   color: #fff;
   display: flex;
@@ -128,15 +136,15 @@ body {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, .34);
+  box-shadow: 0 10px 24px rgba(20, 26, 61, .22);
 }
 .call-btn:hover { transform: scale(1.06); }
 .call-btn:active { transform: scale(.97); }
-.call-btn:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+.call-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .call-icon { width: 24px; height: 24px; transition: transform .2s ease; }
 
 /* Pending = no agent configured yet: muted, still clickable (shows a hint) */
-.call-btn.pending { background: #3a4150; color: #aeb6c4; box-shadow: 0 8px 22px rgba(0, 0, 0, .3); }
+.call-btn.pending { background: #eef0f5; color: #8a93a8; border-color: var(--line); box-shadow: 0 6px 16px rgba(20, 26, 61, .12); }
 .call-btn.pending:hover { transform: scale(1.04); }
 
 /* Spinner (connecting) */
@@ -145,7 +153,7 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 2.5px solid rgba(255, 255, 255, .45);
+  border: 2.5px solid rgba(255, 255, 255, .5);
   border-top-color: #fff;
   animation: call-spin .7s linear infinite;
 }
@@ -168,11 +176,11 @@ body {
   padding: 9px 13px;
   font-size: .82rem;
   line-height: 1.35;
-  color: #e6e8ec;
-  background: rgba(20, 25, 36, .92);
-  border: 1px solid rgba(255, 255, 255, .1);
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
   border-radius: 10px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, .4);
+  box-shadow: 0 10px 28px rgba(20, 26, 61, .16);
   opacity: 0;
   transform: translateY(6px);
   pointer-events: none;

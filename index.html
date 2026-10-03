@@ -9,18 +9,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     /* ============================================================
-       jchowlabs — home (prototype directory)
-       Two centered cards: a circular badge + a title. Nothing else.
-       Add a prototype: copy a <a class="card"> block, swap the
-       badge, title, and href.
+       jchowlabs — home (prototype directory), light theme
+       Palette shared with the Alliances notebook:
+         bg #fafbfd · surface #fff · ink #141a3d · accent #2b4fd8
+       Three centered tiles in a row (stacks on mobile). Each tile
+       is a circular badge + title. Add one: copy an <a class="card">.
        ============================================================ */
+    :root {
+      --bg: #fafbfd; --surface: #ffffff; --ink: #141a3d; --ink-2: #4a5273;
+      --line: #e4e7f0; --accent: #2b4fd8;
+      color-scheme: light;
+    }
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
 
     body {
       font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #1c2230;
-      color: #e6e8ec;
+      background: var(--bg);
+      color: var(--ink);
       -webkit-font-smoothing: antialiased;
       min-height: 100dvh;
       display: flex;
@@ -31,9 +37,9 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 22px;
-      width: min(620px, 100%);
+      width: min(880px, 100%);
     }
 
     .card {
@@ -42,77 +48,73 @@
       align-items: center;
       text-align: center;
       gap: 20px;
-      padding: 38px 24px;
-      background: rgba(255, 255, 255, .028);
-      border: 1px solid rgba(255, 255, 255, .07);
+      padding: 38px 22px;
+      background: var(--surface);
+      border: 1px solid var(--line);
       border-radius: 18px;
       text-decoration: none;
       color: inherit;
-      transition: transform .22s ease, border-color .22s ease,
-                  background .22s ease, box-shadow .22s ease;
+      box-shadow: 0 1px 2px rgba(20,26,61,.04), 0 2px 8px rgba(20,26,61,.04);
+      transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
     }
     .card:hover {
       transform: translateY(-4px);
-      border-color: rgba(120, 170, 240, .40);
-      background: rgba(255, 255, 255, .045);
-      box-shadow: 0 18px 42px rgba(0, 0, 0, .30);
+      border-color: #c7cfe6;
+      box-shadow: 0 10px 20px rgba(20,26,61,.08), 0 2px 6px rgba(20,26,61,.05);
     }
-    .card:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+    .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-    .card h2 { margin: 0; font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
+    .card h2 { margin: 0; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); }
 
-    /* ── Badge: shared circular motif ──────────────────────────── */
+    /* ── Badge: shared circular motif (colored sphere per tool) ── */
     .badge { width: 84px; height: 84px; border-radius: 50%; flex: none; }
 
-    /* Teacher badge = a compact live orb (ported from the orb page) */
+    /* Teacher = a compact live orb (ported from the orb page) */
     .mini-orb {
-      position: relative;
-      overflow: hidden;
-      background: #3460ae;
+      position: relative; overflow: hidden; background: #3460ae;
       box-shadow:
-        inset 0 -11px 24px rgba(0, 0, 0, .34),
-        inset 6px 6px 13px rgba(0, 0, 0, .12),
-        0 8px 20px rgba(0, 0, 0, .28),
-        0 0 0 .5px rgba(255, 255, 255, .08);
+        inset 0 -11px 24px rgba(0,0,0,.34),
+        inset 6px 6px 13px rgba(0,0,0,.12),
+        0 10px 22px rgba(20,26,61,.22),
+        0 2px 6px rgba(20,26,61,.12);
       animation: orb-breathe 4s ease-in-out infinite;
     }
     .mini-orb .mb { position: absolute; border-radius: 50%; pointer-events: none; will-change: transform; }
-    .mb1 {
-      width: 140%; height: 140%; top: -38%; left: -22%; filter: blur(13px);
+    .mb1 { width:140%; height:140%; top:-38%; left:-22%; filter:blur(13px);
       background: radial-gradient(ellipse at 45% 45%, rgba(148,218,255,.96) 0, rgba(72,158,220,.38) 32%, transparent 58%);
-      animation: orb-blob-1 6s ease-in-out infinite;
-    }
-    .mb2 {
-      width: 110%; height: 110%; top: 32%; left: 22%; filter: blur(12px);
+      animation: orb-blob-1 6s ease-in-out infinite; }
+    .mb2 { width:110%; height:110%; top:32%; left:22%; filter:blur(12px);
       background: radial-gradient(ellipse at 50% 50%, rgba(72,130,230,.92) 0, rgba(90,120,210,.32) 38%, transparent 62%);
-      animation: orb-blob-2 4.5s ease-in-out infinite; animation-delay: -2.5s;
-    }
-    .mb3 {
-      width: 56%; height: 56%; top: 30%; left: 6%; filter: blur(9px);
+      animation: orb-blob-2 4.5s ease-in-out infinite; animation-delay:-2.5s; }
+    .mb3 { width:56%; height:56%; top:30%; left:6%; filter:blur(9px);
       background: radial-gradient(ellipse at 50% 50%, rgba(0,168,158,.68) 0, rgba(0,130,122,.22) 36%, transparent 58%);
-      animation: orb-blob-5 3.5s ease-in-out infinite; animation-delay: -1s;
-    }
+      animation: orb-blob-5 3.5s ease-in-out infinite; animation-delay:-1s; }
 
-    /* Deck badge = a gradient sphere + glyph (own hue per prototype) */
-    .deck-badge {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at 38% 30%, #9b97f4 0, #5b53c9 62%, #46409e 100%);
+    /* Shared gradient-sphere badge shell (deck + alliances) */
+    .sphere {
+      display: flex; align-items: center; justify-content: center;
       box-shadow:
-        inset 0 -11px 24px rgba(0, 0, 0, .30),
-        inset 6px 6px 13px rgba(0, 0, 0, .10),
-        0 8px 20px rgba(0, 0, 0, .28),
-        0 0 0 .5px rgba(255, 255, 255, .08);
+        inset 0 -11px 24px rgba(0,0,0,.26),
+        inset 6px 6px 13px rgba(255,255,255,.14),
+        0 10px 22px rgba(20,26,61,.22),
+        0 2px 6px rgba(20,26,61,.12);
     }
-    .deck-badge svg { width: 38px; height: 38px; }
+    .sphere svg { width: 38px; height: 38px; }
 
-    /* ── Orb keyframes (subset from styles.css) ────────────────── */
+    /* Falcon = purple sphere + slides glyph */
+    .deck-badge { background: radial-gradient(circle at 38% 30%, #9b97f4 0, #5b53c9 62%, #46409e 100%); }
+    /* Alliances = teal sphere + linked-partners glyph */
+    .alliance-badge { background: radial-gradient(circle at 38% 30%, #3fd0c9 0, #16a394 60%, #0d7f73 100%); }
+
+    /* ── Orb keyframes ─────────────────────────────────────────── */
     @keyframes orb-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
     @keyframes orb-blob-1 { 0%{transform:translate(0)} 20%{transform:translate(22%,34%)} 45%{transform:translate(10%,54%)} 70%{transform:translate(-30%,24%)} 100%{transform:translate(0)} }
     @keyframes orb-blob-2 { 0%{transform:translate(0) scale(1)} 25%{transform:translate(-38%,-24%) scale(1.12)} 55%{transform:translate(26%,-40%) scale(.88)} 80%{transform:translate(34%,18%) scale(1.08)} 100%{transform:translate(0) scale(1)} }
     @keyframes orb-blob-5 { 0%{transform:translate(0)} 25%{transform:translate(30%,-20%)} 55%{transform:translate(20%,28%)} 80%{transform:translate(-18%,16%)} 100%{transform:translate(0)} }
 
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; width: min(360px, 100%); }
+    }
     @media (prefers-reduced-motion: reduce) {
       .mini-orb, .mini-orb .mb { animation: none !important; }
       .card { transition: none; }
@@ -122,30 +124,39 @@
 <body>
   <main class="grid">
 
-    <!-- Prototype: Proofpoint Teacher ──────────────────────────── -->
+    <!-- Proofpoint Teacher ─────────────────────────────────────── -->
     <a class="card" href="proofpoint-teacher/">
       <div class="badge mini-orb" aria-hidden="true">
-        <span class="mb mb1"></span>
-        <span class="mb mb2"></span>
-        <span class="mb mb3"></span>
+        <span class="mb mb1"></span><span class="mb mb2"></span><span class="mb mb3"></span>
       </div>
       <h2>Proofpoint Teacher</h2>
     </a>
 
-    <!-- Prototype: Falcon Deck ─────────────────────────────────── -->
+    <!-- Falcon Deck ────────────────────────────────────────────── -->
     <a class="card" href="falcon-prep/">
-      <div class="badge deck-badge" aria-hidden="true">
+      <div class="badge sphere deck-badge" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="12" rx="1.6"/>
-          <path d="M12 16v3"/>
-          <path d="M8.5 21h7"/>
-          <path d="M6.5 11.5l3-3 2.2 2.2 4-4"/>
+          <path d="M12 16v3"/><path d="M8.5 21h7"/><path d="M6.5 11.5l3-3 2.2 2.2 4-4"/>
         </svg>
       </div>
       <h2>Falcon Deck</h2>
     </a>
 
-    <!-- Add the next prototype by copying a card block above. -->
+    <!-- Proofpoint Alliances ───────────────────────────────────── -->
+    <a class="card" href="alliances/">
+      <div class="badge sphere alliance-badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="6" cy="7" r="2.4" fill="#fff" stroke="none"/>
+          <circle cx="18" cy="7" r="2.4" fill="#fff" stroke="none"/>
+          <circle cx="12" cy="17.5" r="2.4" fill="#fff" stroke="none"/>
+          <path d="M7.7 8.6l3 7"/><path d="M16.3 8.6l-3 7"/><path d="M8.3 7h7.4"/>
+        </svg>
+      </div>
+      <h2>Proofpoint Alliances</h2>
+    </a>
+
+    <!-- Add the next tool by copying a card block above. -->
 
   </main>
 </body>

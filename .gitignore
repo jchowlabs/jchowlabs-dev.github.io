@@ -1,7 +1,12 @@
-# Source deck + INTERNAL prep notes — never publish these.
-# The public /falcon-prep page serves the rendered images in
-# falcon-prep/slides/ instead.
+# Source material — never publish. Holds the raw deck + INTERNAL notes,
+# and the Proofpoint Alliances source project (its own git repo, admin KB,
+# system prompts). The public pages use copies: /falcon-prep/slides/* and
+# /alliances/ (index.html + vendor/) are what ship.
+examples/
 presentation/
+
+# Stray local duplicate of this repo (has its own .git) — do not track.
+Untitled/
 
 # Local tooling / OS cruft
 .claude/
