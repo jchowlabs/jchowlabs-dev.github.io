@@ -10,9 +10,9 @@
   <style>
     /* ============================================================
        jchowlabs — home (prototype directory), dark theme
-       A "Labs" header over a vertical list of tool rows. Each row is
-       a circular badge + title + description + arrow. Add one: copy
-       an <a class="card"> block.
+       A "Tools" header + subtle divider over a vertical list of rows.
+       Each row is a numbered circle + title + description + arrow.
+       Add one: copy an <a class="card"> block and renumber.
        ============================================================ */
     :root {
       color-scheme: dark;
@@ -37,14 +37,25 @@
     .wrap { width: min(540px, 100%); }
 
     /* ── Header ────────────────────────────────────────────────── */
-    .head { text-align: center; margin-bottom: 36px; }
+    .head { text-align: center; margin-bottom: 32px; }
     .head h1 {
       margin: 0;
-      font-size: clamp(3rem, 7vw, 4.25rem);
+      font-size: clamp(2.25rem, 5.25vw, 3.2rem);
       font-weight: 700;
       letter-spacing: -0.03em;
       color: #fff;
       line-height: 1;
+    }
+    /* Subtle divider: a little wider than the column (centered on the viewport, so it
+       can exceed the 540px column), fading over the outer ~20% on each side */
+    .head-rule {
+      width: min(620px, 90vw);
+      height: 1px;
+      margin: 20px 0 0;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.14) 20%, rgba(255,255,255,.14) 80%, transparent);
     }
 
     /* ── Vertical list of tool rows ────────────────────────────── */
@@ -53,8 +64,8 @@
     .card {
       display: flex;
       align-items: center;
-      gap: 18px;
-      padding: 15px 24px;
+      gap: 16px;
+      padding: 13px 22px;
       background: rgba(255, 255, 255, .028);
       border: 1px solid rgba(255, 255, 255, .07);
       border-radius: 16px;
@@ -70,6 +81,20 @@
     }
     .card:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
 
+    /* Numbered circle (mirrors the "how it works" step markers in alliances) */
+    .num {
+      flex: none;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(230, 232, 236, .45);
+      display: grid; place-items: center;
+      font-size: 1rem; font-weight: 600;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      transition: border-color .22s ease;
+    }
+    .card:hover .num { border-color: rgba(230, 232, 236, .8); }
+
     .meta { flex: 1 1 auto; min-width: 0; }
     .meta h2 {
       margin: 0;
@@ -83,37 +108,17 @@
     .arrow { flex: none; width: 22px; height: 22px; color: var(--muted); transition: transform .22s ease, color .22s ease; }
     .card:hover .arrow { color: var(--ink); transform: translateX(4px); }
 
-    /* ── Badge: shared circular motif (colored sphere per tool) ── */
-    .badge { width: 52px; height: 52px; border-radius: 50%; flex: none; }
-    .sphere {
-      display: flex; align-items: center; justify-content: center;
-      box-shadow:
-        inset 0 -11px 24px rgba(0,0,0,.30),
-        inset 6px 6px 13px rgba(255,255,255,.14),
-        0 8px 20px rgba(0,0,0,.28),
-        0 2px 6px rgba(0,0,0,.16);
-    }
-    .sphere svg { width: 24px; height: 24px; }
-
-    /* Teacher = blue sphere + open-book glyph */
-    .teacher-badge { background: radial-gradient(circle at 38% 30%, #7db2ff 0, #3f6fc9 60%, #2d4f96 100%); }
-    /* Falcon = purple sphere + slides glyph */
-    .deck-badge { background: radial-gradient(circle at 38% 30%, #9b97f4 0, #5b53c9 62%, #46409e 100%); }
-    /* Alliances = teal sphere + linked-partners glyph */
-    .alliance-badge { background: radial-gradient(circle at 38% 30%, #3fd0c9 0, #16a394 60%, #0d7f73 100%); }
-
     /* ── Responsive ────────────────────────────────────────────── */
     @media (max-width: 560px) {
       body { padding: 40px 16px; }
-      .head { margin-bottom: 28px; }
-      .card { gap: 14px; padding: 13px 16px; }
-      .badge { width: 46px; height: 46px; }
-      .sphere svg { width: 22px; height: 22px; }
-      .arrow { width: 19px; height: 19px; }
+      .head { margin-bottom: 26px; }
+      .card { gap: 13px; padding: 12px 16px; }
+      .num { width: 36px; height: 36px; font-size: .95rem; }
+      .arrow { width: 20px; height: 20px; }
     }
     @media (max-height: 640px) { body { justify-content: flex-start; } }
     @media (prefers-reduced-motion: reduce) {
-      .card, .arrow { transition: none; }
+      .card, .arrow, .num { transition: none; }
     }
   </style>
 </head>
@@ -122,18 +127,24 @@
 
     <header class="head">
       <h1>Tools</h1>
+      <div class="head-rule" aria-hidden="true"></div>
     </header>
 
     <nav class="list">
 
+      <!-- Proofpoint Alliances ───────────────────────────────────── -->
+      <a class="card" href="alliances/">
+        <span class="num" aria-hidden="true">1</span>
+        <div class="meta">
+          <h2>Proofpoint Alliances</h2>
+          <p>Alliance tools and resources.</p>
+        </div>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
+
       <!-- Proofpoint Teacher ─────────────────────────────────────── -->
       <a class="card" href="teacher/">
-        <div class="badge sphere teacher-badge" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/>
-            <path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/>
-          </svg>
-        </div>
+        <span class="num" aria-hidden="true">2</span>
         <div class="meta">
           <h2>Proofpoint Teacher</h2>
           <p>Teaching and training tools for Proofpoint.</p>
@@ -143,12 +154,7 @@
 
       <!-- Falcon Deck ────────────────────────────────────────────── -->
       <a class="card" href="falcon/">
-        <div class="badge sphere deck-badge" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="12" rx="1.6"/>
-            <path d="M12 16v3"/><path d="M8.5 21h7"/><path d="M6.5 11.5l3-3 2.2 2.2 4-4"/>
-          </svg>
-        </div>
+        <span class="num" aria-hidden="true">3</span>
         <div class="meta">
           <h2>Falcon Deck</h2>
           <p>Presentation and deck tools.</p>
@@ -156,24 +162,7 @@
         <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </a>
 
-      <!-- Proofpoint Alliances ───────────────────────────────────── -->
-      <a class="card" href="alliances/">
-        <div class="badge sphere alliance-badge" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="6" cy="7" r="2.4" fill="#fff" stroke="none"/>
-            <circle cx="18" cy="7" r="2.4" fill="#fff" stroke="none"/>
-            <circle cx="12" cy="17.5" r="2.4" fill="#fff" stroke="none"/>
-            <path d="M7.7 8.6l3 7"/><path d="M16.3 8.6l-3 7"/><path d="M8.3 7h7.4"/>
-          </svg>
-        </div>
-        <div class="meta">
-          <h2>Proofpoint Alliances</h2>
-          <p>Alliance tools and resources.</p>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-      </a>
-
-      <!-- Add the next tool by copying a card block above. -->
+      <!-- Add the next tool by copying a card block above and renumbering. -->
 
     </nav>
 
