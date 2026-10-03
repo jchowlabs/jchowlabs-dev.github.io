@@ -6,85 +6,90 @@
   <title>jchowlabs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* ============================================================
        jchowlabs — home (prototype directory), dark theme
-       Three centered tiles in a row (stacks on mobile). Each tile
-       is a circular badge + title. Add one: copy an <a class="card">.
+       A "Labs" header over a vertical list of tool rows. Each row is
+       a circular badge + title + description + arrow. Add one: copy
+       an <a class="card"> block.
        ============================================================ */
-    :root { color-scheme: dark; }
+    :root {
+      color-scheme: dark;
+      --ink: #e6e8ec;
+      --muted: #98a0b3;
+    }
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
 
     body {
       font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: #1c2230;
-      color: #e6e8ec;
+      color: var(--ink);
       -webkit-font-smoothing: antialiased;
       min-height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 32px 24px;
+      padding: 56px 24px;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 22px;
-      width: min(880px, 100%);
+    .wrap { width: min(900px, 100%); }
+
+    /* ── Header ────────────────────────────────────────────────── */
+    .head { text-align: center; margin-bottom: 44px; }
+    .head h1 {
+      margin: 0;
+      font-size: clamp(3rem, 7vw, 4.25rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #fff;
+      line-height: 1;
     }
+    .head p {
+      margin: 14px 0 0;
+      font-size: clamp(1rem, 2.4vw, 1.2rem);
+      color: var(--muted);
+    }
+
+    /* ── Vertical list of tool rows ────────────────────────────── */
+    .list { display: flex; flex-direction: column; gap: 18px; }
 
     .card {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      text-align: center;
-      gap: 20px;
-      padding: 38px 22px;
+      gap: 26px;
+      padding: 24px 30px;
       background: rgba(255, 255, 255, .028);
       border: 1px solid rgba(255, 255, 255, .07);
-      border-radius: 18px;
+      border-radius: 16px;
       text-decoration: none;
       color: inherit;
       transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease;
     }
     .card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       border-color: rgba(120, 170, 240, .40);
       background: rgba(255, 255, 255, .045);
       box-shadow: 0 18px 42px rgba(0, 0, 0, .30);
     }
     .card:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
 
-    .card h2 { margin: 0; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; color: #e6e8ec; }
+    .meta { flex: 1 1 auto; min-width: 0; }
+    .meta h2 {
+      margin: 0;
+      font-size: clamp(1.15rem, 2.6vw, 1.35rem);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .meta p { margin: 5px 0 0; font-size: clamp(.9rem, 2.2vw, 1rem); color: var(--muted); line-height: 1.45; }
+
+    .arrow { flex: none; width: 22px; height: 22px; color: var(--muted); transition: transform .22s ease, color .22s ease; }
+    .card:hover .arrow { color: var(--ink); transform: translateX(4px); }
 
     /* ── Badge: shared circular motif (colored sphere per tool) ── */
-    .badge { width: 84px; height: 84px; border-radius: 50%; flex: none; }
-
-    /* Teacher = a compact live orb (ported from the orb page) */
-    .mini-orb {
-      position: relative; overflow: hidden; background: #3460ae;
-      box-shadow:
-        inset 0 -11px 24px rgba(0,0,0,.34),
-        inset 6px 6px 13px rgba(0,0,0,.12),
-        0 8px 20px rgba(0,0,0,.28),
-        0 2px 6px rgba(0,0,0,.16);
-      animation: orb-breathe 4s ease-in-out infinite;
-    }
-    .mini-orb .mb { position: absolute; border-radius: 50%; pointer-events: none; will-change: transform; }
-    .mb1 { width:140%; height:140%; top:-38%; left:-22%; filter:blur(13px);
-      background: radial-gradient(ellipse at 45% 45%, rgba(148,218,255,.96) 0, rgba(72,158,220,.38) 32%, transparent 58%);
-      animation: orb-blob-1 6s ease-in-out infinite; }
-    .mb2 { width:110%; height:110%; top:32%; left:22%; filter:blur(12px);
-      background: radial-gradient(ellipse at 50% 50%, rgba(72,130,230,.92) 0, rgba(90,120,210,.32) 38%, transparent 62%);
-      animation: orb-blob-2 4.5s ease-in-out infinite; animation-delay:-2.5s; }
-    .mb3 { width:56%; height:56%; top:30%; left:6%; filter:blur(9px);
-      background: radial-gradient(ellipse at 50% 50%, rgba(0,168,158,.68) 0, rgba(0,130,122,.22) 36%, transparent 58%);
-      animation: orb-blob-5 3.5s ease-in-out infinite; animation-delay:-1s; }
-
-    /* Shared gradient-sphere badge shell (deck + alliances) */
+    .badge { width: 76px; height: 76px; border-radius: 50%; flex: none; }
     .sphere {
       display: flex; align-items: center; justify-content: center;
       box-shadow:
@@ -93,64 +98,90 @@
         0 8px 20px rgba(0,0,0,.28),
         0 2px 6px rgba(0,0,0,.16);
     }
-    .sphere svg { width: 38px; height: 38px; }
+    .sphere svg { width: 34px; height: 34px; }
 
+    /* Teacher = blue sphere + open-book glyph */
+    .teacher-badge { background: radial-gradient(circle at 38% 30%, #7db2ff 0, #3f6fc9 60%, #2d4f96 100%); }
     /* Falcon = purple sphere + slides glyph */
     .deck-badge { background: radial-gradient(circle at 38% 30%, #9b97f4 0, #5b53c9 62%, #46409e 100%); }
     /* Alliances = teal sphere + linked-partners glyph */
     .alliance-badge { background: radial-gradient(circle at 38% 30%, #3fd0c9 0, #16a394 60%, #0d7f73 100%); }
 
-    /* ── Orb keyframes ─────────────────────────────────────────── */
-    @keyframes orb-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
-    @keyframes orb-blob-1 { 0%{transform:translate(0)} 20%{transform:translate(22%,34%)} 45%{transform:translate(10%,54%)} 70%{transform:translate(-30%,24%)} 100%{transform:translate(0)} }
-    @keyframes orb-blob-2 { 0%{transform:translate(0) scale(1)} 25%{transform:translate(-38%,-24%) scale(1.12)} 55%{transform:translate(26%,-40%) scale(.88)} 80%{transform:translate(34%,18%) scale(1.08)} 100%{transform:translate(0) scale(1)} }
-    @keyframes orb-blob-5 { 0%{transform:translate(0)} 25%{transform:translate(30%,-20%)} 55%{transform:translate(20%,28%)} 80%{transform:translate(-18%,16%)} 100%{transform:translate(0)} }
-
-    @media (max-width: 640px) {
-      .grid { grid-template-columns: 1fr; width: min(360px, 100%); }
+    /* ── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 560px) {
+      body { padding: 40px 16px; }
+      .head { margin-bottom: 32px; }
+      .card { gap: 18px; padding: 18px 18px; }
+      .badge { width: 58px; height: 58px; }
+      .sphere svg { width: 27px; height: 27px; }
+      .arrow { width: 20px; height: 20px; }
     }
+    @media (max-height: 640px) { body { justify-content: flex-start; } }
     @media (prefers-reduced-motion: reduce) {
-      .mini-orb, .mini-orb .mb { animation: none !important; }
-      .card { transition: none; }
+      .card, .arrow { transition: none; }
     }
   </style>
 </head>
 <body>
-  <main class="grid">
+  <main class="wrap">
 
-    <!-- Proofpoint Teacher ─────────────────────────────────────── -->
-    <a class="card" href="teacher/">
-      <div class="badge mini-orb" aria-hidden="true">
-        <span class="mb mb1"></span><span class="mb mb2"></span><span class="mb mb3"></span>
-      </div>
-      <h2>Proofpoint Teacher</h2>
-    </a>
+    <header class="head">
+      <h1>Labs</h1>
+      <p>Internal tools and experiments.</p>
+    </header>
 
-    <!-- Falcon Deck ────────────────────────────────────────────── -->
-    <a class="card" href="falcon/">
-      <div class="badge sphere deck-badge" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="12" rx="1.6"/>
-          <path d="M12 16v3"/><path d="M8.5 21h7"/><path d="M6.5 11.5l3-3 2.2 2.2 4-4"/>
-        </svg>
-      </div>
-      <h2>Falcon Deck</h2>
-    </a>
+    <nav class="list">
 
-    <!-- Proofpoint Alliances ───────────────────────────────────── -->
-    <a class="card" href="alliances/">
-      <div class="badge sphere alliance-badge" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="6" cy="7" r="2.4" fill="#fff" stroke="none"/>
-          <circle cx="18" cy="7" r="2.4" fill="#fff" stroke="none"/>
-          <circle cx="12" cy="17.5" r="2.4" fill="#fff" stroke="none"/>
-          <path d="M7.7 8.6l3 7"/><path d="M16.3 8.6l-3 7"/><path d="M8.3 7h7.4"/>
-        </svg>
-      </div>
-      <h2>Proofpoint Alliances</h2>
-    </a>
+      <!-- Proofpoint Teacher ─────────────────────────────────────── -->
+      <a class="card" href="teacher/">
+        <div class="badge sphere teacher-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <div class="meta">
+          <h2>Proofpoint Teacher</h2>
+          <p>Teaching and training tools for Proofpoint.</p>
+        </div>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
 
-    <!-- Add the next tool by copying a card block above. -->
+      <!-- Falcon Deck ────────────────────────────────────────────── -->
+      <a class="card" href="falcon/">
+        <div class="badge sphere deck-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="12" rx="1.6"/>
+            <path d="M12 16v3"/><path d="M8.5 21h7"/><path d="M6.5 11.5l3-3 2.2 2.2 4-4"/>
+          </svg>
+        </div>
+        <div class="meta">
+          <h2>Falcon Deck</h2>
+          <p>Presentation and deck tools.</p>
+        </div>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
+
+      <!-- Proofpoint Alliances ───────────────────────────────────── -->
+      <a class="card" href="alliances/">
+        <div class="badge sphere alliance-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="7" r="2.4" fill="#fff" stroke="none"/>
+            <circle cx="18" cy="7" r="2.4" fill="#fff" stroke="none"/>
+            <circle cx="12" cy="17.5" r="2.4" fill="#fff" stroke="none"/>
+            <path d="M7.7 8.6l3 7"/><path d="M16.3 8.6l-3 7"/><path d="M8.3 7h7.4"/>
+          </svg>
+        </div>
+        <div class="meta">
+          <h2>Proofpoint Alliances</h2>
+          <p>Alliance tools and resources.</p>
+        </div>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
+
+      <!-- Add the next tool by copying a card block above. -->
+
+    </nav>
 
   </main>
 </body>
