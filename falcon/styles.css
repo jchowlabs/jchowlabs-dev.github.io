@@ -40,7 +40,7 @@ body {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 56px 32px 104px;   /* room for dock (bottom) + home link (top) */
+  padding: 56px 28px 92px;   /* room for dock (bottom) + home link (top) */
 }
 
 /* ── Slide stage ───────────────────────────────────────────── */
@@ -181,7 +181,7 @@ body {
 .toast.show { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 640px) {
-  .viewer { padding: 52px 14px 96px; }
+  .viewer { padding: 48px 12px 88px; }
   .call-btn { right: 16px; bottom: 20px; }
   .toast { right: 16px; }
 }

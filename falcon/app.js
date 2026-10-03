@@ -69,6 +69,28 @@
     else if (e.key === 'End')  { e.preventDefault(); goToSlide(SLIDE_COUNT); }
   });
 
+  // ── Touch swipe (mobile): swipe left → next slide, swipe right → previous ──
+  // Passive listeners + a single-touch guard, so pinch-zoom and taps are unaffected.
+  var stage = document.querySelector('.stage');
+  if (stage) {
+    var tsX = 0, tsY = 0, tsT = 0, tracking = false;
+    stage.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) { tracking = false; return; }
+      var t = e.touches[0];
+      tsX = t.clientX; tsY = t.clientY; tsT = Date.now(); tracking = true;
+    }, { passive: true });
+    stage.addEventListener('touchend', function (e) {
+      if (!tracking) return;
+      tracking = false;
+      var t = e.changedTouches[0];
+      var dx = t.clientX - tsX, dy = t.clientY - tsY, dt = Date.now() - tsT;
+      // Require a deliberate, mostly-horizontal flick (not a tap, long-press, or vertical drag).
+      if (dt < 800 && Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        if (dx < 0) next(); else prev();
+      }
+    }, { passive: true });
+  }
+
   // ── Voice coach (ElevenLabs) ──────────────────────────────
   var btn        = document.getElementById('voice-btn');
   var toast      = document.getElementById('toast');
