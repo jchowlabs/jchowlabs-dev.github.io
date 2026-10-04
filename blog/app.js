@@ -2,10 +2,11 @@
    Blog Generator — UI shell behavior (no model wired yet)
 
    Drives the chat *surface* only:
-   • On load, plays a short "typing → greeting" entrance so the AI
-     appears to greet the visitor. The greeting itself is static
-     content pre-seeded in index.html (no model call) — the typing
-     dots are purely a presentational entrance.
+   • On load, plays a short "typing dots → streamed greeting" entrance
+     so the AI appears to type out its greeting like Claude/ChatGPT.
+     The greeting text is static (pre-seeded in index.html, no model
+     call); app.js just reveals it with a fast typewriter effect that
+     preserves inline formatting (bold words).
    • Sending echoes a user bubble (there is NO assistant reply yet).
    • "New blog" replays the greeting entrance.
    • The blog-card Copy button works; Download/voice are wired later.
@@ -19,9 +20,9 @@
   var micBtn = document.getElementById('micBtn');
   var newBtn = document.getElementById('newBtn');
 
-  // Snapshot the greeting markup before we touch the thread, so we can
-  // replay it on load and on "New blog".
-  var greetingHTML = document.getElementById('greeting').outerHTML;
+  // Snapshot the greeting's inner HTML before we touch the thread, so we
+  // can re-stream it on load and on "New blog".
+  var greetingHTML = document.querySelector('#greeting .content').innerHTML;
 
   var reduceMotion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -36,7 +37,16 @@
   /* ---- scroll helper ---- */
   function scrollToEnd() { thread.scrollTop = thread.scrollHeight; }
 
-  /* ---- build the typing indicator turn ---- */
+  /* ---- build an (empty) assistant turn: avatar + content ---- */
+  function assistantTurn() {
+    var turn = document.createElement('div');
+    turn.className = 'turn assistant';
+    turn.innerHTML =
+      '<div class="avatar" aria-hidden="true"></div><div class="content"></div>';
+    return turn;
+  }
+
+  /* ---- typing-dots turn ---- */
   function typingTurn() {
     var t = document.createElement('div');
     t.className = 'turn assistant';
@@ -47,27 +57,85 @@
     return t;
   }
 
-  /* ---- greeting entrance: typing dots, then the greeting fades in ----
-     This is the "illusion" — on every load / reset the AI appears to
-     greet the visitor, then waits. No network, no model. */
+  /* ---- fast typewriter that preserves inline formatting ----
+     Rebuilds the HTML structure inside `target` with empty text nodes,
+     then fills visible text nodes a few chars per tick. Whitespace-only
+     nodes (indentation between tags) are shown immediately so spacing
+     and bold spans land correctly. */
+  function typeHTML(target, html, opts, done) {
+    opts = opts || {};
+    var speed = opts.speed || 9;   // ms per tick
+    var chunk = opts.chunk || 2;   // chars revealed per tick
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+
+    var queue = []; // visible text nodes to type, in order
+    (function clone(src, dest) {
+      Array.prototype.forEach.call(src.childNodes, function (child) {
+        if (child.nodeType === 3) {               // text node
+          var tn = document.createTextNode('');
+          dest.appendChild(tn);
+          if (child.nodeValue.trim() === '') tn.nodeValue = child.nodeValue; // whitespace now
+          else queue.push({ node: tn, text: child.nodeValue });              // visible → type it
+        } else if (child.nodeType === 1) {        // element (e.g. <p>, <strong>)
+          var el = document.createElement(child.tagName);
+          for (var i = 0; i < child.attributes.length; i++) {
+            el.setAttribute(child.attributes[i].name, child.attributes[i].value);
+          }
+          dest.appendChild(el);
+          clone(child, el);
+        }
+      });
+    })(tmp, target);
+
+    // A blinking caret that follows the growing text (inserted right after
+    // the text node currently being typed, so it stays inline).
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('aria-hidden', 'true');
+    function placeCaret(node) {
+      var p = node.parentNode;
+      if (node.nextSibling) p.insertBefore(caret, node.nextSibling);
+      else p.appendChild(caret);
+    }
+
+    var qi = 0, ci = 0;
+    (function tick() {
+      if (qi >= queue.length) {
+        if (caret.parentNode) caret.parentNode.removeChild(caret);
+        if (done) done();
+        return;
+      }
+      var item = queue[qi];
+      ci += chunk;
+      item.node.nodeValue = item.text.slice(0, ci);
+      placeCaret(item.node);
+      scrollToEnd();
+      if (ci >= item.text.length) { qi++; ci = 0; }
+      setTimeout(tick, speed);
+    })();
+  }
+
+  /* ---- greeting entrance: typing dots, then the greeting streams in ----
+     This is the "illusion" — on every load / reset the AI appears to type
+     out its greeting, then waits. No network, no model. */
   function showGreeting() {
     thread.innerHTML = '';
 
-    function reveal() {
-      var tmp = document.createElement('div');
-      tmp.innerHTML = greetingHTML;
-      var g = tmp.firstElementChild;
-      if (!reduceMotion) g.classList.add('enter');
-      thread.appendChild(g);
-      scrollToEnd();
+    function stream() {
+      var turn = assistantTurn();
+      turn.id = 'greeting';
+      thread.appendChild(turn);
+      var content = turn.querySelector('.content');
+      if (reduceMotion) { content.innerHTML = greetingHTML; scrollToEnd(); return; }
+      typeHTML(content, greetingHTML, { speed: 9, chunk: 2 });
     }
 
-    if (reduceMotion) { reveal(); return; }
-
+    if (reduceMotion) { stream(); return; }
     var typing = typingTurn();
     thread.appendChild(typing);
     scrollToEnd();
-    setTimeout(function () { typing.remove(); reveal(); }, 750);
+    setTimeout(function () { typing.remove(); stream(); }, 650);
   }
 
   /* ---- append a user turn (pure UI echo — no model reply yet) ---- */

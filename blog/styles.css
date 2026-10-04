@@ -61,6 +61,10 @@ body{
 .turn.enter{animation:turn-enter .35s ease both}
 @keyframes turn-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
+/* streaming caret that follows the typewriter text */
+.caret{display:inline-block;width:7px;height:1.02em;margin-left:1px;vertical-align:-2px;background:var(--accent);border-radius:1px;animation:caret-blink 1s steps(1) infinite}
+@keyframes caret-blink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+
 /* ── Rendered blog draft ── */
 .blog-card{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
 .blog-body{padding:24px 26px 6px}
