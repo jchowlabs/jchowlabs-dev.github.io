@@ -43,7 +43,7 @@
     }
 
     /* Centered content column (mirrors .wrap in Alliances) */
-    .wrap { max-width: 840px; margin-inline: auto; padding: 0 20px 64px; }
+    .wrap { max-width: 700px; margin-inline: auto; padding: 0 20px 64px; }
 
     /* ── Header ────────────────────────────────────────────────── */
     .home-head { padding-block: 56px 24px; }
@@ -59,8 +59,8 @@
     /* ── Tile grid ─────────────────────────────────────────────── */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 13px;
     }
 
     .tile {
@@ -71,8 +71,8 @@
       justify-content: center;
       gap: 8px;
       text-align: center;
-      min-height: 168px;
-      padding: 34px 18px 24px;
+      min-height: 140px;
+      padding: 28px 15px 20px;
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 14px;
@@ -91,9 +91,9 @@
     /* Numbered index label, top-left — takes the "category" slot from the Alliances tiles */
     .tile .num {
       position: absolute;
-      top: 12px;
-      left: 14px;
-      font-size: 11px;
+      top: 11px;
+      left: 13px;
+      font-size: 9.5px;
       font-weight: 600;
       letter-spacing: .08em;
       color: var(--ink-3);
@@ -103,7 +103,7 @@
     .tile .nm {
       font-family: var(--f-display);
       font-weight: 700;
-      font-size: clamp(17px, 2.2vw, 20px);
+      font-size: clamp(14px, 1.85vw, 17px);
       letter-spacing: -.01em;
       line-height: 1.25;
       text-wrap: balance;
