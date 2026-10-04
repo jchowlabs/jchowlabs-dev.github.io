@@ -13,7 +13,10 @@
        A grid of tiles, ported from the Alliances home pattern:
        each tile is a numbered index label (top-left) + a centered
        title. Tiles flow left-to-right, then wrap down — 3 across on
-       desktop, 2 on tablet, 1 on mobile.
+       desktop, 2 on tablet.
+       On mobile the grid collapses to a single column of thin, short
+       horizontal rows (number circle + title + arrow) — the original
+       "list row" look (see the mobile media query below).
        Add one: copy an <a class="tile"> (real page) or a
        <div class="tile"> (not-yet-built placeholder) and bump the number.
        Wire up a placeholder: change its <div class="tile"> to
@@ -109,8 +112,63 @@
       text-wrap: balance;
     }
 
+    /* Arrow only appears in the mobile row layout; hidden in the tile grid. */
+    .tile .arrow { display: none; }
+
+    /* ── Mobile: single column of thin, short horizontal rows ──────
+       Reverts to the original "list row" look: a numbered circle on the
+       left, the title, and a trailing arrow — short height, stacked. */
+    @media (max-width: 480px) {
+      .wrap { padding: 0 16px 48px; }
+      .home-head { padding-block: 40px 18px; }
+
+      .grid { grid-template-columns: 1fr; gap: 12px; }
+
+      .tile {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 13px;
+        text-align: left;
+        min-height: 0;
+        padding: 11px 16px;
+      }
+
+      /* number returns to an inline circle marker on the left */
+      .tile .num {
+        position: static;
+        flex: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(230, 232, 236, .45);
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        letter-spacing: 0;
+        color: var(--ink);
+      }
+
+      .tile .nm {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-size: 15px;
+        line-height: 1.3;
+      }
+
+      .tile .arrow {
+        display: block;
+        flex: none;
+        width: 18px;
+        height: 18px;
+        color: var(--ink-3);
+        transition: transform .2s ease, color .2s ease;
+      }
+      .tile:hover .arrow { color: var(--ink); transform: translateX(3px); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      .tile { transition: none; }
+      .tile, .tile .arrow { transition: none; }
     }
   </style>
 </head>
@@ -127,54 +185,63 @@
       <a class="tile" href="teacher/">
         <span class="num" aria-hidden="true">01</span>
         <span class="nm">Proofpoint Companion</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </a>
 
       <!-- 2 · Proofpoint Alliances ─────────────────────────────── -->
       <a class="tile" href="alliances/">
         <span class="num" aria-hidden="true">02</span>
         <span class="nm">Proofpoint Alliances</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </a>
 
       <!-- 3 · Falcon Presentation ──────────────────────────────── -->
       <a class="tile" href="falcon/">
         <span class="num" aria-hidden="true">03</span>
         <span class="nm">Falcon Presentation</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </a>
 
       <!-- 4 · Blog Generator ──────────────────────────────────── -->
       <a class="tile" href="blog/">
         <span class="num" aria-hidden="true">04</span>
         <span class="nm">Blog Generator</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </a>
 
       <!-- 5 · Deck Generator (placeholder — no link yet) ───────── -->
       <div class="tile">
         <span class="num" aria-hidden="true">05</span>
         <span class="nm">Deck Generator</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </div>
 
       <!-- 6 · Solution Brief Generator (placeholder — no link yet) ─ -->
       <div class="tile">
         <span class="num" aria-hidden="true">06</span>
         <span class="nm">Solution Brief Generator</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </div>
 
       <!-- 7 · Diagrams Generator (placeholder — no link yet) ───── -->
       <div class="tile">
         <span class="num" aria-hidden="true">07</span>
         <span class="nm">Diagrams Generator</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </div>
 
       <!-- 8 · Web Content Template Generator (placeholder — no link yet) ─ -->
       <div class="tile">
         <span class="num" aria-hidden="true">08</span>
         <span class="nm">Web Content Template Generator</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </div>
 
       <!-- 9 · Joint Value Messaging Generator (placeholder — no link yet) ─ -->
       <div class="tile">
         <span class="num" aria-hidden="true">09</span>
         <span class="nm">Joint Value Messaging Generator</span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </div>
 
     </nav>
