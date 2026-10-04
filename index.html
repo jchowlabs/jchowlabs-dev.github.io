@@ -28,17 +28,18 @@
       color: var(--ink);
       -webkit-font-smoothing: antialiased;
       min-height: 100dvh;
-      /* Column flex: cross axis (align-items) = horizontal, main axis (justify-content) = vertical.
-         This keeps the content horizontally centered at every width, while letting the short-screen
-         rule below switch the VERTICAL axis to top-aligned (see @media max-height). */
+      /* Column flex centers the column horizontally via align-items. Vertical centering is handled by
+         margin-block:auto on .wrap below — NOT justify-content — so a list taller than the viewport
+         degrades to top-aligned + scrollable instead of clipping the header off the top of the screen. */
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       padding: 56px 24px;
     }
 
-    .wrap { width: min(420px, 100%); transform: translateY(-13vh); }
+    /* margin:auto centers vertically when there's spare room, and collapses to 0 on overflow so the
+       list starts at the top and scrolls down — the "Tools" header stays reachable at any row count. */
+    .wrap { width: min(420px, 100%); margin-block: auto; }
 
     /* ── Header ────────────────────────────────────────────────── */
     .head { text-align: center; margin-bottom: 32px; }
@@ -120,9 +121,6 @@
       .num { width: 31px; height: 31px; font-size: .82rem; }
       .arrow { width: 18px; height: 18px; }
     }
-    /* Short viewports: top-align vertically (so tall content isn't clipped/unscrollable) and drop the
-       upward nudge. Horizontal centering is unaffected — it's governed by align-items, not this. */
-    @media (max-height: 640px) { body { justify-content: flex-start; } .wrap { transform: none; } }
     @media (prefers-reduced-motion: reduce) {
       .card, .arrow, .num { transition: none; }
     }
@@ -179,6 +177,42 @@
         <span class="num" aria-hidden="true">5</span>
         <div class="meta">
           <h2>Deck Generator</h2>
+        </div>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </div>
+
+      <!-- Solution Brief Generator (placeholder — page coming in a later pass; no link yet) ─ -->
+      <div class="card" aria-disabled="true">
+        <span class="num" aria-hidden="true">6</span>
+        <div class="meta">
+          <h2>Solution Brief Generator</h2>
+        </div>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </div>
+
+      <!-- Diagrams Generator (placeholder — page coming in a later pass; no link yet) ─ -->
+      <div class="card" aria-disabled="true">
+        <span class="num" aria-hidden="true">7</span>
+        <div class="meta">
+          <h2>Diagrams Generator</h2>
+        </div>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </div>
+
+      <!-- Web Content Template Generator (placeholder — page coming in a later pass; no link yet) ─ -->
+      <div class="card" aria-disabled="true">
+        <span class="num" aria-hidden="true">8</span>
+        <div class="meta">
+          <h2>Web Content Template Generator</h2>
+        </div>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </div>
+
+      <!-- Joint Value Messaging Generator (placeholder — page coming in a later pass; no link yet) ─ -->
+      <div class="card" aria-disabled="true">
+        <span class="num" aria-hidden="true">9</span>
+        <div class="meta">
+          <h2>Joint Value Messaging Generator</h2>
         </div>
         <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </div>
