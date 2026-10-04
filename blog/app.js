@@ -1,11 +1,14 @@
 /* ============================================================
    Blog Generator — UI shell behavior (no model wired yet)
 
-   This only drives the chat *surface*: auto-growing input, sending
-   a message (which echoes a user bubble — there is NO assistant
-   reply yet), "New blog" reset, and the blog-card Copy button.
-   The live model, voice dictation, and real .docx export are added
-   in later phases.
+   Drives the chat *surface* only:
+   • On load, plays a short "typing → greeting" entrance so the AI
+     appears to greet the visitor. The greeting itself is static
+     content pre-seeded in index.html (no model call) — the typing
+     dots are purely a presentational entrance.
+   • Sending echoes a user bubble (there is NO assistant reply yet).
+   • "New blog" replays the greeting entrance.
+   • The blog-card Copy button works; Download/voice are wired later.
    ============================================================ */
 (function () {
   'use strict';
@@ -16,8 +19,12 @@
   var micBtn = document.getElementById('micBtn');
   var newBtn = document.getElementById('newBtn');
 
-  // Snapshot the greeting so "New blog" can reset to a clean slate.
+  // Snapshot the greeting markup before we touch the thread, so we can
+  // replay it on load and on "New blog".
   var greetingHTML = document.getElementById('greeting').outerHTML;
+
+  var reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---- textarea auto-grow ---- */
   function autoGrow() {
@@ -29,10 +36,44 @@
   /* ---- scroll helper ---- */
   function scrollToEnd() { thread.scrollTop = thread.scrollHeight; }
 
+  /* ---- build the typing indicator turn ---- */
+  function typingTurn() {
+    var t = document.createElement('div');
+    t.className = 'turn assistant';
+    t.innerHTML =
+      '<div class="avatar" aria-hidden="true"></div>' +
+      '<div class="typing" role="status" aria-label="Assistant is typing">' +
+      '<span></span><span></span><span></span></div>';
+    return t;
+  }
+
+  /* ---- greeting entrance: typing dots, then the greeting fades in ----
+     This is the "illusion" — on every load / reset the AI appears to
+     greet the visitor, then waits. No network, no model. */
+  function showGreeting() {
+    thread.innerHTML = '';
+
+    function reveal() {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = greetingHTML;
+      var g = tmp.firstElementChild;
+      if (!reduceMotion) g.classList.add('enter');
+      thread.appendChild(g);
+      scrollToEnd();
+    }
+
+    if (reduceMotion) { reveal(); return; }
+
+    var typing = typingTurn();
+    thread.appendChild(typing);
+    scrollToEnd();
+    setTimeout(function () { typing.remove(); reveal(); }, 750);
+  }
+
   /* ---- append a user turn (pure UI echo — no model reply yet) ---- */
   function addUserMessage(text) {
     var turn = document.createElement('div');
-    turn.className = 'turn user';
+    turn.className = 'turn user' + (reduceMotion ? '' : ' enter');
     var bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.textContent = text;
@@ -57,13 +98,12 @@
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
 
-  /* ---- New blog: reset the thread to just the greeting ---- */
+  /* ---- New blog: replay the greeting entrance ---- */
   newBtn.addEventListener('click', function () {
-    thread.innerHTML = greetingHTML;
     input.value = '';
     autoGrow();
+    showGreeting();
     input.focus();
-    scrollToEnd();
   });
 
   /* ---- mic: visual placeholder for now ---- */
@@ -109,7 +149,7 @@
     toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
   }
 
-  /* ---- init ---- */
+  /* ---- init: play the greeting entrance ---- */
   autoGrow();
-  scrollToEnd();
+  showGreeting();
 })();

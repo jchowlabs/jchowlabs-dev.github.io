@@ -52,6 +52,15 @@ body{
 /* user = right-aligned bubble */
 .bubble{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:10px 15px;max-width:80%;color:var(--ink);line-height:1.55;font-size:.95rem;white-space:pre-wrap;word-wrap:break-word}
 
+/* typing indicator (the "…AI is composing" entrance) + turn fade-in */
+.typing{display:inline-flex;align-items:center;gap:5px;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:13px 15px}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:typing-blink 1.4s infinite both}
+.typing span:nth-child(2){animation-delay:.18s}
+.typing span:nth-child(3){animation-delay:.36s}
+@keyframes typing-blink{0%,70%,100%{opacity:.3;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}
+.turn.enter{animation:turn-enter .35s ease both}
+@keyframes turn-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
 /* ── Rendered blog draft ── */
 .blog-card{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
 .blog-body{padding:24px 26px 6px}
@@ -104,4 +113,5 @@ body{
 }
 @media (prefers-reduced-motion:reduce){
   .action-btn,.toast,.composer{transition:none}
+  .typing span,.turn.enter{animation:none}
 }

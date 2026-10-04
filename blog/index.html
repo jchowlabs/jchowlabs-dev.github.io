@@ -23,76 +23,20 @@
 
     <!-- =========================================================
          Conversation thread.
-         The content below is STATIC sample content so the layout is
-         visible end-to-end (greeting → answer → rendered draft).
-         The live model, voice, and real .docx export are wired up in
-         later phases — this file is the UI shell only.
+         Seeded with ONE static assistant greeting — that's the whole
+         "illusion": the AI appears to greet you the moment the page
+         loads (app.js plays a short typing → greeting entrance). Nothing
+         else happens until the user submits. The live model, voice, and
+         real .docx export are wired up in later phases.
          ========================================================= -->
     <div id="thread" class="thread">
 
-      <!-- greeting (New blog resets the thread back to just this) -->
+      <!-- greeting — the only pre-seeded message. "New blog" resets here. -->
       <div class="turn assistant" id="greeting">
         <div class="avatar" aria-hidden="true"></div>
         <div class="content">
           <p>Hi — I'll help you draft a <strong>Proofpoint blog</strong>. Answer a few quick questions and I'll put together a first draft you can refine right here.</p>
           <p>To start: <strong>what are you announcing, and is there a partner involved?</strong></p>
-        </div>
-      </div>
-
-      <!-- sample user answer -->
-      <div class="turn user">
-        <div class="bubble">Proofpoint + SailPoint — we're extending the partnership to connect data security with identity governance, so customers can see which identities put their sensitive data at risk and fix it at the source.</div>
-      </div>
-
-      <!-- sample assistant draft -->
-      <div class="turn assistant">
-        <div class="avatar" aria-hidden="true"></div>
-        <div class="content">
-          <p>Here's a first draft. Tell me what to change — tighten a section, add a stat, swap the title — and I'll update it right here.</p>
-
-          <article class="blog-card">
-            <div class="blog-body">
-              <span class="eyebrow">Draft · Announcement</span>
-              <h1>Proofpoint Extends Its SailPoint Partnership to Reduce Data Exposure and Identify Risk</h1>
-              <p class="dek">Now you can understand and remediate risks to your sensitive data within the context of the identities that can access it.</p>
-              <p class="byline">By Nikhil Sinha, Nirav Shah, Jason Chow · Proofpoint</p>
-
-              <h2>The gap between identity and data</h2>
-              <p>Security and identity teams each see half the picture. Identity teams know who — and what — exists in their environment, but not always what those identities can actually reach, or how sensitive that data is. Data teams know what's sensitive, but not who can get to it, or whether that access is even still needed. Non-human identities make the gap worse: service accounts and AI agents multiply faster than either team can track manually.</p>
-
-              <h2>Why this matters now</h2>
-              <p>Proofpoint monitors more than 50 million cloud accounts across 8,000 customers for signs of account compromise — and in the past 12 months, 99%+ of monitored organizations were targeted for account takeover. According to SailPoint's research, 97% of AI agents have access to sensitive data today, and only 21% of organizations are highly confident they can manage that risk.</p>
-
-              <blockquote class="pullquote">
-                <p>"As AI agents and machine identities multiply across the enterprise, understanding what they can actually access is no longer optional — it's foundational to security."</p>
-                <cite>Soumya Banerjee, Head of Product Acceleration, SailPoint</cite>
-              </blockquote>
-
-              <h2>How it works</h2>
-              <ul>
-                <li><strong>Proofpoint classifies and remediates</strong> — it maps SailPoint's identity inventory to the sensitive data each identity can reach, then right-sizes or revokes access and hands the action to SailPoint to execute at the source.</li>
-                <li><strong>SailPoint enriches its identity context</strong> — it pulls Proofpoint's data-sensitivity metadata into the Identity Graph, so every identity risk profile now includes what sensitive data it can actually reach.</li>
-              </ul>
-
-              <h2>What this means for your organization</h2>
-              <p>The hard part of securing AI agents and service accounts isn't writing new policy — it's connecting the identity governance you already trust to the data it's meant to protect. This is the first step in a broader roadmap to bring identity and data security together.</p>
-              <p class="cta">If you're a joint Proofpoint and SailPoint customer, reach out to your account team to learn more.</p>
-
-              <h2>Frequently asked questions</h2>
-              <div class="faq">
-                <p class="q">What's actually new here?</p>
-                <p class="a">SailPoint's Identity Graph now includes Proofpoint's data-sensitivity context, and Proofpoint's remediation flow now includes SailPoint's identity and risk data — so both platforms act with the full picture, not half of it.</p>
-                <p class="q">Does this replace the partnership you've had since 2020?</p>
-                <p class="a">No — it extends it. The original partnership applied Proofpoint's risk visibility to human users; this brings data security and identity governance together across every identity, human and non-human.</p>
-                <p class="q">When can I get started?</p>
-                <p class="a">We expect this to be available to joint customers by the end of 2026 — reach out to your account team to be notified as it rolls out.</p>
-              </div>
-            </div>
-            <div class="blog-actions">
-              <button class="action-btn primary" type="button" data-action="download">Download .docx</button>
-              <button class="action-btn" type="button" data-action="copy">Copy</button>
-            </div>
-          </article>
         </div>
       </div>
 
