@@ -10,9 +10,9 @@
    navigates manually, it sends the agent a contextual update so the
    coach always knows which slide is on screen.
 
-   TO GO LIVE: paste the ElevenLabs agent id into VOICE_AGENT_ID below,
-   upload the system prompt / greeting / knowledge base, define the four
-   client tools, and allowlist this origin. See
+   The ElevenLabs agent id is set in VOICE_AGENT_ID below. Agent config
+   (system prompt / greeting / knowledge base, the four client tools, and
+   the origin allowlist) lives on the ElevenLabs dashboard. See
    ../elevenlabs/falcon/elevenlabs.md.
 
    Must be served over http(s) — file:// blocks ES-module imports, so the

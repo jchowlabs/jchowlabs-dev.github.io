@@ -1,7 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#1c2230;color:#e6e8ec}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Alliances</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#1c2230;color:#e6e8ec}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>jchowlabs</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></head><body>
 <style>
 /* Layout: a notebook. Home is an alphabetized tile grid; each partner opens as one long article
    (overview, use cases with diagrams, joint messaging, collapsed sales prep) with a sticky section bar. */
@@ -466,15 +463,14 @@ route();
    - Session persistence is free here: the notebook only ever navigates by URL
      hash (no document loads), so the WebSocket Conversation simply survives.
    - Agent config (system prompt, voice, LLM, tool schemas) lives on the
-     ElevenLabs dashboard. Two things are required before voice will connect:
-       1) paste the agent id into VOICE_AGENT_ID below (Phase 2), and
-       2) add this site's origin to the agent's allowlist in the dashboard.
+     ElevenLabs dashboard. The agent id is set in VOICE_AGENT_ID below, and
+     this site's origin is on the agent's allowlist in the dashboard.
    - Must be served over http(s) (e.g. GitHub Pages) — file:// blocks ES module
      imports, so the vendored SDK won't load from a double-clicked file.
    ============================================================ */
 (function(){
   'use strict';
-  const VOICE_AGENT_ID = 'agent_5501m3wd6q0mf7zbb5va2p0epgwf';                               // <-- Phase 2: ElevenLabs agent id goes here
+  const VOICE_AGENT_ID = 'agent_5501m3wd6q0mf7zbb5va2p0epgwf';  // ElevenLabs agent id — Proofpoint Alliances notebook
   const SDK_URL = './vendor/elevenlabs-client-0.15.2.js';  // vendored, pinned, same-origin (no runtime CDN)
 
   const isMobile = /Mobi|Android.*Mobile|iPhone|iPod/i.test(navigator.userAgent || '');

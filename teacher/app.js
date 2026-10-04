@@ -1,5 +1,5 @@
 /* ============================================================
-   Proofpoint learning agent — ElevenLabs voice session
+   Proofpoint Companion — ElevenLabs voice session
 
    Single circular call button below the orb:
      idle        → phone icon      (press to start)
@@ -12,6 +12,7 @@
   // ─── Replace with your ElevenLabs Agent ID ───────────────────────────────
   var AGENT_ID = 'agent_8501kwhz7amrft48eb44mtmh2gyy';
   // ─────────────────────────────────────────────────────────────────────────
+  var SDK_URL = './vendor/elevenlabs-client-0.15.2.js'; // vendored, pinned, same-origin (no runtime CDN)
 
   var btn = document.getElementById('voice-btn');
 
@@ -21,7 +22,7 @@
 
   // Preload the SDK at page load so the first tap is instant (keeps the mic
   // request inside the tap gesture on mobile).
-  var sdkPromise = import('https://cdn.jsdelivr.net/npm/@elevenlabs/client@0.15.2/+esm');
+  var sdkPromise = import(SDK_URL);
 
   function isActive(s) { return s === 'listening' || s === 'speaking'; }
 
@@ -49,7 +50,7 @@
     setStatus('connecting');
 
     try {
-      if (!sdkPromise) sdkPromise = import('https://cdn.jsdelivr.net/npm/@elevenlabs/client@0.15.2/+esm');
+      if (!sdkPromise) sdkPromise = import(SDK_URL);
       var mod;
       try { mod = await sdkPromise; } catch (e) { sdkPromise = null; throw e; }
       var Conversation = mod.Conversation;

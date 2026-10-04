@@ -1,6 +1,6 @@
 # Source material — never publish. Holds the raw deck + INTERNAL notes,
 # and the Proofpoint Alliances source project (its own git repo, admin KB,
-# system prompts). The public pages use copies: /falcon-prep/slides/* and
+# system prompts). The public pages use copies: falcon/slides/* and
 # /alliances/ (index.html + vendor/) are what ship.
 examples/
 presentation/
