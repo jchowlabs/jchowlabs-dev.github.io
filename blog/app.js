@@ -1,15 +1,13 @@
 /* ============================================================
-   Blog Generator — UI shell behavior (no model wired yet)
+   Blog Generator — chat UI
 
-   Drives the chat *surface* only:
    • On load, plays a short "typing dots → streamed greeting" entrance
      so the AI appears to type out its greeting like Claude/ChatGPT.
-     The greeting text is static (pre-seeded in index.html, no model
-     call); app.js just reveals it with a fast typewriter effect that
-     preserves inline formatting (bold words).
-   • Sending echoes a user bubble (there is NO assistant reply yet).
+     The greeting is static (pre-seeded in index.html); app.js reveals
+     it with a fast typewriter that preserves inline formatting.
+   • The composer echoes the user's message; the mic fills the input
+     via in-page dictation (Web Speech API).
    • "New blog" replays the greeting entrance.
-   • The blog-card Copy button works; Download/voice are wired later.
    ============================================================ */
 (function () {
   'use strict';
@@ -157,7 +155,6 @@
     input.value = '';
     autoGrow();
     input.focus();
-    // The assistant response gets wired to the Cloudflare Worker in a later phase.
   }
   form.addEventListener('submit', function (e) { e.preventDefault(); send(); });
   input.addEventListener('keydown', function (e) {
@@ -230,30 +227,6 @@
       return;
     }
     if (listening) stopDictation(); else startDictation();
-  });
-
-  /* ---- blog-card actions (Copy works today; Download is wired up later) ---- */
-  thread.addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    var card = btn.closest('.blog-card');
-    if (!card) return;
-
-    var action = btn.getAttribute('data-action');
-    if (action === 'copy') {
-      var body = card.querySelector('.blog-body');
-      var text = body ? body.innerText.trim() : '';
-      if (text && navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(
-          function () { toast('Copied to clipboard'); },
-          function () { toast('Copy failed — select and copy manually.'); }
-        );
-      } else {
-        toast('Copy not available in this browser.');
-      }
-    } else if (action === 'download') {
-      toast('Word export turns on when we wire the backend.');
-    }
   });
 
   /* ---- tiny toast ---- */

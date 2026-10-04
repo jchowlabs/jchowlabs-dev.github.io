@@ -21,14 +21,10 @@
       <button id="newBtn" class="ghost-btn" type="button">New blog</button>
     </header>
 
-    <!-- =========================================================
-         Conversation thread.
-         Seeded with ONE static assistant greeting — that's the whole
-         "illusion": the AI appears to greet you the moment the page
-         loads (app.js plays a short typing → greeting entrance). Nothing
-         else happens until the user submits. The live model, voice, and
-         real .docx export are wired up in later phases.
-         ========================================================= -->
+    <!-- Conversation thread. Seeded with one static assistant greeting;
+         app.js plays a short "typing → greeting" entrance on load, then
+         waits for the user to type. -->
+
     <div id="thread" class="thread">
 
       <!-- greeting — the only pre-seeded message. "New blog" resets here. -->
@@ -48,7 +44,7 @@
 
     <!-- composer -->
     <form id="composer" class="composer" autocomplete="off">
-      <button id="micBtn" class="mic-btn" type="button" aria-label="Dictate (coming soon)" title="Voice input — coming soon">
+      <button id="micBtn" class="mic-btn" type="button" aria-label="Dictate" title="Dictate">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/><path d="M5 11v1a7 7 0 0 0 14 0v-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
       <textarea id="input" class="input" rows="1" placeholder="Describe what you're announcing…"></textarea>
