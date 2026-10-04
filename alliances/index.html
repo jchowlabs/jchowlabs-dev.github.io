@@ -67,6 +67,12 @@ h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:
 .home-link{position:fixed;top:18px;left:18px;z-index:10;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:#9aa4b6;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);transition:color .2s ease,background .2s ease,border-color .2s ease}
 .home-link:hover{color:#e6e8ec;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
 .home-link svg{width:18px;height:18px}
+/* Desktop: keep proportional left/right gutters as the window narrows instead of
+   letting them collapse to the 20px padding. The 86vw column tracks the viewport
+   (~7% margins each side) and meets the 1080px cap continuously at ~1256px, so wide
+   windows look unchanged while the title stays clear of the fixed corner arrow and
+   the tiles shrink. Home grid only (not .narrow); mobile (<=720px) untouched. */
+@media (min-width:721px){ .wrap:not(.narrow){width:min(1080px,86vw)} }
 
 /* ---------- partner ---------- */
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
