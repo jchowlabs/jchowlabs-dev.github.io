@@ -1,8 +1,17 @@
 /* ============================================================
    Falcon Deck — presentation prep viewer
    Dark stage, slide shown as a card, simple nav dock,
-   and a voice-coach call button (ported from the orb page).
+   and the deck-coach voice widget (pill / dock / toast).
    ============================================================ */
+:root {
+  /* Slate theme tokens — shared with the deck-coach widget (va-* block below). */
+  --surface: #252c3d;
+  --line: #343e52;
+  --ink: #e6e8ec;
+  --ink-2: #a7b0c2;
+  --ink-3: #7c879c;
+  --accent: #5c9ced;
+}
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 
@@ -108,84 +117,114 @@ body {
   user-select: none;
 }
 
-/* ── Voice coach button (ported from styles.css of the orb) ── */
-.call-btn {
-  position: fixed;
-  right: 28px;
-  bottom: 24px;
-  z-index: 9;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, .08);
-  background: #4caf72;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform .18s ease, background .2s ease, color .2s ease, opacity .2s ease;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, .34);
+/* ── Keep the slide-nav dock clear of the coach ─────────────── */
+.dock { transition: opacity .25s ease, transform .25s ease; }
+/* While a voice session is live, hide the nav dock so it never collides
+   with the coach dock (desktop) or toast (mobile). */
+body.va-session .dock { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(12px); }
+
+/* ============================================================
+   Deck coach voice widget — Pill (desktop idle) + Dock (desktop active)
+   + Toast (mobile). Ported from the alliances notebook; all classes are
+   va-* prefixed. Uses the slate theme tokens from :root above.
+   ============================================================ */
+:root{
+  --va-grad-idle: radial-gradient(circle at 35% 35%, #38bdf8, #1d9fd8, #2563eb, #6366f1);
+  --va-grad-connecting: radial-gradient(circle at 35% 35%, #38bdf8, #2563eb);
+  --va-grad-speaking: radial-gradient(circle at 35% 35%, #60a5fa, #3b82f6, #2563eb);
+  --va-grad-listening: radial-gradient(circle at 35% 35%, #38bdf8, #1d9fd8, #2563eb);
+  --va-grad-error: radial-gradient(circle at 35% 35%, #e5e5e5, #a3a3a3);
+  --va-mobile-shadow: 0 -6px 40px rgba(0,0,0,.18), 0 -1px 10px rgba(0,0,0,.10);
+  --va-mobile-bg: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px), #252c3d;
 }
-.call-btn:hover { transform: scale(1.06); }
-.call-btn:active { transform: scale(.97); }
-.call-btn:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
-.call-icon { width: 24px; height: 24px; transition: transform .2s ease; }
+@keyframes va-blink{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes va-idle-pulse{0%,100%{box-shadow:0 0 0 4px rgba(37,99,235,.06)}50%{box-shadow:0 0 0 7px rgba(37,99,235,.09)}}
+@keyframes va-dock-speaking-rings{0%{box-shadow:0 0 0 0 rgba(59,130,246,.25),0 0 0 0 rgba(56,189,248,.15)}50%{box-shadow:0 0 0 8px rgba(59,130,246,.08),0 0 0 16px rgba(56,189,248,.04)}100%{box-shadow:0 0 0 14px rgba(59,130,246,0),0 0 0 24px rgba(56,189,248,0)}}
+@keyframes va-dock-listening-rings{0%,100%{box-shadow:0 0 0 4px rgba(56,189,248,.08)}50%{box-shadow:0 0 0 8px rgba(56,189,248,.12)}}
+@keyframes va-orb-speaking-rings{0%{box-shadow:0 0 0 0 rgba(59,130,246,.25),0 0 0 0 rgba(56,189,248,.15),0 0 12px 4px rgba(56,189,248,.10)}50%{box-shadow:0 0 0 8px rgba(59,130,246,.08),0 0 0 16px rgba(56,189,248,.04),0 0 16px 6px rgba(56,189,248,.08)}100%{box-shadow:0 0 0 14px rgba(59,130,246,0),0 0 0 24px rgba(56,189,248,0),0 0 12px 4px rgba(56,189,248,.10)}}
+@keyframes va-orb-listening-rings{0%,100%{box-shadow:0 0 0 4px rgba(56,189,248,.08),0 0 14px 5px rgba(56,189,248,.08)}50%{box-shadow:0 0 0 8px rgba(56,189,248,.12),0 0 20px 8px rgba(56,189,248,.12)}}
 
-/* Pending = no agent configured yet: muted, still clickable (shows a hint) */
-.call-btn.pending { background: #3a4150; color: #aeb6c4; box-shadow: 0 8px 22px rgba(0, 0, 0, .3); }
-.call-btn.pending:hover { transform: scale(1.04); }
+.va-mic-icon{width:14px;height:14px;flex-shrink:0}
 
-/* Spinner (connecting) */
-.call-spinner {
-  display: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2.5px solid rgba(255, 255, 255, .45);
-  border-top-color: #fff;
-  animation: call-spin .7s linear infinite;
+/* ---- Desktop pill (idle trigger, bottom-right) ---- */
+.va-wrap{position:fixed;bottom:24px;right:24px;display:flex;align-items:center;z-index:9999;overflow:visible;opacity:1;transition:opacity .5s ease}
+.va-wrap.va-hidden{opacity:0;pointer-events:none}
+.va-pill{position:relative;display:flex;align-items:center;gap:8px;width:fit-content;padding:5px 10px 5px 5px;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:0 2px 12px rgba(0,0,0,.4);cursor:pointer;user-select:none;-webkit-user-select:none;transition:box-shadow .4s ease,padding .25s ease,gap .25s ease}
+.va-pill:hover{box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.va-pill.idle-orb{padding:5px;justify-content:center;gap:0}
+.va-pill.idle-orb .va-pill-label{max-width:0;opacity:0;overflow:hidden;transition:max-width .25s ease,opacity .2s ease;pointer-events:none}
+@media (hover:hover) and (pointer:fine){
+  .va-pill.idle-orb:hover{padding:5px 12px 5px 5px;gap:8px}
+  .va-pill.idle-orb:hover .va-pill-label{max-width:120px;opacity:1}
 }
-@keyframes call-spin { to { transform: rotate(360deg); } }
+.va-pill.idle-orb.preview-expand{padding:5px 12px 5px 5px;gap:8px}
+.va-pill.idle-orb.preview-expand .va-pill-label{max-width:120px;opacity:1}
+.va-pill-orb{width:38px;height:38px;border-radius:50%;background:var(--va-grad-idle);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .3s ease,box-shadow .3s ease;animation:va-idle-pulse 3s ease-in-out infinite}
+.va-pill-label{font-size:12px;font-weight:500;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none;opacity:1;text-align:center;letter-spacing:.5px}
+.va-pill.error .va-pill-orb{background:var(--va-grad-error);animation:none}
+.va-pill.error .va-pill-label{color:var(--ink-2)}
 
-.call-btn[data-status="connecting"] { cursor: default; }
-.call-btn[data-status="connecting"] .call-icon { display: none; }
-.call-btn[data-status="connecting"] .call-spinner { display: block; }
+/* ---- Desktop dock (active session, bottom-center) ---- */
+.va-dock{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:8px 20px 11px;width:330px;background:var(--surface);border:1px solid var(--line);border-bottom:none;box-shadow:0 -4px 24px rgba(0,0,0,.45),0 -1px 6px rgba(0,0,0,.3);border-radius:16px 16px 0 0;opacity:0;pointer-events:none;cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .35s ease-out,opacity .3s ease-out}
+.va-dock.va-dock--visible{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.va-dock-mic{width:40px;height:40px;border-radius:50%;background:var(--va-grad-idle);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .3s ease,box-shadow .3s ease;animation:va-idle-pulse 3s ease-in-out infinite}
+.va-dock-mic .va-mic-icon{width:16px;height:16px}
+.va-dock.connecting .va-dock-mic{background:var(--va-grad-connecting);animation:va-blink 1.8s ease-in-out infinite}
+.va-dock.speaking .va-dock-mic{background:var(--va-grad-speaking);animation:va-dock-speaking-rings 1.5s ease-out infinite}
+.va-dock.listening .va-dock-mic{background:var(--va-grad-listening);animation:va-dock-listening-rings 2.5s ease-in-out infinite}
+.va-dock-handle{display:flex;justify-content:center;width:100%;padding-bottom:10px}
+.va-dock-handle span{width:32px;height:4px;border-radius:2px;background:#404b5e}
+.va-dock-row{display:flex;align-items:center;justify-content:center;gap:18px;width:100%}
+.va-dock-label{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:.3px;white-space:nowrap}
+.va-dock-wave{display:flex;align-items:center;gap:2px;height:16px;padding-left:2px}
+.va-dock-wave span{display:block;width:2px;height:4px;background:#7c879c;border-radius:1px;transition:height .04s linear}
+.va-dock-close{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.06);font-size:16px;color:var(--ink-3);cursor:pointer;line-height:1;padding:0;margin-left:2px;transition:background .2s ease,color .2s ease}
+.va-dock-close:hover{background:rgba(255,255,255,.1);color:var(--ink-2)}
 
-.call-btn[data-status="active"] { background: #e8564f; border-color: #e8564f; color: #fff; }
-.call-btn[data-status="active"] .call-icon { transform: rotate(135deg); }
+/* ---- Mobile toast (bottom sheet) ---- */
+.va-toast{display:none}
+.va-toast-handle{display:none;justify-content:center;padding:6px 0 5px}
+.va-toast-handle span{width:36px;height:4px;border-radius:2px;background:#404b5e}
+.va-toast-close{display:none;background:none;border:none;font-size:22px;color:var(--ink-3);cursor:pointer;line-height:1;padding:4px;z-index:2;flex-shrink:0}
+.va-toast-close:hover{color:var(--ink-2)}
+.va-toast-card{display:flex;flex-direction:column;align-items:center;padding:10px 20px 12px;gap:10px;opacity:1}
+.va-toast-card-row{display:flex;align-items:center;position:relative;justify-content:center;gap:14px;width:100%}
+.va-toast-card-text{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.va-toast-card-primary{font-size:17px;font-weight:600;color:var(--ink);letter-spacing:.3px;white-space:nowrap}
+.va-toast-card-secondary{font-size:14px;font-weight:300;color:var(--ink-2);letter-spacing:.5px;min-height:14px}
+.va-toast-orb{width:38px;height:38px;border-radius:50%;background:var(--va-grad-idle);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 4px rgba(37,99,235,.06);transition:background .3s ease,box-shadow .3s ease;animation:va-idle-pulse 3s ease-in-out infinite;cursor:pointer}
+.va-toast-orb .va-mic-icon{width:13px;height:13px}
+.va-toast.connecting .va-toast-orb{background:var(--va-grad-connecting);animation:va-blink 1.8s ease-in-out infinite}
+.va-toast.speaking .va-toast-orb{background:var(--va-grad-speaking);animation:va-orb-speaking-rings 1.5s ease-out infinite}
+.va-toast.active .va-toast-orb{background:var(--va-grad-listening);animation:va-orb-listening-rings 2.5s ease-in-out infinite}
+.va-toast.error .va-toast-orb{background:var(--va-grad-error);animation:none;box-shadow:none}
 
-/* ── Toast (e.g. "voice coach coming soon") ────────────────── */
-.toast {
-  position: fixed;
-  right: 28px;
-  bottom: 92px;
-  z-index: 9;
-  max-width: 240px;
-  padding: 9px 13px;
-  font-size: .82rem;
-  line-height: 1.35;
-  color: #e6e8ec;
-  background: rgba(20, 25, 36, .92);
-  border: 1px solid rgba(255, 255, 255, .1);
-  border-radius: 10px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, .4);
-  opacity: 0;
-  transform: translateY(6px);
-  pointer-events: none;
-  transition: opacity .2s ease, transform .2s ease;
+@media (max-width:480px) and (hover:none) and (pointer:coarse){.va-pill{display:none!important}.va-wrap{display:none!important}}
+@media (max-width:480px){.va-dock{display:none!important}}
+@media (max-width:480px){
+  .va-toast{display:block;position:fixed;bottom:0;left:20px;right:20px;width:auto;z-index:9999;background:var(--surface);border:1px solid var(--line);border-bottom:none;border-radius:20px 20px 0 0;box-shadow:0 -6px 32px rgba(0,0,0,.18),0 -1px 8px rgba(0,0,0,.10);height:140px;overflow:hidden;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none;will-change:transform;opacity:0;transform:translateY(140px);pointer-events:none;transition:transform .3s ease-out,opacity .25s ease-out,box-shadow .25s ease-out}
+  .va-toast.va-toast--visible{opacity:1;transform:translateY(48px);pointer-events:auto}
+  .va-toast .va-toast-handle{display:flex}
+  .va-toast .va-toast-card-row .va-toast-orb{position:absolute;left:0;top:50%;transform:translateY(-50%)}
+  .va-toast .va-toast-close{display:none;position:absolute;top:10px;right:14px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);font-size:18px;color:var(--ink-3);align-items:center;justify-content:center;line-height:1;padding:0}
+  .va-toast .va-toast-card-text{gap:10px}
+  .va-toast.va-toast--ready{transform:translateY(38px);background:var(--va-mobile-bg);background-size:1.5px 1.5px;box-shadow:var(--va-mobile-shadow)}
+  .va-toast.va-toast--ready .va-toast-close{display:flex}
+  .va-toast.session-active{transform:translateY(0);background:var(--va-mobile-bg);background-size:1.5px 1.5px;box-shadow:var(--va-mobile-shadow);animation:none}
+  .va-toast.session-active .va-toast-close{display:flex}
+  .va-toast .va-toast-wave{display:none;align-items:flex-end;justify-content:center;gap:3px;height:24px;width:100%;margin-top:8px;margin-bottom:12px}
+  .va-toast .va-toast-wave span{width:2px;border-radius:2px;background:var(--accent);height:4px;transition:height .04s linear}
+  .va-toast.session-active .va-toast-wave{display:flex}
 }
-.toast.show { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 640px) {
   .viewer { padding: 48px 12px 88px; }
-  .call-btn { right: 16px; bottom: 20px; }
-  .toast { right: 16px; }
+}
+/* On phones the mobile toast peeks at the bottom — raise the nav dock above it. */
+@media (max-width: 480px) {
+  .dock { bottom: 110px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .call-btn, .nav-btn, .home-link, .toast { transition: none; }
+  .nav-btn, .home-link, .dock { transition: none; }
 }
