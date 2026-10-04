@@ -152,6 +152,7 @@
   function send() {
     var text = input.value.trim();
     if (!text) return;
+    stopDictation();
     addUserMessage(text);
     input.value = '';
     autoGrow();
@@ -172,9 +173,63 @@
     input.focus();
   });
 
-  /* ---- mic: visual placeholder for now ---- */
+  /* ---- mic: in-page dictation via the Web Speech API ----
+     Supported in Chrome/Edge (desktop + Android) and Safari (macOS + iOS).
+     Where it isn't (e.g. Firefox), the button points users at their own
+     device dictation instead. Requires https (or localhost) + mic access. */
+  var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var recognition = null, listening = false, speechBase = '';
+
+  function setListening(on) {
+    listening = on;
+    micBtn.classList.toggle('listening', on);
+    micBtn.setAttribute('aria-label', on ? 'Stop dictation' : 'Dictate');
+  }
+
+  function stopDictation() {
+    if (recognition && listening) { try { recognition.stop(); } catch (e) {} }
+    setListening(false);
+  }
+
+  function startDictation() {
+    if (!recognition) {
+      recognition = new SpeechRec();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = navigator.language || 'en-US';
+
+      recognition.onresult = function (e) {
+        var finalText = speechBase, interim = '';
+        for (var i = e.resultIndex; i < e.results.length; i++) {
+          var t = e.results[i][0].transcript;
+          if (e.results[i].isFinal) finalText += t; else interim += t;
+        }
+        speechBase = finalText;             // keep finalized words as the new base
+        input.value = finalText + interim;  // finalized text + live interim words
+        autoGrow();
+      };
+      recognition.onerror = function (e) {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          toast('Allow microphone access to dictate.');
+        } else if (e.error !== 'no-speech' && e.error !== 'aborted') {
+          toast('Dictation stopped — tap the mic to try again.');
+        }
+        setListening(false);
+      };
+      recognition.onend = function () { setListening(false); };
+    }
+    // Seed with whatever's already typed so speech appends to it.
+    var existing = input.value.replace(/\s+$/, '');
+    speechBase = existing ? existing + ' ' : '';
+    try { recognition.start(); setListening(true); input.focus(); } catch (e) {}
+  }
+
   micBtn.addEventListener('click', function () {
-    toast('Voice input turns on in a later phase.');
+    if (!SpeechRec) {
+      toast("In-page dictation isn't supported in this browser — use your device's dictation (keyboard mic, or press the ⌘ key twice on Mac).");
+      return;
+    }
+    if (listening) stopDictation(); else startDictation();
   });
 
   /* ---- blog-card actions (Copy works today; Download is wired up later) ---- */

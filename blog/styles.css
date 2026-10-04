@@ -99,6 +99,8 @@ body{
 .mic-btn svg,.send-btn svg{width:18px;height:18px}
 .mic-btn{background:var(--surface-2);color:var(--ink-2)}
 .mic-btn:hover{background:#39445a;color:var(--ink)}
+.mic-btn.listening{background:#e5484d;color:#fff;animation:mic-pulse 1.4s ease-in-out infinite}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(229,72,77,.5)}50%{box-shadow:0 0 0 6px rgba(229,72,77,0)}}
 .send-btn{background:var(--accent);color:#0f1726}
 .send-btn:hover{background:#6ea6f0}
 
@@ -118,5 +120,5 @@ body{
 }
 @media (prefers-reduced-motion:reduce){
   .action-btn,.toast,.composer{transition:none}
-  .typing span,.turn.enter{animation:none}
+  .typing span,.turn.enter,.mic-btn.listening{animation:none}
 }
