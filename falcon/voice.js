@@ -41,9 +41,9 @@
   var root = document.createElement('div');
   root.id = 'voice';
   root.innerHTML =
-    '<div class="va-wrap"><div class="va-pill idle-orb" role="button" tabindex="0" aria-label="Open deck coach"><div class="va-pill-orb">' + MIC + '</div><span class="va-pill-label">Ask Anything</span></div></div>' +
-    '<div class="va-dock" role="status" aria-label="Deck coach active"><div class="va-dock-handle"><span></span></div><div class="va-dock-row"><div class="va-dock-mic">' + MIC + '</div><span class="va-dock-label"></span><div class="va-dock-wave">' + '<span></span>'.repeat(10) + '</div><button class="va-dock-close" aria-label="End session">×</button></div></div>' +
-    '<div class="va-toast" role="button" tabindex="0" aria-label="Open deck coach"><div class="va-toast-handle"><span></span></div><div class="va-toast-card"><div class="va-toast-card-row"><div class="va-toast-orb">' + MIC + '</div><div class="va-toast-card-text"><span class="va-toast-card-primary">Deck Coach</span><span class="va-toast-card-secondary">(Swipe ↑ to speak)</span></div></div><div class="va-toast-wave">' + '<span></span>'.repeat(20) + '</div><button class="va-toast-close" aria-label="End session">×</button></div></div>';
+    '<div class="va-wrap"><div class="va-pill idle-orb" role="button" tabindex="0" aria-label="Open voice assistant"><div class="va-pill-orb">' + MIC + '</div><span class="va-pill-label">Ask Anything</span></div></div>' +
+    '<div class="va-dock" role="status" aria-label="Voice assistant active"><div class="va-dock-handle"><span></span></div><div class="va-dock-row"><div class="va-dock-mic">' + MIC + '</div><span class="va-dock-label"></span><div class="va-dock-wave">' + '<span></span>'.repeat(10) + '</div><button class="va-dock-close" aria-label="End session">×</button></div></div>' +
+    '<div class="va-toast" role="button" tabindex="0" aria-label="Open voice assistant"><div class="va-toast-handle"><span></span></div><div class="va-toast-card"><div class="va-toast-card-row"><div class="va-toast-orb">' + MIC + '</div><div class="va-toast-card-text"><span class="va-toast-card-primary">Voice Assistant</span><span class="va-toast-card-secondary">(Swipe ↑ to speak)</span></div></div><div class="va-toast-wave">' + '<span></span>'.repeat(20) + '</div><button class="va-toast-close" aria-label="End session">×</button></div></div>';
   document.body.appendChild(root);
 
   var wrap = root.querySelector('.va-wrap'), pill = root.querySelector('.va-pill'), pillLabel = root.querySelector('.va-pill-label');
