@@ -20,7 +20,7 @@
    ============================================================ */
 (function () {
   'use strict';
-  var VOICE_AGENT_ID = '';                                   // <-- paste the ElevenLabs agent id here
+  var VOICE_AGENT_ID = 'agent_0801m424tv5hfqk8sqd50100wrqg'; // ElevenLabs agent id — Falcon deck coach
   var SDK_URL = './vendor/elevenlabs-client-0.15.2.js';      // vendored, pinned, same-origin (no runtime CDN)
 
   var isMobile = /Mobi|Android.*Mobile|iPhone|iPod/i.test(navigator.userAgent || '');
