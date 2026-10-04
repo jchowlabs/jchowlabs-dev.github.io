@@ -28,7 +28,11 @@
       color: var(--ink);
       -webkit-font-smoothing: antialiased;
       min-height: 100dvh;
+      /* Column flex: cross axis (align-items) = horizontal, main axis (justify-content) = vertical.
+         This keeps the content horizontally centered at every width, while letting the short-screen
+         rule below switch the VERTICAL axis to top-aligned (see @media max-height). */
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 56px 24px;
@@ -116,6 +120,8 @@
       .num { width: 31px; height: 31px; font-size: .82rem; }
       .arrow { width: 18px; height: 18px; }
     }
+    /* Short viewports: top-align vertically (so tall content isn't clipped/unscrollable) and drop the
+       upward nudge. Horizontal centering is unaffected — it's governed by align-items, not this. */
     @media (max-height: 640px) { body { justify-content: flex-start; } .wrap { transform: none; } }
     @media (prefers-reduced-motion: reduce) {
       .card, .arrow, .num { transition: none; }

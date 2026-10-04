@@ -2,8 +2,7 @@
 # and the Proofpoint Alliances source project (its own git repo, admin KB,
 # system prompts). The public pages use copies: falcon/slides/* and
 # /alliances/ (index.html + vendor/) are what ship.
-examples/
-presentation/
+example/
 
 # Stray local duplicates of this repo (their own .git) — do not track.
 elevenlabs/
