@@ -37,12 +37,11 @@
   /* ---- scroll helper ---- */
   function scrollToEnd() { thread.scrollTop = thread.scrollHeight; }
 
-  /* ---- build an (empty) assistant turn: avatar + content ---- */
+  /* ---- build an (empty) assistant turn (content only, no avatar) ---- */
   function assistantTurn() {
     var turn = document.createElement('div');
     turn.className = 'turn assistant';
-    turn.innerHTML =
-      '<div class="avatar" aria-hidden="true"></div><div class="content"></div>';
+    turn.innerHTML = '<div class="content"></div>';
     return turn;
   }
 
@@ -51,7 +50,6 @@
     var t = document.createElement('div');
     t.className = 'turn assistant';
     t.innerHTML =
-      '<div class="avatar" aria-hidden="true"></div>' +
       '<div class="typing" role="status" aria-label="Assistant is typing">' +
       '<span></span><span></span><span></span></div>';
     return t;

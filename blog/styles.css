@@ -42,12 +42,13 @@ body{
 .turn{display:flex;gap:12px;margin:0 0 22px;align-items:flex-start}
 .turn.user{justify-content:flex-end}
 
-.avatar{flex:none;width:28px;height:28px;border-radius:50%;background:var(--grad);box-shadow:0 0 0 1px rgba(255,255,255,.06)}
-
-/* assistant = plain text block (Claude-style, no bubble) */
-.content{min-width:0;max-width:calc(100% - 40px);color:var(--ink);line-height:1.6;font-size:.95rem}
+/* assistant = plain text block, full width (Claude/ChatGPT-style, no avatar) */
+.content{min-width:0;max-width:100%;color:var(--ink);line-height:1.6;font-size:.95rem}
 .content > p{margin:0 0 10px}.content > p:last-child{margin-bottom:0}
 .content strong{color:var(--ink);font-weight:600}
+.content ul{margin:8px 0 0;padding-left:20px}
+.content li{margin:0 0 6px;line-height:1.55}
+.content li:last-child{margin-bottom:0}
 
 /* user = right-aligned bubble */
 .bubble{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:10px 15px;max-width:80%;color:var(--ink);line-height:1.55;font-size:.95rem;white-space:pre-wrap;word-wrap:break-word}
@@ -109,7 +110,7 @@ body{
 @media (max-width:560px){
   .chat{padding:0 14px}
   .topbar{padding-left:42px}           /* clear the fixed back arrow */
-  .content{max-width:calc(100% - 38px)}
+  .content{max-width:100%}
   .bubble{max-width:88%}
   .blog-body{padding:20px 18px 6px}
   .blog-body h1{font-size:1.35rem}
