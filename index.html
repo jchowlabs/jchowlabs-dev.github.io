@@ -2,222 +2,180 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>jchowlabs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* ============================================================
-       jchowlabs — home (prototype directory), dark theme
-       A "Tools" header + subtle divider over a vertical list of rows.
-       Each row is a numbered circle + title + description + arrow.
-       Add one: copy an <a class="card"> block and renumber.
+       jchowlabs — home (prototype directory), dark theme.
+       A grid of tiles, ported from the Alliances home pattern:
+       each tile is a numbered index label (top-left) + a centered
+       title. Tiles flow left-to-right, then wrap down — 3 across on
+       desktop, 2 on tablet, 1 on mobile.
+       Add one: copy an <a class="tile"> (real page) or a
+       <div class="tile"> (not-yet-built placeholder) and bump the number.
+       Wire up a placeholder: change its <div class="tile"> to
+       <a class="tile" href="…/">.
        ============================================================ */
     :root {
       color-scheme: dark;
+      --bg: #1c2230;
+      --surface: #252c3d;
       --ink: #e6e8ec;
-      --muted: #98a0b3;
+      --ink-2: #a7b0c2;
+      --ink-3: #7c879c;
+      --line: #343e52;
+      --accent: #5c9ced;
+      --shadow: 0 1px 2px rgba(0,0,0,.25), 0 4px 14px rgba(0,0,0,.18);
+      --f-display: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     }
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
+    html, body { margin: 0; }
 
     body {
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #1c2230;
+      background: var(--bg);
       color: var(--ink);
+      font-family: var(--f-display);
       -webkit-font-smoothing: antialiased;
       min-height: 100dvh;
-      /* Column flex centers the column horizontally via align-items. Vertical centering is handled by
-         margin-block:auto on .wrap below — NOT justify-content — so a list taller than the viewport
-         degrades to top-aligned + scrollable instead of clipping the header off the top of the screen. */
+    }
+
+    /* Centered content column (mirrors .wrap in Alliances) */
+    .wrap { max-width: 840px; margin-inline: auto; padding: 0 20px 64px; }
+
+    /* ── Header ────────────────────────────────────────────────── */
+    .home-head { padding-block: 56px 24px; }
+    .home-head h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 46px);
+      font-weight: 700;
+      letter-spacing: -.022em;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    /* ── Tile grid ─────────────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .tile {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 56px 24px;
-    }
-
-    /* margin:auto centers vertically when there's spare room, and collapses to 0 on overflow so the
-       list starts at the top and scrolls down — the "Tools" header stays reachable at any row count. */
-    .wrap { width: min(420px, 100%); margin-block: auto; }
-
-    /* ── Header ────────────────────────────────────────────────── */
-    .head { text-align: center; margin-bottom: 32px; }
-    .head h1 {
-      margin: 0;
-      font-size: clamp(1.7rem, 4vw, 2.45rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      color: #fff;
-      line-height: 1;
-    }
-    /* Subtle divider: a solid thin line, a little wider than the column
-       (centered on the viewport, so it can exceed the column width) */
-    .head-rule {
-      width: min(480px, 90vw);
-      height: 1px;
-      margin: 20px 0 0;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255,255,255,.13);
-    }
-
-    /* ── Vertical list of tool rows ────────────────────────────── */
-    .list { display: flex; flex-direction: column; gap: 12px; }
-
-    .card {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      padding: 11px 18px;
-      background: rgba(255, 255, 255, .028);
-      border: 1px solid rgba(255, 255, 255, .07);
-      border-radius: 16px;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
+      min-height: 168px;
+      padding: 34px 18px 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
       text-decoration: none;
       color: inherit;
-      transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
     }
-    .card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(120, 170, 240, .40);
-      background: rgba(255, 255, 255, .045);
-      box-shadow: 0 18px 42px rgba(0, 0, 0, .30);
+    .tile:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 30px rgba(0,0,0,.30);
     }
-    .card:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+    .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-    /* Numbered circle (mirrors the "how it works" step markers in alliances) */
-    .num {
-      flex: none;
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(230, 232, 236, .45);
-      display: grid; place-items: center;
-      font-size: .88rem; font-weight: 600;
-      color: var(--ink);
-      font-variant-numeric: tabular-nums;
-      transition: border-color .22s ease;
-    }
-    .card:hover .num { border-color: rgba(230, 232, 236, .8); }
-
-    .meta { flex: 1 1 auto; min-width: 0; }
-    .meta h2 {
-      margin: 0;
-      font-size: clamp(.88rem, 2.2vw, .96rem);
+    /* Numbered index label, top-left — takes the "category" slot from the Alliances tiles */
+    .tile .num {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: -0.01em;
-      color: var(--ink);
+      letter-spacing: .08em;
+      color: var(--ink-3);
+      font-variant-numeric: tabular-nums;
     }
-    .meta p { margin: 3px 0 0; font-size: clamp(.75rem, 1.9vw, .8rem); color: var(--muted); line-height: 1.4; }
 
-    .arrow { flex: none; width: 20px; height: 20px; color: var(--muted); transition: transform .22s ease, color .22s ease; }
-    .card:hover .arrow { color: var(--ink); transform: translateX(4px); }
-
-    /* ── Responsive ────────────────────────────────────────────── */
-    @media (max-width: 560px) {
-      body { padding: 40px 16px; }
-      .head { margin-bottom: 22px; }
-      .card { gap: 12px; padding: 10px 14px; }
-      .num { width: 31px; height: 31px; font-size: .82rem; }
-      .arrow { width: 18px; height: 18px; }
+    .tile .nm {
+      font-family: var(--f-display);
+      font-weight: 700;
+      font-size: clamp(17px, 2.2vw, 20px);
+      letter-spacing: -.01em;
+      line-height: 1.25;
+      text-wrap: balance;
     }
+
     @media (prefers-reduced-motion: reduce) {
-      .card, .arrow, .num { transition: none; }
+      .tile { transition: none; }
     }
   </style>
 </head>
 <body>
   <main class="wrap">
 
-    <header class="head">
+    <header class="home-head">
       <h1>Tools</h1>
-      <div class="head-rule" aria-hidden="true"></div>
     </header>
 
-    <nav class="list">
+    <nav class="grid">
 
-      <!-- Proofpoint Companion ─────────────────────────────────────── -->
-      <a class="card" href="teacher/">
-        <span class="num" aria-hidden="true">1</span>
-        <div class="meta">
-          <h2>Proofpoint Companion</h2>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <!-- 1 · Proofpoint Companion ─────────────────────────────── -->
+      <a class="tile" href="teacher/">
+        <span class="num" aria-hidden="true">01</span>
+        <span class="nm">Proofpoint Companion</span>
       </a>
 
-      <!-- Proofpoint Alliances ─────────────────────────────────────── -->
-      <a class="card" href="alliances/">
-        <span class="num" aria-hidden="true">2</span>
-        <div class="meta">
-          <h2>Proofpoint Alliances</h2>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <!-- 2 · Proofpoint Alliances ─────────────────────────────── -->
+      <a class="tile" href="alliances/">
+        <span class="num" aria-hidden="true">02</span>
+        <span class="nm">Proofpoint Alliances</span>
       </a>
 
-      <!-- Falcon Presentation ──────────────────────────────────────── -->
-      <a class="card" href="falcon/">
-        <span class="num" aria-hidden="true">3</span>
-        <div class="meta">
-          <h2>Falcon Presentation</h2>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <!-- 3 · Falcon Presentation ──────────────────────────────── -->
+      <a class="tile" href="falcon/">
+        <span class="num" aria-hidden="true">03</span>
+        <span class="nm">Falcon Presentation</span>
       </a>
 
-      <!-- Blog Generator (placeholder — page coming in a later pass; no link yet) ─ -->
-      <div class="card" aria-disabled="true">
-        <span class="num" aria-hidden="true">4</span>
-        <div class="meta">
-          <h2>Blog Generator</h2>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <!-- 4 · Blog Generator (placeholder — no link yet) ───────── -->
+      <div class="tile">
+        <span class="num" aria-hidden="true">04</span>
+        <span class="nm">Blog Generator</span>
       </div>
 
-      <!-- Deck Generator (placeholder — page coming in a later pass; no link yet) ─ -->
-      <div class="card" aria-disabled="true">
-        <span class="num" aria-hidden="true">5</span>
-        <div class="meta">
-          <h2>Deck Generator</h2>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <!-- 5 · Deck Generator (placeholder — no link yet) ───────── -->
+      <div class="tile">
+        <span class="num" aria-hidden="true">05</span>
+        <span class="nm">Deck Generator</span>
       </div>
 
-      <!-- Solution Brief Generator (placeholder — page coming in a later pass; no link yet) ─ -->
-      <div class="card" aria-disabled="true">
-        <span class="num" aria-hidden="true">6</span>
-        <div class="meta">
-          <h2>Solution Brief Generator</h2>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <!-- 6 · Solution Brief Generator (placeholder — no link yet) ─ -->
+      <div class="tile">
+        <span class="num" aria-hidden="true">06</span>
+        <span class="nm">Solution Brief Generator</span>
       </div>
 
-      <!-- Diagrams Generator (placeholder — page coming in a later pass; no link yet) ─ -->
-      <div class="card" aria-disabled="true">
-        <span class="num" aria-hidden="true">7</span>
-        <div class="meta">
-          <h2>Diagrams Generator</h2>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <!-- 7 · Diagrams Generator (placeholder — no link yet) ───── -->
+      <div class="tile">
+        <span class="num" aria-hidden="true">07</span>
+        <span class="nm">Diagrams Generator</span>
       </div>
 
-      <!-- Web Content Template Generator (placeholder — page coming in a later pass; no link yet) ─ -->
-      <div class="card" aria-disabled="true">
-        <span class="num" aria-hidden="true">8</span>
-        <div class="meta">
-          <h2>Web Content Template Generator</h2>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <!-- 8 · Web Content Template Generator (placeholder — no link yet) ─ -->
+      <div class="tile">
+        <span class="num" aria-hidden="true">08</span>
+        <span class="nm">Web Content Template Generator</span>
       </div>
 
-      <!-- Joint Value Messaging Generator (placeholder — page coming in a later pass; no link yet) ─ -->
-      <div class="card" aria-disabled="true">
-        <span class="num" aria-hidden="true">9</span>
-        <div class="meta">
-          <h2>Joint Value Messaging Generator</h2>
-        </div>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <!-- 9 · Joint Value Messaging Generator (placeholder — no link yet) ─ -->
+      <div class="tile">
+        <span class="num" aria-hidden="true">09</span>
+        <span class="nm">Joint Value Messaging Generator</span>
       </div>
-
-      <!-- To wire up a placeholder: change its <div class="card"> to <a class="card" href="…/">. -->
 
     </nav>
 
