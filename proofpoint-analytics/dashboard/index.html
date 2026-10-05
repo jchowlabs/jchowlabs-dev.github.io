@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jchowlabs · Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --border:#e9ebee; --border-2:#eef0f3;
+    --ink:#161b22; --ink-2:#5b6472; --ink-3:#98a1b0;
+    --blue:#3b4fd6; --blue-ink:#2f6bf0; --red:#e4524a; --green:#27a567;
+    --track:#eef0f3;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.06);
+    --f:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;min-height:100dvh}
+  .wrap{max-width:1180px;margin-inline:auto;padding:22px 26px 72px}
+
+  /* ── Header (range controls only) ── */
+  .head{display:flex;align-items:center;justify-content:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+  .controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .seg{display:inline-flex;background:#eceef1;border-radius:10px;padding:4px;gap:2px}
+  .seg button{appearance:none;border:0;background:transparent;color:var(--ink-2);font:inherit;font-size:13.5px;font-weight:600;padding:7px 16px;border-radius:7px;cursor:pointer;transition:.15s}
+  .seg button:hover{color:var(--ink)}
+  .seg button.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(16,24,40,.12)}
+  .nav{display:inline-flex;align-items:center;gap:10px}
+  .nav button{width:30px;height:30px;display:grid;place-items:center;background:transparent;border:0;border-radius:8px;color:var(--ink-3);cursor:pointer;font-size:19px}
+  .nav button:hover{color:var(--ink);background:#eceef1}
+  .nav button:disabled{opacity:.3;cursor:default;background:transparent}
+  .nav .period{font-size:15px;font-weight:600;color:var(--ink);min-width:140px;text-align:center}
+
+  .sample-badge{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:50;font-size:10.5px;font-weight:700;letter-spacing:.08em;color:#9a6a12;background:#fdf1d8;border:1px solid #f0dca8;padding:4px 12px;border-radius:999px;box-shadow:var(--shadow)}
+
+  /* ── Cards ── */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+  @media(max-width:860px){.cards{grid-template-columns:repeat(2,1fr)}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow);text-align:center}
+  .card .k{font-size:12px;font-weight:600;color:var(--ink-3);letter-spacing:.05em;text-transform:uppercase}
+  .card .v{font-size:34px;font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1;color:var(--ink)}
+  .card .sub{font-size:13px;color:var(--ink-3);margin-top:12px;min-height:16px}
+  .botgrid{display:flex;justify-content:center;gap:18px;margin-top:12px;font-size:12px;color:var(--ink-3)}
+  .botgrid b{display:block;color:var(--ink-2);font-size:14px;font-weight:700;margin-top:2px}
+
+  /* ── Panels ── */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+  @media(max-width:860px){.grid2{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;box-shadow:var(--shadow)}
+  .panel h2{margin:0 0 20px;font-size:17px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+
+  /* ── Visitors by day ── */
+  .vrow{display:grid;grid-template-columns:62px 1fr 34px;align-items:center;gap:14px;margin-bottom:13px}
+  .vrow .d{font-size:14px;color:var(--ink-2)}
+  .vtrack{height:16px;border-radius:5px;background:var(--track);overflow:hidden;display:flex}
+  .vtrack .h{background:var(--blue);height:100%}
+  .vtrack .b{background:var(--red);height:100%}
+  .vrow .c{font-size:14px;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+  .legend{display:flex;gap:20px;margin-top:18px;font-size:13.5px;color:var(--ink-2)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .dot.h{background:var(--blue)} .dot.b{background:var(--red)}
+
+  /* ── Tables ── */
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  thead th{text-align:right;font-size:11.5px;font-weight:600;color:var(--ink-3);letter-spacing:.05em;text-transform:uppercase;padding:0 0 12px}
+  thead th:first-child{text-align:left}
+  tbody td{padding:14px 0;border-top:1px solid var(--border-2);text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+  tbody td:first-child{text-align:left}
+  .site{display:flex;align-items:center;gap:11px}
+  .site .sq{width:9px;height:9px;border-radius:3px;flex:none}
+  .site .nm{font-weight:600}
+  .site .pth{font-size:12.5px;color:var(--ink-3);margin-left:2px}
+  .muted{color:var(--ink-3)}
+  .empty{color:var(--ink-3);font-size:14px;padding:8px 0 4px}
+  .foot-note{margin-top:16px;padding-top:14px;border-top:1px solid var(--border-2);display:flex;justify-content:space-between;font-size:13.5px}
+  .foot-note .n{color:var(--ink-2)} .foot-note .c{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <!-- ── Header ── -->
+  <div class="head">
+    <div class="controls">
+      <div class="seg" id="seg">
+        <button data-range="day">Day</button>
+        <button data-range="week">Week</button>
+        <button data-range="month" class="active">Month</button>
+        <button data-range="all">All Time</button>
+      </div>
+      <div class="nav">
+        <button id="prev" aria-label="Previous">‹</button>
+        <span class="period" id="period">—</span>
+        <button id="next" aria-label="Next">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Summary cards ── -->
+  <div class="cards">
+    <div class="card">
+      <div class="k">Visitors</div>
+      <div class="v" id="cVisitors">—</div>
+      <div class="sub" id="cVisitorsSub"></div>
+    </div>
+    <div class="card">
+      <div class="k">Avg Time on Site</div>
+      <div class="v" id="cTime">—</div>
+      <div class="sub">avg per session</div>
+    </div>
+    <div class="card">
+      <div class="k">Voice Engaged</div>
+      <div class="v" id="cVoice">—</div>
+      <div class="sub" id="cVoiceSub"></div>
+    </div>
+    <div class="card">
+      <div class="k">Bots Detected</div>
+      <div class="v" id="cBots">—</div>
+      <div class="botgrid">
+        <span>AI Agents<b id="cBotsAI">—</b></span>
+        <span>Crawlers<b id="cBotsCrawl">—</b></span>
+        <span>Headless<b id="cBotsHead">—</b></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Visitors by day + Voice concierge ── -->
+  <div class="grid2">
+    <div class="panel">
+      <h2>Visitors by Day</h2>
+      <div id="vdays"></div>
+      <div class="legend">
+        <span><i class="dot h"></i> Human</span>
+        <span><i class="dot b"></i> Bot</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Voice Concierge</h2>
+      <table>
+        <thead>
+          <tr><th>Agent / Site</th><th>Sessions</th><th>Users</th><th>Avg Dur</th></tr>
+        </thead>
+        <tbody id="voiceRows"></tbody>
+      </table>
+      <div class="foot-note">
+        <span class="n">Mic-blocked errors (all agents)</span>
+        <span class="c" id="micErrors">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Pages visited (per site) ── -->
+  <div class="panel">
+    <h2>Pages Visited</h2>
+    <table>
+      <thead>
+        <tr><th>Site</th><th>Views</th><th>Visitors</th></tr>
+      </thead>
+      <tbody id="pageRows"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<script>
+/* ==================================================================
+   jchowlabs analytics dashboard
+   Served by the proofpoint-analytics Worker; calls its /api/* routes
+   on the same origin. Add ?demo to the URL to preview with sample data.
+   ================================================================== */
+
+const API_BASE = '';                       // same-origin (served by the worker)
+const DEMO = new URLSearchParams(location.search).has('demo');
+
+/* ---- site display map (slug prefix -> label / colour) ---- */
+const SITES = {
+  home:      { nm:'Home',      pth:'/',           c:'#98a1b0' },
+  alliances: { nm:'Alliances', pth:'/alliances/', c:'#3b4fd6' },
+  teacher:   { nm:'Companion', pth:'/teacher/',   c:'#27a567' },
+  blog:      { nm:'Blog',      pth:'/blog/',      c:'#a06bd6' },
+  falcon:    { nm:'Falcon',    pth:'/falcon/',    c:'#e0a458' },
+};
+function site(key){
+  const k = (key === '' || key == null) ? 'home' : key;
+  return SITES[k] || { nm:k, pth:'/'+k+'/', c:'#98a1b0' };
+}
+
+/* ---- formatting ---- */
+const fmtNum = n => (n == null ? '—' : Number(n).toLocaleString());
+function fmtMs(ms){
+  if(!ms || ms < 1000) return '—';
+  const s = Math.round(ms/1000);
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+
+/* ---- date range maths ---- */
+let range = 'month';
+let anchor = new Date();
+
+const startOfDay   = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
+const endOfDay     = d => { const x=new Date(d); x.setHours(23,59,59,999); return x; };
+function startOfWeek(d){ const x=startOfDay(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x; }      // Monday
+function endOfWeek(d){ const x=startOfWeek(d); x.setDate(x.getDate()+6); return endOfDay(x); }
+const startOfMonth = d => new Date(d.getFullYear(), d.getMonth(), 1, 0,0,0,0);
+const endOfMonth   = d => new Date(d.getFullYear(), d.getMonth()+1, 0, 23,59,59,999);
+
+function bounds(){
+  if(range === 'all') return { start:null, end:null };
+  if(range === 'day')  return { start:+startOfDay(anchor),  end:+endOfDay(anchor) };
+  if(range === 'week') return { start:+startOfWeek(anchor), end:+endOfWeek(anchor) };
+  return { start:+startOfMonth(anchor), end:+endOfMonth(anchor) };
+}
+function periodLabel(){
+  if(range === 'all')  return 'All time';
+  if(range === 'day')  return anchor.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  if(range === 'week'){ const s=startOfWeek(anchor), e=endOfWeek(anchor);
+    return s.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' +
+           e.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+  return anchor.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+}
+function step(dir){
+  const d = new Date(anchor);
+  if(range === 'day')  d.setDate(d.getDate()+dir);
+  if(range === 'week') d.setDate(d.getDate()+7*dir);
+  if(range === 'month')d.setMonth(d.getMonth()+dir);
+  anchor = d;
+}
+function canGoForward(){
+  if(range === 'all') return false;
+  return bounds().end < Date.now();
+}
+
+/* ---- data fetch ---- */
+async function apiGet(path, params){
+  const qs = new URLSearchParams();
+  if(params.start != null) qs.set('start', params.start);
+  if(params.end   != null) qs.set('end',   params.end);
+  qs.set('range', range);
+  const res = await fetch(`${API_BASE}${path}?${qs}`, { credentials:'include' });
+  if(!res.ok) throw new Error(path + ' ' + res.status);
+  return res.json();
+}
+
+async function load(){
+  document.getElementById('period').textContent = periodLabel();
+  document.getElementById('prev').disabled = (range === 'all');
+  document.getElementById('next').disabled = !canGoForward();
+
+  if(DEMO){ renderAll(demoData()); return; }
+
+  const b = bounds();
+  try{
+    const [summary, visitors, voice, pages] = await Promise.all([
+      apiGet('/api/summary',  b),
+      apiGet('/api/visitors', b),
+      apiGet('/api/voice',    b),
+      apiGet('/api/pages',    b),
+    ]);
+    renderAll({ summary, visitors, voice, pages });
+  }catch(err){
+    renderAll(emptyData());   // worker not reachable yet / no data
+  }
+}
+
+/* ---- render ---- */
+function renderAll({summary, visitors, voice, pages}){
+  // cards
+  const s = summary || {};
+  setText('cVisitors', fmtNum(s.visitors));
+  setText('cVisitorsSub', (s.humans != null) ? `${fmtNum(s.humans)} human · ${fmtNum(s.bots)} bot` : '');
+  setText('cTime', fmtMs(s.avg_time_ms));
+  setText('cVoice', (s.voice_engaged != null) ? `${fmtNum(s.voice_engaged)} of ${fmtNum(s.voice_humans)}` : '—');
+  setText('cVoiceSub', (s.voice_rate != null) ? `${s.voice_rate}% of humans` : '');
+  setText('cBots', fmtNum(s.bots));
+  setText('cBotsAI', fmtNum(s.bots_ai));
+  setText('cBotsCrawl', fmtNum(s.bots_crawler));
+  setText('cBotsHead', fmtNum(s.bots_headless));
+
+  // visitors by day
+  const days = (visitors && visitors.days) || [];
+  const max = Math.max(1, ...days.map(d => (d.humans||0)+(d.bots||0)));
+  document.getElementById('vdays').innerHTML = days.length ? days.map(d => {
+    const h=d.humans||0, b=d.bots||0, total=h+b, scale=total/max*100;
+    return `<div class="vrow">
+      <span class="d">${fmtDay(d.day)}</span>
+      <div class="vtrack"><span class="h" style="width:${total?h/total*scale:0}%"></span><span class="b" style="width:${total?b/total*scale:0}%"></span></div>
+      <span class="c">${total}</span>
+    </div>`;
+  }).join('') : `<div class="empty">No visits in this period.</div>`;
+
+  // voice concierge (per site)
+  const vrows = (voice && voice.by_site) || [];
+  document.getElementById('voiceRows').innerHTML = vrows.length ? vrows.map(r => {
+    const si = site(r.site);
+    return `<tr>
+      <td><div class="site"><span class="nm">${si.nm}</span><span class="pth">${si.pth}</span></div></td>
+      <td>${fmtNum(r.sessions)}</td><td>${fmtNum(r.users)}</td><td>${fmtMs(r.avg_duration_ms)}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="4"><div class="empty">No voice sessions yet.</div></td></tr>`;
+  setText('micErrors', fmtNum(voice && voice.mic_errors));
+
+  // pages visited (per site)
+  const prows = (pages && pages.by_site) || [];
+  document.getElementById('pageRows').innerHTML = prows.length ? prows.map(r => {
+    const si = site(r.site);
+    return `<tr>
+      <td><div class="site"><span class="sq" style="background:${si.c}"></span><span class="nm">${si.nm}</span><span class="pth">${si.pth}</span></div></td>
+      <td>${fmtNum(r.views)}</td><td>${fmtNum(r.visitors)}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="3"><div class="empty">No page views yet.</div></td></tr>`;
+}
+
+function setText(id, t){ document.getElementById(id).textContent = t; }
+function fmtDay(day){ // day is 'YYYY-MM-DD' from the worker
+  if(!day) return '';
+  const [y,m,d] = day.split('-').map(Number);
+  return new Date(y, m-1, d).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
+/* ---- empty + demo payloads ---- */
+function emptyData(){
+  return {
+    summary:{ visitors:0, humans:0, bots:0, avg_time_ms:0, voice_engaged:0, voice_humans:0, voice_rate:0, bots_ai:0, bots_crawler:0, bots_headless:0 },
+    visitors:{ days:[] }, voice:{ by_site:[], mic_errors:0 }, pages:{ by_site:[] },
+  };
+}
+function demoData(){
+  return {
+    summary:{ visitors:487, humans:425, bots:62, avg_time_ms:168000, voice_engaged:96, voice_humans:425, voice_rate:23, bots_ai:21, bots_crawler:34, bots_headless:7 },
+    visitors:{ days:[
+      {day:'2026-10-01',humans:22,bots:8},{day:'2026-10-02',humans:35,bots:11},{day:'2026-10-03',humans:41,bots:9},
+      {day:'2026-10-04',humans:28,bots:14},{day:'2026-10-05',humans:33,bots:10},{day:'2026-10-06',humans:30,bots:12},
+      {day:'2026-10-07',humans:25,bots:9},{day:'2026-10-08',humans:38,bots:13},{day:'2026-10-09',humans:31,bots:7},{day:'2026-10-10',humans:19,bots:5},
+    ]},
+    voice:{ by_site:[
+      {site:'alliances',sessions:61,users:48,avg_duration_ms:112000},
+      {site:'teacher',  sessions:44,users:35,avg_duration_ms:130000},
+      {site:'falcon',   sessions:22,users:19,avg_duration_ms:200000},
+    ], mic_errors:9 },
+    pages:{ by_site:[
+      {site:'home',views:420,visitors:310},{site:'alliances',views:240,visitors:140},
+      {site:'teacher',views:180,visitors:95},{site:'blog',views:130,visitors:72},{site:'falcon',views:90,visitors:38},
+    ]},
+  };
+}
+
+/* ---- wire controls ---- */
+document.getElementById('seg').addEventListener('click', e => {
+  const btn = e.target.closest('button'); if(!btn) return;
+  range = btn.dataset.range; anchor = new Date();
+  [...document.querySelectorAll('#seg button')].forEach(b => b.classList.toggle('active', b === btn));
+  load();
+});
+document.getElementById('prev').addEventListener('click', () => { step(-1); load(); });
+document.getElementById('next').addEventListener('click', () => { if(canGoForward()){ step(1); load(); } });
+
+/* ---- demo badge + boot ---- */
+if(DEMO){
+  const b = document.createElement('div');
+  b.className = 'sample-badge'; b.textContent = 'SAMPLE DATA — ?demo';
+  document.body.appendChild(b);
+}
+load();
+</script>
+</body>
+</html>
