@@ -141,11 +141,11 @@
       return mod.Conversation.startSession({
         agentId: VOICE_AGENT_ID,
         dynamicVariables: { total_slides: String(d ? d.count : 23), current_slide: String(d ? d.current() : 1) },
-        onConnect: function () { if (gen !== sessionGen) return; setStatus('listening'); notifySlide(); },
-        onDisconnect: function () { if (gen !== sessionGen) return; stopWaves(); var wasSpeaking = status === 'speaking'; var done = function () { conversation = null; setStatus('idle'); }; wasSpeaking ? setTimeout(done, 2000) : done(); },
+        onConnect: function () { if (gen !== sessionGen) return; setStatus('listening'); notifySlide(); if (window.jcl) jcl.voiceStart(); },
+        onDisconnect: function () { if (gen !== sessionGen) return; if (window.jcl) jcl.voiceEnd(); stopWaves(); var wasSpeaking = status === 'speaking'; var done = function () { conversation = null; setStatus('idle'); }; wasSpeaking ? setTimeout(done, 2000) : done(); },
         onModeChange: function (m) { if (gen !== sessionGen) return; var mode = m && m.mode; setStatus(mode === 'speaking' ? 'speaking' : 'listening'); if (mode === 'speaking' && endingTimer) { clearTimeout(endingTimer); endingTimer = null; } if (mode === 'listening' && ending) { endingTimer = setTimeout(function () { if (ending) endSession(); }, 1500); } },
         onStatusChange: function (s) { if (gen !== sessionGen) return; if (s && s.status === 'connecting') setStatus('connecting'); },
-        onError: function () { if (gen !== sessionGen) return; conversation = null; setStatus('error'); setTimeout(function () { if (status === 'error') setStatus('idle'); }, 4000); },
+        onError: function () { if (gen !== sessionGen) return; if (window.jcl) jcl.voiceError(); conversation = null; setStatus('error'); setTimeout(function () { if (status === 'error') setStatus('idle'); }, 4000); },
         clientTools: clientTools
       });
     }).then(function (conv) {
@@ -155,6 +155,7 @@
     }).catch(function (err) {
       if (gen !== sessionGen) return;
       sdkPromise = null;
+      if (window.jcl) jcl.voiceError();
       var micDenied = err && (err.name === 'NotAllowedError' || err.name === 'NotFoundError' || (err.message && /microphone|permission|not allowed/i.test(err.message)));
       if (micDenied) { setStatus('mic-blocked'); }
       else { console.error('[voice] start failed:', err); setStatus('error'); setTimeout(function () { if (status === 'error') setStatus('idle'); }, 4000); }

@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#1c2230;color:#e6e8ec}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>jchowlabs</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></head><body>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#1c2230;color:#e6e8ec}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>jchowlabs</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><script src="/analytics.js" defer></script></head><body>
 <style>
 /* Layout: a notebook. Home is an alphabetized tile grid; each partner opens as one long article
    (overview, use cases with diagrams, joint messaging, collapsed sales prep) with a sticky section bar. */
@@ -652,17 +652,18 @@ route();
       if(gen!==sessionGen) return;
       const conv=await mod.Conversation.startSession({
         agentId: VOICE_AGENT_ID,
-        onConnect: ()=>{ if(gen!==sessionGen) return; setStatus('listening'); },
-        onDisconnect: ()=>{ if(gen!==sessionGen) return; stopWaves(); const wasSpeaking=status==='speaking'; const done=()=>{ conversation=null; setStatus('idle'); }; wasSpeaking?setTimeout(done,2000):done(); },
+        onConnect: ()=>{ if(gen!==sessionGen) return; setStatus('listening'); if(window.jcl) jcl.voiceStart(); },
+        onDisconnect: ()=>{ if(gen!==sessionGen) return; if(window.jcl) jcl.voiceEnd(); stopWaves(); const wasSpeaking=status==='speaking'; const done=()=>{ conversation=null; setStatus('idle'); }; wasSpeaking?setTimeout(done,2000):done(); },
         onModeChange: (m)=>{ if(gen!==sessionGen) return; const mode=m&&m.mode; setStatus(mode==='speaking'?'speaking':'listening'); if(mode==='speaking'&&endingTimer){ clearTimeout(endingTimer); endingTimer=null; } if(mode==='listening'&&ending){ endingTimer=setTimeout(()=>{ if(ending) endSession(); },1500); } },
         onStatusChange: (s)=>{ if(gen!==sessionGen) return; if(s&&s.status==='connecting') setStatus('connecting'); },
-        onError: ()=>{ if(gen!==sessionGen) return; conversation=null; setStatus('error'); setTimeout(()=>{ if(status==='error') setStatus('idle'); },4000); },
+        onError: ()=>{ if(gen!==sessionGen) return; if(window.jcl) jcl.voiceError(); conversation=null; setStatus('error'); setTimeout(()=>{ if(status==='error') setStatus('idle'); },4000); },
         clientTools: clientTools
       });
       if(gen!==sessionGen){ try{ conv.endSession(); }catch(e){} return; }
       conversation=conv; startWaves();
     }catch(err){
       if(gen!==sessionGen) return;
+      if(window.jcl) jcl.voiceError();
       const micDenied = err && (err.name==='NotAllowedError'||err.name==='NotFoundError'||(err.message&&/microphone|permission|not allowed/i.test(err.message)));
       if(micDenied){ setStatus('mic-blocked'); }
       else { console.error('[voice] start failed:', err); setStatus('error'); setTimeout(()=>{ if(status==='error') setStatus('idle'); },4000); }

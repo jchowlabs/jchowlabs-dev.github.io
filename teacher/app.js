@@ -73,10 +73,12 @@
         onConnect: function () {
           if (myGen !== sessionGen) return;
           setStatus('listening');
+          if (window.jcl) jcl.voiceStart();
         },
 
         onDisconnect: function () {
           if (myGen !== sessionGen) return;
+          if (window.jcl) jcl.voiceEnd();
           conversation = null;
           setStatus('idle');
         },
@@ -89,6 +91,7 @@
 
         onError: function () {
           if (myGen !== sessionGen) return;
+          if (window.jcl) jcl.voiceError();
           conversation = null;
           setStatus('error');
           setTimeout(function () { if (status === 'error') setStatus('idle'); }, 2500);
@@ -104,6 +107,7 @@
 
     } catch (e) {
       if (myGen !== sessionGen) return;
+      if (window.jcl) jcl.voiceError();
       conversation = null;
       // Mic denial and every other failure reset silently to idle.
       setStatus('error');
