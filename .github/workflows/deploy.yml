@@ -29,6 +29,12 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # The analytics Worker is deployed separately (via wrangler) and must
+      # NOT be published to the public site — strip it from the ephemeral
+      # checkout before upload so wrangler.toml (D1/KV ids) never ships.
+      - name: Exclude Worker source from Pages
+        run: rm -rf proofpoint-analytics
+
       # Uploads the repo root as-is (no Jekyll). The action auto-excludes
       # .git and .github, so the site — index.html, app.js, styles.css,
       # CNAME, .nojekyll — is published.

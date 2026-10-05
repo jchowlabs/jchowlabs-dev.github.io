@@ -1,0 +1,21 @@
+name = "proofpoint-analytics"
+main = "src/index.js"
+compatibility_date = "2025-12-01"
+
+# Serve the single-file dashboard as static assets. Any non-/api request
+# falls through to index.html (SPA), while /api/* is handled by the Worker.
+[assets]
+directory = "./dashboard"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+# D1 database — id is filled in after `wrangler d1 create proofpoint-analytics`
+[[d1_databases]]
+binding = "DB"
+database_name = "proofpoint-analytics"
+database_id = "c81631c1-d4fd-4413-8eb1-8cfdd1264c27"
+
+# KV namespace for IP rate limiting (namespace title: proofpoint_rl)
+[[kv_namespaces]]
+binding = "RATE_LIMITER"
+id = "6168027addba47818c2f79fdc208df84"
