@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Email Defense</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Saira+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: one service-manual plate. Header + deployment and scenario switches, a mail-path rail, then three panels (message · classifiers · mailbox), then the step caption. */
+:root{
+  --paper:#EBEEF2; --panel:#F8F9FB; --screen:#FFFFFF; --ink:#17202B; --soft:#5B6676; --line:#C9D0D9; --grid:#DCE1E8; --chip:#EEF0F3;
+  --accent:#2C4BDB; --accentS:#DDE3FA; --risk:#C4352A; --riskS:#F7DEDB; --ok:#1F7A4D; --okS:#DCEFE4; --warn:#A8670E; --warnS:#F6E8D2; --onAccent:#FFFFFF;
+  --f-display:"Saira Condensed","Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0D131B; --panel:#141C26; --screen:#1A2330; --ink:#DCE3EC; --soft:#8C99AA; --line:#2B3747; --grid:#222D3A; --chip:#222D3A;
+  --accent:#7F95FF; --accentS:#26315A; --risk:#FF6A5C; --riskS:#4A1F1C; --ok:#4CC38A; --okS:#173828; --warn:#E3A548; --warnS:#45331A; --onAccent:#0D131B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0D131B; --panel:#141C26; --screen:#1A2330; --ink:#DCE3EC; --soft:#8C99AA; --line:#2B3747; --grid:#222D3A; --chip:#222D3A;
+  --accent:#7F95FF; --accentS:#26315A; --risk:#FF6A5C; --riskS:#4A1F1C; --ok:#4CC38A; --okS:#173828; --warn:#E3A548; --warnS:#45331A; --onAccent:#0D131B; color-scheme:dark}
+
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1440px;margin:0 auto;padding-inline:24px;padding-block:22px 36px;display:grid;gap:14px}
+@media (max-width:600px){.wrap{padding-inline:16px}}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+h1{margin:0;font:700 clamp(30px,4vw,40px)/1 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
+.grp{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lbl{font:600 10.5px var(--f-mono);letter-spacing:.12em;color:var(--soft);text-transform:uppercase}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;border-radius:0;background:transparent;color:var(--soft);font:600 13px var(--f-body);padding:8px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg.sc button.bad[aria-pressed="true"]{background:var(--risk);color:var(--onAccent)}
+.seg.sc button.good[aria-pressed="true"]{background:var(--ok);color:var(--onAccent)}
+.ctrls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto}
+.btn{font:500 13px var(--f-body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 12px;cursor:pointer}
+.btn:hover{border-color:var(--soft)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--onAccent);min-width:76px}
+/* Back-to-home link, upper-left of the header. Reuses .btn box styling. */
+.back{display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.back svg{width:16px;height:16px;flex:none}
+.back:hover{color:var(--accent);border-color:var(--accent)}
+button:focus-visible,a.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stepno{font:500 12px var(--f-mono);color:var(--soft);letter-spacing:.06em;font-variant-numeric:tabular-nums;min-width:96px;text-align:right}
+.bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.bar.b i{background:var(--risk)}
+.stage{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin:0}
+.stage svg{display:block;width:100%;min-width:980px;height:auto}
+
+/* svg */
+svg text{font-family:var(--f-body);fill:var(--ink)}
+svg .mono{font-family:var(--f-mono)}
+.gridline{stroke:var(--grid);fill:none}
+.colhd{font:600 11px var(--f-mono);letter-spacing:.12em;fill:var(--soft)}
+.ts{fill:var(--soft)} .ta{fill:var(--accent)} .tr{fill:var(--risk)} .tok{fill:var(--ok)} .twn{fill:var(--warn)} .tw{fill:var(--onAccent)}
+.card{fill:var(--screen);stroke:var(--line)}
+.pnl{fill:var(--panel);stroke:var(--line)}
+.skel{fill:var(--chip)}
+
+/* rail */
+.node{transition:transform .7s cubic-bezier(.6,0,.3,1)}
+.nbox{fill:var(--screen);stroke:var(--line);stroke-width:1.2;transition:fill .3s,stroke .3s}
+.node.pp .nbox{stroke:var(--accent);stroke-width:1.6}
+.node.on .nbox{fill:var(--accentS);stroke:var(--accent);stroke-width:2}
+.node.risk .nbox{fill:var(--riskS);stroke:var(--risk);stroke-width:2}
+.node.okk .nbox{fill:var(--okS);stroke:var(--ok);stroke-width:2}
+.ntitle{font-size:15px;font-weight:700}
+.node.pp .ntitle{fill:var(--accent)}
+.edge{stroke:var(--soft);stroke-width:1.5;fill:none}
+.edge.dash{stroke-dasharray:5 5}
+.edges{animation:fade .5s .55s both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.arrowh{fill:var(--soft)}
+.flow{fill:none;stroke-width:2.5;stroke-dasharray:8 6;stroke-linecap:round;animation:dash 1s linear infinite;stroke:var(--accent)}
+.flow.k-risk{stroke:var(--risk);stroke-width:3}
+.flow.k-ok{stroke:var(--ok)}
+@keyframes dash{to{stroke-dashoffset:-14}}
+.pk{fill:var(--accent)} .pk.k-risk{fill:var(--risk)} .pk.k-ok{fill:var(--ok)}
+.pkh{fill:var(--accent);opacity:.22} .pkh.k-risk{fill:var(--risk)} .pkh.k-ok{fill:var(--ok)}
+.blockc{fill:var(--risk)}
+
+/* message parts */
+.part{fill:transparent;stroke:transparent;stroke-width:1.4;transition:fill .3s,stroke .3s}
+.part.q{stroke:var(--accent);stroke-dasharray:3 3}
+.part.scan{fill:var(--accentS);stroke:var(--accent)}
+.part.pass{fill:var(--okS);stroke:var(--ok)}
+.part.warn{fill:var(--warnS);stroke:var(--warn)}
+.part.flag{fill:var(--riskS);stroke:var(--risk)}
+.linkbtn{fill:var(--accent)}
+.docicon{fill:var(--screen);stroke:var(--soft)} .docline{stroke:var(--soft);stroke-width:1.4}
+
+/* classifier rows */
+.crow{fill:transparent;stroke:transparent;transition:fill .25s,stroke .25s}
+.crow.scan{fill:var(--accentS);stroke:var(--accent)}
+.crow.flag{fill:var(--riskS)}
+.crow.warn{fill:var(--warnS)}
+.st{fill:var(--panel);stroke:var(--line);stroke-width:2;transition:fill .25s,stroke .25s}
+.st.queued{stroke:var(--accent);stroke-dasharray:3 3}
+.st.scan{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-dasharray:24 12;transform-box:fill-box;transform-origin:center;animation:spin 1s linear infinite}
+.st.pass{fill:var(--ok);stroke:var(--ok)}
+.st.warn{fill:var(--warn);stroke:var(--warn)}
+.st.flag{fill:var(--risk);stroke:var(--risk)}
+.st.na{fill:var(--panel);stroke:var(--line)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chipr{fill:none;stroke:none}
+.chipr.scan{fill:var(--accent)} .chipr.pass{fill:var(--ok)} .chipr.warn{fill:var(--warn)} .chipr.flag{fill:var(--risk)} .chipr.na{fill:var(--chip)}
+.chipt{font:600 10.5px var(--f-mono);letter-spacing:.06em;fill:var(--onAccent)}
+.chipt.na{fill:var(--soft)}
+.ld{fill:none;stroke-width:1.6;transition:opacity .25s}
+.ld.q{stroke:var(--accent);stroke-dasharray:3 4;opacity:.55}
+.ld.scan{stroke:var(--accent);stroke-width:2.2}
+.ld.pass{stroke:var(--ok)} .ld.warn{stroke:var(--warn)} .ld.flag{stroke:var(--risk);stroke-width:2.2}
+.ldd{transition:opacity .25s}
+.ldd.q,.ldd.scan{fill:var(--accent)} .ldd.pass{fill:var(--ok)} .ldd.warn{fill:var(--warn)} .ldd.flag{fill:var(--risk)}
+.sbar{fill:var(--grid)}
+.sfill{fill:var(--ok)} .sfill.bad{fill:var(--risk)}
+.thr{stroke:var(--ink);stroke-width:1.5}
+
+/* mailbox */
+.mrow{fill:var(--screen);stroke:var(--line)}
+.avatar{fill:var(--chip)}
+.newrow{transition:transform .9s cubic-bezier(.6,0,.3,1),opacity .4s}
+.newrow.instant{transition:none}
+.newrow .mrow{fill:var(--accentS);stroke:var(--accent)}
+.newrow.risk .mrow{fill:var(--riskS);stroke:var(--risk);stroke-width:1.6}
+.newrow.okk .mrow{fill:var(--okS);stroke:var(--ok)}
+.unread{fill:var(--accent)} .newrow.risk .unread{fill:var(--risk)} .newrow.okk .unread{fill:var(--ok)}
+.others{transition:transform .9s cubic-bezier(.6,0,.3,1)}
+.qbox{fill:var(--screen);stroke:var(--line);transition:stroke .3s}
+.qbox.alert{stroke:var(--risk);stroke-width:1.6}
+.slot{fill:none;stroke:var(--line);stroke-dasharray:4 4}
+.pop{animation:pop .45s ease-out both}
+@keyframes pop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){
+  .flow,.st.scan,.pop,.edges{animation:none}
+  .node,.newrow,.others{transition:none}
+}
+</style>
+</head><body style="margin:0">
+
+<div class="wrap">
+  <div class="top">
+    <a class="btn back" href="../" aria-label="Back to home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      <span>Back</span>
+    </a>
+    <h1>Email Defense</h1>
+    <div class="grp">
+      <span class="lbl">Deployment</span>
+      <div class="seg" role="group" aria-label="Deployment">
+        <button type="button" id="m-gw" aria-pressed="true">Gateway</button>
+        <button type="button" id="m-api" aria-pressed="false">API</button>
+      </div>
+    </div>
+    <div class="grp">
+      <span class="lbl">Message</span>
+      <div class="seg sc" role="group" aria-label="Example message">
+        <button type="button" id="s-clean" class="good" aria-pressed="false">Legitimate</button>
+        <button type="button" id="s-phish" class="bad" aria-pressed="true">Phishing</button>
+        <button type="button" id="s-bec" class="bad" aria-pressed="false">BEC</button>
+        <button type="button" id="s-mal" class="bad" aria-pressed="false">Malware</button>
+      </div>
+    </div>
+    <div class="ctrls">
+      <span class="stepno" id="stepno"></span>
+      <button type="button" class="btn" id="restart">Restart</button>
+      <button type="button" class="btn" id="prev" aria-label="Previous step">Back</button>
+      <button type="button" class="btn primary" id="play">Pause</button>
+      <button type="button" class="btn" id="next" aria-label="Next step">Next</button>
+    </div>
+  </div>
+  <div class="bar" id="bar"><i></i></div>
+
+  <figure class="stage">
+    <svg id="svg" viewBox="0 0 1376 760" role="img" aria-label="Animated diagram: an inbound email is broken into properties, each property is checked by a Proofpoint classifier, and the combined verdict either delivers the message, blocks it at the gateway, or pulls it from the inbox over the API"></svg>
+  </figure>
+
+</div>
+
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg',svg=document.getElementById('svg');
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function e(tag,a,p,txt){const n=document.createElementNS(NS,tag);for(const k in a)n.setAttribute(k,a[k]);if(txt!=null)n.textContent=txt;(p||svg).appendChild(n);return n}
+function g(cls,p){return e('g',cls?{class:cls}:{},p)}
+function wrap(t,n){const w=t.split(' '),r=[];let c='';w.forEach(x=>{if(c&&(c+' '+x).length>n){r.push(c);c=x}else c=c?c+' '+x:x});r.push(c);return r}
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+
+/* ---------- classifiers ---------- */
+const CL=[
+ {id:'auth',g:0,name:'Sender authentication',prop:'SPF · DKIM · DMARC'},
+ {id:'rep', g:0,name:'Sender reputation',prop:'domain age · sending IP history'},
+ {id:'look',g:0,name:'Impersonation & lookalikes',prop:'display name · domain similarity'},
+ {id:'rel', g:0,name:'Relationship history',prop:'has this sender written to Jane?'},
+ {id:'url', g:1,name:'URL analysis',prop:'follow every link in a sandbox'},
+ {id:'att', g:1,name:'Attachment sandbox',prop:'open files, watch what they do'},
+ {id:'nlp', g:1,name:'Language & intent',prop:'urgency · payment · credential asks'}
+];
+const PART0={auth:'addr',rep:'addr',look:'addr',rel:'addr',url:'link',att:'att',nlp:'body'};
+const RANK={na:0,pass:1,warn:2,flag:3};
+const CHIP={scan:'CHECK',pass:'PASS',warn:'WARN',flag:'FLAG',na:'N/A'};
+
+/* ---------- scenarios ---------- */
+const SC={
+ clean:{tag:'Clean',score:4,
+  email:{name:'John Smith',addr:'john.smith@globex.com',reply:null,subject:'Updated Q4 delivery schedule',
+   body:'Hi Jane, attached is the revised delivery schedule we talked through on Tuesday. Let me know if the new dates work for your team.',
+   att:'Q4_Delivery_Schedule.pdf',attSub:'PDF · 212 KB'},
+  r:{auth:['pass','SPF, DKIM and DMARC all align'],rep:['pass','Established domain, clean history'],look:['pass','Exact match to a known supplier'],
+     rel:['pass','38 earlier messages with Jane'],url:['na','No links in this message'],att:['pass','Opened in sandbox, nothing executed'],nlp:['pass','Routine business language']},
+  send:'A supplier Jane works with every week sends her an updated delivery schedule, with a PDF attached.',
+  idn:'Authentication, reputation, impersonation and relationship checks all come back green. John is a known supplier who writes to Jane regularly.',
+  cnt:'The PDF opens in the sandbox and does nothing unusual. The language is routine. There are no links to follow.',
+  ver:'Seven checks, no concerns. The combined score is 4 out of 100, far below the line.',
+  sumT:'Good mail flows through'},
+ phish:{tag:'Credential phishing',score:96,
+  email:{name:'IT Service Desk',addr:'helpdesk@acme-support.com',reply:null,subject:'Action required: your password expires today',
+   body:'Your Acme account password expires in 2 hours. To avoid losing access to email and files, confirm your current password now.',
+   link:'Keep current password',href:'acme-sso.login-verify.net'},
+  r:{auth:['pass','Attacker owns the domain, so SPF passes'],rep:['flag','Domain registered 2 days ago'],look:['flag','Imitates acme.com'],
+     rel:['warn','Has never written to Acme'],url:['flag','Sandbox finds a fake Acme sign-in page'],att:['na','No attachment'],nlp:['flag','Deadline plus a password request']},
+  send:'An attacker sends Jane, an accounts manager at Acme, a warning that her password is about to expire.',
+  idn:'Authentication passes because the attacker owns the lookalike domain. That is why one check is never enough. The domain is two days old, imitates Acme’s own, and has never written in before.',
+  cnt:'The link is followed inside a sandbox and lands on a fake Acme sign-in page. The text pairs a deadline with a request for her password.',
+  ver:'Four strong red flags push the score to 96. No single classifier had to be certain on its own.',
+  sumT:'Phishing, caught'},
+ bec:{tag:'Business email compromise',score:89,partOv:{look:'name'},
+  email:{name:'John Doe',addr:'john.doe.ceo@gmail.com',reply:'j.doe@exec-office.co',subject:'Quick favor',
+   body:'Are you at your desk? I need a wire sent to a new vendor before 3pm. I’m in meetings all day, so email only. Please keep this between us for now.'},
+  r:{auth:['pass','Gmail authenticates its own users'],rep:['pass','Free webmail, widely used'],look:['flag','Your CEO’s name on an outside address'],
+     rel:['flag','John has never used this address with Jane'],url:['na','No links to follow'],att:['na','No file to open'],nlp:['flag','Wire request, urgency, secrecy']},
+  send:'Someone writing as Acme’s CEO asks Jane for an urgent, private favor. No link, no attachment.',
+  idn:'Gmail vouches for the sender, so authentication and reputation look fine. The problem is the pairing: the CEO’s name on an address he has never used with Jane.',
+  cnt:'There is nothing to detonate, which is why BEC slips past tools that only hunt malware. The language classifier reads intent: money, urgency, secrecy.',
+  ver:'No malware anywhere, yet identity and intent signals add up to 89.',
+  sumT:'BEC, caught without malware'},
+ mal:{tag:'Malware delivery',score:93,
+  email:{name:'Accounts Receivable',addr:'ar@initech-freight.com',reply:null,subject:'Invoice 48213 is 30 days overdue',
+   body:'Please see the attached invoice. Payment is overdue and late fees apply after Friday. Click Enable Editing to view the full statement.',
+   att:'Invoice_48213.docm',attSub:'Word macro document · 88 KB'},
+  r:{auth:['pass','SPF and DKIM pass'],rep:['warn','Sending server seen in a recent campaign'],look:['pass','No brand imitation'],
+     rel:['warn','First message to anyone at Acme'],url:['na','No links in the body'],att:['flag','Macro downloads a payload in the sandbox'],nlp:['warn','Payment pressure, “Enable Editing”']},
+  send:'An unfamiliar freight company sends Jane an overdue invoice as a Word file with macros.',
+  idn:'The sender is real and authenticated. Its sending server showed up in a recent campaign and has never written to Acme. Suspicious, not conclusive.',
+  cnt:'The attachment is opened in a sandbox. Its macro reaches out and downloads a payload. That alone is decisive.',
+  ver:'One decisive flag from the sandbox, backed by three weaker warnings, lands at 93.',
+  sumT:'Malware, caught in the sandbox'}
+};
+
+/* ---------- steps ---------- */
+const STEPS={gw:['send','route','unpack','identity','content','verdict','act','summary'],
+             api:['send','land','api','unpack','identity','content','verdict','act','summary']};
+const DUR={send:3600,route:3400,land:3800,api:3800,unpack:4000,identity:5800,content:5000,verdict:4400,act:4800,summary:7000};
+
+/* ---------- static scene ---------- */
+const defs=e('defs',{});
+const pat=e('pattern',{id:'gp',width:24,height:24,patternUnits:'userSpaceOnUse'},defs);e('path',{d:'M24 0H0V24',class:'gridline'},pat);
+const mk=e('marker',{id:'ah',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},defs);e('path',{d:'M0 0L10 5L0 10z',class:'arrowh'},mk);
+e('rect',{width:1376,height:760,fill:'url(#gp)'});
+
+// rail
+const RY=118;
+e('rect',{x:40,y:24,width:1296,height:156,rx:8,class:'pnl'});
+e('text',{x:56,y:48,class:'colhd'},null,'MAIL PATH · WHERE INSPECTION HAPPENS');
+const railNote=e('text',{x:1320,y:48,'font-size':12,class:'ts','text-anchor':'end'});
+const NODES={net:['Internet','sender'],pp:['Proofpoint',''],m365:['Microsoft 365','Exchange Online'],inbox:['Inbox','Jane Doe · Acme']};
+const POS={gw:{net:205,pp:530,m365:855,inbox:1180},api:{net:205,m365:530,inbox:855,pp:1180}};
+const EDGES={gw:[['net','pp','MX record',0],['pp','m365','',0],['m365','inbox','',0]],api:[['net','m365','MX record',0],['m365','inbox','',0],['inbox','pp','API connection',1]]};
+const edgeG=g();const nodeEl={},nodeSub={};
+for(const k in NODES){const ng=g('node'+(k==='pp'?' pp':''));
+  e('rect',{x:-100,y:RY-30,width:200,height:60,rx:8,class:'nbox'},ng);
+  e('text',{x:0,y:RY-3,'text-anchor':'middle',class:'ntitle'},ng,NODES[k][0]);
+  nodeSub[k]=e('text',{x:0,y:RY+15,'text-anchor':'middle','font-size':11,class:'ts'},ng,NODES[k][1]);
+  ng.style.transform=`translate(${POS.gw[k]}px,0)`;nodeEl[k]=ng}
+const railFx=g(),railPk=g(),railMark=g();
+
+// panels
+const PY=200;
+e('rect',{x:40,y:PY,width:360,height:540,rx:8,class:'card'});
+e('text',{x:56,y:PY+24,class:'colhd'},null,'1 · THE MESSAGE');
+const msgG=g();
+e('rect',{x:440,y:PY,width:490,height:540,rx:8,class:'card'});
+e('text',{x:456,y:PY+24,class:'colhd'},null,'2 · PROOFPOINT CLASSIFIERS');
+const ppNote=e('text',{x:914,y:PY+24,'font-size':11,class:'ta','text-anchor':'end','font-weight':600});
+e('text',{x:456,y:PY+54,class:'colhd','font-size':10},null,'IDENTITY · WHO SENT IT?');
+e('text',{x:456,y:PY+270,class:'colhd','font-size':10},null,'CONTENT · WHAT DOES IT WANT?');
+const ldG=g();
+const rowY=c=>{const i=CL.indexOf(c);return c.g===0?PY+64+i*46:PY+280+(i-4)*46};
+const rows=CL.map(c=>{const y=rowY(c),rg=g();
+  const box=e('rect',{x:452,y,width:466,height:40,rx:6,class:'crow'},rg);
+  const st=e('circle',{cx:472,cy:y+20,r:7,class:'st'},rg);
+  e('text',{x:490,y:y+17,'font-size':13,'font-weight':600},rg,c.name);
+  const sub=e('text',{x:490,y:y+33,'font-size':11,class:'ts mono'},rg,c.prop);
+  const cr=e('rect',{x:852,y:y+10,width:54,height:20,rx:10,class:'chipr'},rg);
+  const ct=e('text',{x:879,y:y+24,'text-anchor':'middle',class:'chipt'},rg,'');
+  return {c,y,box,st,sub,cr,ct}});
+// score
+e('line',{x1:456,x2:914,y1:PY+452,y2:PY+452,stroke:'var(--grid)'});
+e('text',{x:456,y:PY+478,class:'colhd'},null,'COMBINED VERDICT');
+const verT=e('text',{x:914,y:PY+479,'text-anchor':'end','font-size':15,'font-weight':700,style:'font-family:var(--f-display);letter-spacing:.06em'});
+e('rect',{x:456,y:PY+492,width:458,height:14,rx:7,class:'sbar'});
+const sFill=e('rect',{x:456,y:PY+492,width:0,height:14,rx:7,class:'sfill'});
+const TX=456+458*.7;
+e('line',{x1:TX,x2:TX,y1:PY+486,y2:PY+512,class:'thr'});
+e('text',{x:TX,y:PY+526,'font-size':10.5,class:'ts mono','text-anchor':'middle'},null,'quarantine at 70');
+const scoreT=e('text',{x:456,y:PY+526,'font-size':11,class:'ts mono'});
+
+// mailbox
+const MX=970;
+e('rect',{x:MX,y:PY,width:366,height:260,rx:8,class:'card'});
+e('text',{x:MX+16,y:PY+24,class:'colhd'},null,'3 · JANE’S INBOX');
+e('text',{x:MX+350,y:PY+24,'font-size':11,class:'ts mono','text-anchor':'end'},null,'jane.doe@acme.com');
+const SLOT=i=>PY+38+i*46;
+function mrow(p,y,name,subj,time,initial){
+  e('rect',{x:MX+12,y,width:342,height:40,rx:6,class:'mrow'},p);
+  e('circle',{cx:MX+34,cy:y+20,r:12,class:'avatar'},p);
+  e('text',{x:MX+34,y:y+24,'font-size':11,'font-weight':700,'text-anchor':'middle',class:'ts'},p,initial);
+  const n=e('text',{x:MX+56,y:y+17,'font-size':12.5,'font-weight':600},p,name);
+  const s=e('text',{x:MX+56,y:y+33,'font-size':11.5,class:'ts'},p,subj);
+  e('text',{x:MX+344,y:y+17,'font-size':10.5,class:'ts mono','text-anchor':'end'},p,time);
+  return {n,s}}
+const others=g('others');
+[['Alex Kim','Offsite agenda, final draft','9:12','AK'],['Facilities','Garage closed Saturday','8:47','F'],['Sam Lee','Re: Q3 close checklist','Mon','SL']]
+ .forEach((r,i)=>mrow(others,SLOT(i),...r));
+const inboxNote=e('text',{x:MX+16,y:PY+242,'font-size':11.5,'font-weight':600});
+e('rect',{x:MX,y:PY+280,width:366,height:260,rx:8,class:'qbox',id:'qbox'});
+const qbox=document.getElementById('qbox');
+e('text',{x:MX+16,y:PY+304,class:'colhd'},null,'QUARANTINE · HELD BY PROOFPOINT');
+const QY=PY+318;
+e('rect',{x:MX+12,y:QY,width:342,height:40,rx:6,class:'slot'});
+const qNote1=e('text',{x:MX+16,y:QY+84,'font-size':12,'font-weight':600});
+const qNote2=e('text',{x:MX+16,y:QY+104,'font-size':11.5,class:'ts'});
+const qNote3=e('text',{x:MX+16,y:QY+122,'font-size':11.5,class:'ts'});
+const newRow=g('newrow');let newRowTx={n:null,s:null};
+const newUnread=e('circle',{cx:MX+6+14,cy:0,r:0},newRow);
+
+/* ---------- message card (per scenario) ---------- */
+let parts={},partAnchor={};
+function buildMsg(){
+  msgG.innerHTML='';parts={};partAnchor={};
+  const m=SC[scen].email;
+  const P=(k,x,y,w,h)=>{parts[k]=e('rect',{x,y,width:w,height:h,rx:4,class:'part'},msgG);partAnchor[k]=y+h/2};
+  const L=(t,y)=>e('text',{x:56,y,class:'colhd','font-size':9.5},msgG,t);
+  let y=PY+58;
+  L('FROM',y+4);P('name',124,y-12,268,22);e('text',{x:130,y:y+4,'font-size':14,'font-weight':700},msgG,m.name);
+  y+=24;P('addr',124,y-12,268,20);e('text',{x:130,y:y+3,'font-size':12,class:'mono'},msgG,m.addr);
+  y+=32;L('REPLY-TO',y+4);P('reply',124,y-11,268,20);e('text',{x:130,y:y+4,'font-size':12,class:m.reply?'mono':'ts'},msgG,m.reply||'same as sender');
+  y+=28;L('TO',y+4);e('text',{x:130,y:y+4,'font-size':12,class:'mono ts'},msgG,'jane.doe@acme.com');
+  y+=34;L('SUBJECT',y+4);const sl=wrap(m.subject,28);P('subject',124,y-13,268,sl.length*19+8);
+  sl.forEach((t,i)=>e('text',{x:130,y:y+4+i*19,'font-size':14,'font-weight':700},msgG,t));
+  y+=sl.length*19+16;e('line',{x1:56,x2:384,y1:y,y2:y,stroke:'var(--line)'},msgG);
+  y+=28;const bl=wrap(m.body,44);P('body',48,y-17,344,bl.length*20+12);
+  bl.forEach((t,i)=>e('text',{x:56,y:y+i*20,'font-size':13},msgG,t));
+  y+=bl.length*20+8;
+  if(m.link){y+=10;P('link',48,y-6,344,64);
+    const w=m.link.length*7.6+40;e('rect',{x:56,y,width:w,height:30,rx:5,class:'linkbtn'},msgG);
+    e('text',{x:56+w/2,y:y+20,'font-size':13,'font-weight':600,'text-anchor':'middle',class:'tw'},msgG,m.link);
+    e('text',{x:56,y:y+48,'font-size':11,class:'ts mono'},msgG,'links to ▸ '+m.href);y+=70}
+  if(m.att){y+=10;P('att',48,y-6,344,56);
+    e('rect',{x:56,y,width:328,height:44,rx:6,class:'card'},msgG);
+    e('rect',{x:68,y:y+8,width:22,height:28,rx:3,class:'docicon'},msgG);
+    [y+16,y+22,y+28].forEach(yy=>e('line',{x1:73,x2:85,y1:yy,y2:yy,class:'docline'},msgG));
+    e('text',{x:102,y:y+19,'font-size':12.5,'font-weight':600,class:'mono'},msgG,m.att);
+    e('text',{x:102,y:y+35,'font-size':11,class:'ts'},msgG,m.attSub);y+=56}
+  if(!m.link&&!m.att){y+=14;e('text',{x:56,y,'font-size':11.5,class:'ts'},msgG,'No links. No attachments.')}
+  // leaders
+  ldG.innerHTML='';
+  CL.forEach((c,i)=>{const pk=partOf(c.id),r=rows[i];r.part=pk;r.ld=null;
+    if(!pk||!parts[pk])return;const py=partAnchor[pk],ry=r.y+20;
+    r.ld=e('path',{d:`M392 ${py} C 424 ${py}, 420 ${ry}, 452 ${ry}`,class:'ld',opacity:0},ldG);
+    r.ldd=e('circle',{cx:392,cy:py,r:3.5,class:'ldd',opacity:0},ldG)});
+  // new inbox row text
+  newRow.innerHTML='';
+  const t=mrow(newRow,SLOT(0),m.name,m.subject.length>34?m.subject.slice(0,33)+'…':m.subject,'10:41',m.name.split(' ').map(w=>w[0]).join('').slice(0,2));
+  e('circle',{cx:MX+20,cy:SLOT(0)+20,r:3.5,class:'unread'},newRow);
+}
+function partOf(id){const sc=SC[scen];if(sc.partOv&&sc.partOv[id])return sc.partOv[id];const p=PART0[id];
+  if(p==='link'&&!sc.email.link)return null;if(p==='att'&&!sc.email.att)return null;return p}
+
+/* ---------- state ---------- */
+let mode='gw',scen='phish',cur=0,playing=!reduce,t0=performance.now(),anims=[],packets=[],lastMode=null;
+const steps=()=>STEPS[mode];
+
+function railPath(a,b){const P=POS[mode];const xa=P[a],xb=P[b];const d=xb>xa?1:-1;return `M${xa+d*100} ${RY} L${xb-d*100} ${RY}`}
+
+function render(n){
+  const S=steps(),id=S[n],sc=SC[scen],bad=sc.score>=70,API=mode==='api';
+  const at=k=>S.indexOf(k),reached=k=>at(k)>=0&&at(k)<=n;
+  anims=[];packets=[];
+  const now=performance.now();
+
+  /* rail */
+  railNote.textContent=API?'Proofpoint connects beside the mailbox. Inspection happens after delivery.':'Proofpoint sits in the mail path. Inspection happens before delivery.';
+  nodeSub.pp.textContent=API?'API · post-delivery':'secure email gateway';
+  for(const k in nodeEl){nodeEl[k].style.transform=`translate(${POS[mode][k]}px,0)`;nodeEl[k].setAttribute('class','node'+(k==='pp'?' pp':''))}
+  if(lastMode!==mode){edgeG.innerHTML='';const eg=g(lastMode&&!reduce?'edges':null,edgeG);
+    EDGES[mode].forEach(([a,b,lab,both])=>{e('path',{d:railPath(a,b),class:'edge'+(both?' dash':''),'marker-end':'url(#ah)','marker-start':both?'url(#ah)':''},eg);
+      if(lab){const xm=(POS[mode][a]+POS[mode][b])/2;e('text',{x:xm,y:RY-10,'font-size':10.5,class:'ts mono','text-anchor':'middle'},eg,lab)}});
+    lastMode=mode}
+  const on=(k,c)=>nodeEl[k].classList.add(c||'on');
+  railFx.innerHTML='';railPk.innerHTML='';railMark.innerHTML='';
+  const flows=[];
+  if(id==='send')on('net');
+  if(id==='route'){on('pp');flows.push({d:railPath('net','pp'),k:'req'})}
+  if(id==='land'){on('inbox');flows.push({d:`M${POS.api.net+100} ${RY} L${POS.api.inbox-100} ${RY}`,k:'req',dur:2000})}
+  if(id==='api'){on('pp');flows.push({d:railPath('inbox','pp'),k:'req'})}
+  if(['unpack','identity','content','verdict'].includes(id)){on('pp');if(API&&reached('land'))on('inbox')}
+  if(reached('act')){
+    if(!bad){on('inbox','okk');if(id==='act'&&!API)flows.push({d:`M${POS.gw.pp+100} ${RY} L${POS.gw.inbox-100} ${RY}`,k:'ok',dur:2000});if(API)on('pp')}
+    else if(!API){on('pp','risk');const xm=(POS.gw.pp+POS.gw.m365)/2,bg=g(id==='act'&&!reduce?'pop':null,railMark);
+      e('circle',{cx:xm,cy:RY,r:13,class:'blockc'},bg);e('path',{d:`M${xm-5} ${RY-5}l10 10M${xm+5} ${RY-5}l-10 10`,style:'stroke:var(--onAccent);stroke-width:2.4'},bg);
+      e('text',{x:xm,y:RY+34,'font-size':11,'font-weight':700,class:'tr','text-anchor':'middle'},bg,'BLOCKED')}
+    else{on('inbox','risk');on('pp','risk');if(id==='act')flows.push({d:railPath('inbox','pp'),k:'risk'});
+      const xm=(POS.api.inbox+POS.api.pp)/2;e('text',{x:xm,y:RY+30,'font-size':11,'font-weight':700,class:'tr','text-anchor':'middle'},railMark,'PULLED')}
+  }
+  flows.forEach(p=>{e('path',{d:p.d,class:'flow k-'+p.k},railFx);if(reduce)return;
+    const path=e('path',{d:p.d,fill:'none',stroke:'none'},railPk);
+    const halo=e('circle',{r:12,class:'pkh k-'+p.k,opacity:0},railPk);
+    const dot=g(null,railPk);dot.setAttribute('opacity',0);
+    e('rect',{x:-9,y:-6,width:18,height:12,rx:2,class:'pk k-'+p.k},dot);e('path',{d:'M-9 -6 L0 1 L9 -6',style:'fill:none;stroke:var(--onAccent);stroke-width:1.3'},dot);
+    packets.push({path,len:path.getTotalLength(),halo,dot,delay:300,dur:p.dur||1500})});
+
+  /* message pop on send */
+  msgG.setAttribute('class',id==='send'&&!reduce?'pop':'');
+  ppNote.textContent=API?'reading via API':'inline in the mail path';
+
+  /* classifiers */
+  const grpStep=['identity','content'];
+  function state(i,el){const c=CL[i],gs=grpStep[c.g];
+    if(!reached('unpack'))return {s:'idle'};
+    if(!reached(gs))return {s:'queued'};
+    const res=sc.r[c.id];
+    if(id!==gs)return {s:res[0],done:1};
+    const k=CL.filter(x=>x.g===c.g).indexOf(c),s0=500+k*1000;
+    if(el<s0)return {s:'queued'};if(el<s0+650)return {s:'scan',live:1};
+    return {s:res[0],live:el<s0+1300,done:1}}
+  function applyCls(el){
+    const ps={};
+    rows.forEach((r,i)=>{const st=state(i,el),s=st.s,res=sc.r[r.c.id];
+      r.box.setAttribute('class','crow'+(s==='scan'?' scan':s==='flag'?' flag':s==='warn'?' warn':''));
+      r.st.setAttribute('class','st '+s);
+      if(st.done){r.sub.textContent=res[1];r.sub.setAttribute('class',s==='pass'?'tok':s==='warn'?'twn':s==='flag'?'tr':'ts');r.sub.setAttribute('font-weight',s==='na'?400:600)}
+      else{r.sub.textContent=r.c.prop;r.sub.setAttribute('class','ts mono');r.sub.setAttribute('font-weight',400)}
+      r.cr.setAttribute('class','chipr '+(CHIP[s]?s:''));r.ct.textContent=CHIP[s]||'';r.ct.setAttribute('class','chipt'+(s==='na'?' na':''));
+      // leaders
+      if(r.ld){let lc=null;
+        if(id==='unpack'&&(reduce||el>400+i*220))lc='q';
+        else if(st.live)lc=s;
+        else if(id==='summary'&&st.done&&(bad?(s==='flag'||s==='warn'):s==='pass'))lc=s;
+        r.ld.setAttribute('class','ld '+(lc||''));r.ld.setAttribute('opacity',lc?1:0);
+        r.ldd.setAttribute('class','ldd '+(lc||''));r.ldd.setAttribute('opacity',lc?1:0);
+        // part state
+        if(reached('unpack')){const prev=ps[r.part];
+          let v=st.done?s:(s==='scan'?'scan':'q');
+          if(id==='unpack')v=(reduce||el>400+i*220)?'scan':null;
+          if(v==='na')v='q';
+          const rank=x=>x==null?-1:x==='q'?0:x==='scan'?1.5:RANK[x];
+          if(prev===undefined||rank(v)>rank(prev))ps[r.part]=v}}
+    });
+    for(const k in parts)parts[k].setAttribute('class','part '+(ps[k]||''));
+  }
+  applyCls(reduce?1e9:0);anims.push(applyCls);
+
+  /* score */
+  const setScore=f=>{sFill.setAttribute('width',458*f*sc.score/100);sFill.setAttribute('class','sfill'+(bad?' bad':''))};
+  const showVer=v=>{if(v){verT.textContent=(bad?'⚠  ':'✓  ')+sc.tag.toUpperCase();verT.setAttribute('class',bad?'tr':'tok');scoreT.textContent='score '+sc.score+' / 100'}
+    else{verT.textContent=reached('unpack')?'COLLECTING SIGNALS…':'WAITING';verT.setAttribute('class','ts');scoreT.textContent=''}};
+  if(!reached('verdict')){setScore(0);showVer(false)}
+  else if(id==='verdict'&&!reduce){setScore(0);showVer(false);anims.push(el=>{setScore(ease(Math.max(0,Math.min(1,(el-300)/1500))));showVer(el>1900)})}
+  else{setScore(1);showVer(true)}
+
+  /* mailbox */
+  let where=null;
+  if(API){if(reached('land'))where=(bad&&reached('act'))?'q':'inbox'}
+  else if(reached('act'))where=bad?'q':'inbox';
+  const instant=!API&&where==='q';
+  newRow.classList.toggle('instant',instant||reduce);
+  newRow.style.transform=`translate(0px,${where==='q'?QY-SLOT(0):0}px)`;
+  newRow.style.opacity=where?1:0;
+  newRow.classList.toggle('risk',bad&&(where==='q'||(API&&reached('verdict'))));
+  newRow.classList.toggle('okk',!bad&&reached('act'));
+  others.style.transform=`translate(0px,${where==='inbox'?46:0}px)`;
+  let iN='',iC='ts';
+  if(!API){if(reached('route')&&!reached('act')){iN='Nothing yet. The message is still at the gateway.'}
+    else if(reached('act')){iN=bad?'Never delivered. Nothing here for Jane to click.':'✓ Delivered. Jane sees normal mail.';iC=bad?'tr':'tok'}}
+  else{if(reached('land')&&!reached('act')){iN=bad&&reached('verdict')?'Flagged. Still in the inbox, about to be pulled.':'Delivered. Jane can open it right now.';iC=bad&&reached('verdict')?'tr':'ta'}
+    else if(reached('act')){iN=bad?'Pulled. Gone from Jane’s inbox.':'✓ Inspected and left in place.';iC=bad?'tr':'tok'}}
+  inboxNote.textContent=iN;inboxNote.setAttribute('class',iC);
+  qbox.setAttribute('class','qbox'+(where==='q'?' alert':''));
+  if(where==='q'){qNote1.textContent='⚠  '+sc.tag;qNote1.setAttribute('class','tr');
+    qNote2.textContent=API?'Removed over the API, from every mailbox':'Held at the gateway. Microsoft 365';
+    qNote3.textContent=API?'it reached. Nothing left to click.':'never received it.'}
+  else{qNote1.textContent='Empty';qNote1.setAttribute('class','ts');qNote2.textContent='Messages the verdict stops end up here.';qNote3.textContent=''}
+
+  /* chrome */
+  document.getElementById('stepno').textContent='Step '+String(n+1).padStart(2,'0')+' / '+S.length;
+  const bar=document.getElementById('bar');bar.classList.toggle('b',bad&&reached('verdict'));bar.firstElementChild.style.width=((n+1)/S.length*100)+'%';
+  t0=now;
+}
+
+
+/* ---------- controls ---------- */
+const playBtn=document.getElementById('play');
+function setPlaying(v){playing=v;playBtn.textContent=v?'Pause':'Play';t0=performance.now()}
+function go(n){cur=Math.max(0,Math.min(steps().length-1,n));render(cur)}
+function setMode(m){if(m===mode)return;const idNow=steps()[cur];mode=m;
+  ['gw','api'].forEach(k=>document.getElementById('m-'+k).setAttribute('aria-pressed',k===m));
+  let i=steps().indexOf(idNow);if(i<0)i=Math.min(cur,steps().length-1);go(i)}
+function setScen(s){scen=s;['clean','phish','bec','mal'].forEach(k=>document.getElementById('s-'+k).setAttribute('aria-pressed',k===s));buildMsg();go(0);setPlaying(!reduce)}
+document.getElementById('m-gw').onclick=()=>setMode('gw');
+document.getElementById('m-api').onclick=()=>setMode('api');
+['clean','phish','bec','mal'].forEach(k=>document.getElementById('s-'+k).onclick=()=>setScen(k));
+playBtn.onclick=()=>{if(!playing&&cur===steps().length-1)go(0);setPlaying(!playing)};
+document.getElementById('next').onclick=()=>{setPlaying(false);go(cur+1)};
+document.getElementById('prev').onclick=()=>{setPlaying(false);go(cur-1)};
+document.getElementById('restart').onclick=()=>{go(0);setPlaying(true)};
+document.addEventListener('keydown',ev=>{if(ev.key==='ArrowRight'){setPlaying(false);go(cur+1)}else if(ev.key==='ArrowLeft'){setPlaying(false);go(cur-1)}});
+
+function tick(now){
+  const el=now-t0;
+  if(!reduce)anims.forEach(f=>f(el));
+  packets.forEach(p=>{const t=(el-p.delay)/p.dur;
+    if(t<0||t>1){p.dot.setAttribute('opacity',0);p.halo.setAttribute('opacity',0);return}
+    const pt=p.path.getPointAtLength(ease(t)*p.len);
+    p.dot.setAttribute('transform',`translate(${pt.x},${pt.y})`);p.halo.setAttribute('cx',pt.x);p.halo.setAttribute('cy',pt.y);
+    p.dot.setAttribute('opacity',1);p.halo.setAttribute('opacity',1)});
+  const dur=DUR[steps()[cur]]||4200;
+  if(playing&&el>dur){if(cur<steps().length-1)go(cur+1);else setPlaying(false)}
+  requestAnimationFrame(tick);
+}
+buildMsg();setPlaying(playing);go(0);requestAnimationFrame(tick);
+})();
+</script>
+
+</body></html>
