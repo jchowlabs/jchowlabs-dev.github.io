@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Agent Drivetrain</title>
+<title>jchowlabs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Saira+Condensed:wght@600;700&display=swap">
 <style>
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0}
 
-/* Layout: fixed-width plate (1376px) centered in the window; narrower windows scroll. Back arrow row, header row, progress bar, stage. Dark only. */
+/* Layout: fluid plate that fills the window width (capped), centered. Back arrow row, header row, progress bar, stage. Dark only. */
 :root{
   --paper:#1B202B; --panel:#222836; --screen:#272E3D; --ink:#E3E8EF; --soft:#8E99AA; --line:#363F51; --grid:#2C3444; --chip:#2F3747;
   --accent:#7F95FF; --accentS:#2D3762; --risk:#FF6A5C; --riskS:#4A2526; --ok:#4CC38A; --onAccent:#12161F; --bezel:#0E1117; --base:#3B4557;
@@ -21,7 +21,7 @@ body{margin:0}
 }
 
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
-.wrap{box-sizing:content-box;width:1376px;margin:0 auto;padding-inline:24px;padding-block:16px 20px;display:grid;gap:10px}
+.wrap{box-sizing:border-box;width:100%;max-width:1560px;margin:0 auto;padding-inline:24px;padding-block:16px 20px;display:grid;gap:10px}
 .back{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);text-decoration:none}
 .back:hover{border-color:var(--soft)}
 .back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
