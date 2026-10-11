@@ -35,11 +35,11 @@ h1{margin:0;font:700 clamp(30px,4vw,40px)/1 var(--f-display);text-transform:uppe
 .btn{font:500 13px var(--f-body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 12px;cursor:pointer}
 .btn:hover{border-color:var(--soft)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--onAccent);min-width:76px}
-/* Back-to-home button, upper-left corner — circular arrow, matches Agent Drivetrain / Alliances. */
-.back{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);text-decoration:none}
-.back:hover{border-color:var(--soft)}
+/* Back-to-home button — subtle circular arrow matching the Alliances page; sits inline in the toolbar. */
+.back{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--soft);text-decoration:none;transition:color .2s,border-color .2s}
+.back:hover{color:var(--ink);border-color:var(--soft)}
 .back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .stepno{font:500 12px var(--f-mono);color:var(--soft);letter-spacing:.06em;font-variant-numeric:tabular-nums;min-width:96px;text-align:right}
 .bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
@@ -140,9 +140,8 @@ svg .mono{font-family:var(--f-mono)}
 </head><body style="margin:0">
 
 <div class="wrap">
-  <div><a class="back" href="../" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a></div>
   <div class="top">
-    <h1>Email Defense</h1>
+    <a class="back" href="../" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
     <div class="grp">
       <span class="lbl">Deployment</span>
       <div class="seg" role="group" aria-label="Deployment">
