@@ -1,0 +1,470 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>jchowlabs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: a single "figure plate" (the animated canvas) with its numbered caption and controls beneath, like a paper figure */
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --ink:#15171c; --muted:#5a6070; --line:#d8dbe2;
+  --accent:#c2410c;
+  --b-emb:#f8d6d9; --b-attn:#fbd8a5; --b-ffn:#c2e4f3; --b-norm:#f0f2b4; --b-lin:#d9dbf2; --b-soft:#c8e7d0;
+  --v-neg:#0f7c84; --v-pos:#bd3378; --v-mid:#eceef3;
+  --f-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-ui:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111419; --surface:#191d25; --ink:#e7e9ef; --muted:#9aa1b1; --line:#2c323d;
+    --accent:#f59a52;
+    --b-emb:#5a3037; --b-attn:#5d4221; --b-ffn:#1e4457; --b-norm:#48491e; --b-lin:#36395c; --b-soft:#254530;
+    --v-neg:#3cc0c7; --v-pos:#ee68a6; --v-mid:#242933;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111419; --surface:#191d25; --ink:#e7e9ef; --muted:#9aa1b1; --line:#2c323d;
+  --accent:#f59a52;
+  --b-emb:#5a3037; --b-attn:#5d4221; --b-ffn:#1e4457; --b-norm:#48491e; --b-lin:#36395c; --b-soft:#254530;
+  --v-neg:#3cc0c7; --v-pos:#ee68a6; --v-mid:#242933;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:24px 24px}
+.wrap{width:min(1240px,max(960px,calc((100vh - 248px) * 1.6667)));margin:0 auto;display:grid;gap:14px}
+header h1{font-family:var(--f-display);font-weight:600;font-size:34px;line-height:1.15;margin:0;letter-spacing:-.01em}
+/* Back-to-home button, upper-left corner — circular arrow, matches Email Security / Agent Drivetrain. */
+.back{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none}
+.back:hover{border-color:var(--muted)}
+.back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.plate{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+canvas{display:block;width:100%;border-radius:10px;aspect-ratio:1000/600;cursor:default}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 12px;cursor:pointer;line-height:1.2}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--ink);color:var(--surface);border-color:var(--ink);min-width:84px}
+button:disabled{opacity:.4;cursor:default}
+#scrub{flex:1 1 200px;min-width:140px;accent-color:var(--accent)}
+.tabs{display:flex;gap:0;align-items:stretch;counter-reset:none}
+.tabs button{flex:1 1 0;font-size:13.5px;padding:8px 6px 9px;display:flex;gap:7px;align-items:baseline;justify-content:center;border:0;border-bottom:2px solid var(--line);border-radius:0;background:transparent;color:var(--muted);white-space:nowrap}
+.tabs button:hover{color:var(--ink);border-bottom-color:var(--muted)}
+.tabs button .n{font-family:var(--f-mono);font-size:11px}
+.tabs button.done{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs button[aria-current="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--accent);border-bottom-width:3px;padding-bottom:8px}
+.tabs button[aria-current="true"] .n{color:var(--accent)}
+.heads{display:flex;gap:6px;align-items:center;margin-left:8px;padding-left:14px;border-left:1px solid var(--line)}
+.heads .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:2px}
+.heads button{font-size:13px;padding:5px 9px}
+.heads button[aria-pressed="true"]{background:var(--b-attn);border-color:var(--accent)}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+kbd{font-family:var(--f-mono);font-size:12px;border:1px solid var(--line);border-radius:4px;padding:0 4px}
+@media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
+</style>
+
+<div class="wrap">
+  <div><a class="back" href="../" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a></div>
+  <header><h1>Transformer in Motion</h1></header>
+  <nav class="tabs" id="tabs" aria-label="Steps"></nav>
+  <div class="controls">
+    <button id="prev" aria-label="Previous step">← Prev</button>
+    <button id="play" class="primary">Pause</button>
+    <button id="next" aria-label="Next step">Next →</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Scrub within this step">
+    <div class="heads" id="headsWrap" hidden><span class="lbl">Head</span><span id="heads" style="display:flex;gap:6px"></span></div>
+  </div>
+  <div class="plate"><canvas id="stage" aria-label="Animated diagram of a transformer language model"></canvas></div>
+</div>
+
+<script>
+(()=>{
+const W=1000,H=600;
+const cv=document.getElementById('stage'),ctx=cv.getContext('2d');
+const FD='"Source Serif 4", Georgia, serif', FU='"Atkinson Hyperlegible", system-ui, sans-serif', FM='"JetBrains Mono", ui-monospace, Menlo, monospace';
+
+/* ---------- helpers ---------- */
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const lerpV=(a,b,t)=>a.map((v,k)=>lerp(v,b[k],t));
+function parse(h){h=h.trim();if(h[0]!=='#')return[128,128,128];if(h.length===4)h='#'+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];return[1,3,5].map(i=>parseInt(h.slice(i,i+2),16))}
+const TOKS=['bg','surface','ink','muted','line','accent','b-emb','b-attn','b-ffn','b-norm','b-lin','b-soft','v-neg','v-pos','v-mid'];
+let C={};
+function readTheme(){const cs=getComputedStyle(document.documentElement);TOKS.forEach(k=>C[k]=parse(cs.getPropertyValue('--'+k)))}
+readTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readTheme);
+new MutationObserver(readTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+const col=(k,a=1)=>`rgba(${C[k][0]},${C[k][1]},${C[k][2]},${a})`;
+const mixc=(a,b,t,al=1)=>{const A=C[a],B=C[b];return`rgba(${A.map((v,i)=>Math.round(lerp(v,B[i],t))).join(',')},${al})`};
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function text(s,x,y,{size=12,font=FU,color='ink',alpha=1,align='left',base='middle',weight=''}={}){ctx.font=`${weight} ${size}px ${font}`;ctx.fillStyle=col(color,alpha);ctx.textAlign=align;ctx.textBaseline=base;ctx.fillText(s,x,y)}
+function wrap(s,x,y,maxW,lh,o={}){ctx.font=`${o.weight||''} ${o.size||12}px ${o.font||FU}`;const words=s.split(' ');let line='',yy=y;for(const w of words){const test=line?line+' '+w:w;if(ctx.measureText(test).width>maxW&&line){text(line,x,yy,o);line=w;yy+=lh}else line=test}if(line)text(line,x,yy,o);return yy}
+function arrow(x1,y1,x2,y2,c='ink',a=1,lw=1.4){ctx.strokeStyle=col(c,a);ctx.fillStyle=col(c,a);ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();const an=Math.atan2(y2-y1,x2-x1);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-7*Math.cos(an-.45),y2-7*Math.sin(an-.45));ctx.lineTo(x2-7*Math.cos(an+.45),y2-7*Math.sin(an+.45));ctx.closePath();ctx.fill()}
+
+/* ---------- model data (small, seeded, internally consistent) ---------- */
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const R=rng(11),rn=()=>R()*2-1;
+const TOK=['The',' cat',' sat',' on',' the',' mat'], IDS=[464,3797,3332,319,262,2603];
+const lab=s=>s.replace(/^ /,'·');
+const D=8,NT=6;
+const emb=TOK.map(()=>Array.from({length:D},()=>rn()*.95));
+const PE=TOK.map((_,p)=>Array.from({length:D},(_,k)=>{const i=Math.floor(k/2),f=1/Math.pow(10000,2*i/D);return .55*(k%2?Math.cos(p*f):Math.sin(p*f))}));
+const x0=emb.map((e,i)=>e.map((v,k)=>v+PE[i][k]));
+const mat=(r,c,s)=>Array.from({length:r},()=>Array.from({length:c},()=>rn()*s));
+const mv=(M,v)=>M.map(row=>row.reduce((a,w,k)=>a+w*v[k],0));
+const Wv=mat(D,D,.45);
+const V=x0.map(x=>mv(Wv,x));
+const CONTENT=Array.from({length:NT},(_,i)=>Array.from({length:NT},(_,j)=>j===i?.5:0));
+CONTENT[1][1]=1;CONTENT[2][1]=2.2;CONTENT[3][2]=1.8;CONTENT[4][1]=2.4;CONTENT[4][2]=1.3;CONTENT[5][2]=1.7;CONTENT[5][3]=1.2;
+const HEADS=[
+  {name:'Previous-token',score:(i,j)=>j===i-1?3:(j===i?.8:0)},
+  {name:'Content',score:(i,j)=>CONTENT[i][j]},
+  {name:'First-token',score:(i,j)=>j===0?2.6:(j===i?.6:0)}];
+const WTS=HEADS.map(h=>Array.from({length:NT},(_,i)=>{const s=Array.from({length:NT},(_,j)=>j<=i?Math.exp(h.score(i,j)):0);const z=s.reduce((a,b)=>a+b);return s.map(v=>v/z)}));
+const x1=x0.map((x,i)=>{const o=Array(D).fill(0);HEADS.forEach((_,h)=>{for(let j=0;j<=i;j++)V[j].forEach((v,k)=>o[k]+=WTS[h][i][j]*v/HEADS.length)});return x.map((v,k)=>v+o[k])});
+const W1=mat(32,D,.7),W2=mat(D,32,.28);
+const PRE=x1.map(x=>mv(W1,x));
+const x2=x1.map((x,i)=>{const f=mv(W2,PRE[i].map(v=>Math.max(0,v)));return x.map((v,k)=>v+f[k])});
+const SS=[x2];for(let s=1;s<4;s++)SS.push(SS[s-1].map(x=>x.map(v=>v*.85+rn()*.75)));
+const vecAt=(i,u)=>{u=clamp(u)*3;const k=Math.min(2,Math.floor(u));return lerpV(SS[k][i],SS[k+1][i],ease(u-k))};
+const TABLE=Array.from({length:26},()=>Array.from({length:D},()=>rn()*.95));
+const ROWMAP=[2,8,13,17,21,24];ROWMAP.forEach((r,i)=>TABLE[r]=emb[i]);
+const TOP5=[[' mat',.38],[' floor',.17],[' couch',.09],[' bed',.07],[' ground',.05]];
+const LOGITS=Array.from({length:64},()=>4+R()*12);[[9,44],[23,34],[37,27],[48,25],[57,23]].forEach(([i,h])=>LOGITS[i]=h);
+
+/* ---------- drawing primitives ---------- */
+const colX=(i,n)=>460+(i-(n-1)/2)*80;
+const valColor=(v,a=1)=>{const t=Math.tanh(v*1.1);return mixc('v-mid',t<0?'v-neg':'v-pos',Math.abs(t),a)};
+function drawVec(x,y,vals,{alpha=1,cw=22,ch=10,glow=0}={}){
+  const h=ch*vals.length;ctx.globalAlpha=alpha;
+  vals.forEach((v,k)=>{ctx.fillStyle=valColor(v);ctx.fillRect(x-cw/2,y-h/2+k*ch,cw,ch)});
+  ctx.strokeStyle=col('surface',.55);ctx.lineWidth=.6;
+  for(let k=1;k<vals.length;k++){ctx.beginPath();ctx.moveTo(x-cw/2,y-h/2+k*ch);ctx.lineTo(x+cw/2,y-h/2+k*ch);ctx.stroke()}
+  ctx.strokeStyle=col('ink');ctx.lineWidth=1.3;ctx.strokeRect(x-cw/2,y-h/2,cw,h);
+  if(glow>0){ctx.strokeStyle=col('accent',glow);ctx.lineWidth=2.5;ctx.strokeRect(x-cw/2-4,y-h/2-4,cw+8,h+8)}
+  ctx.globalAlpha=1;
+}
+function drawChip(x,y,s,alpha=1,hl=0){
+  ctx.font=`15px ${FU}`;const w=Math.max(46,ctx.measureText(s).width+18);
+  ctx.globalAlpha=alpha;rr(x-w/2,y-13,w,26,6);ctx.fillStyle=col('surface');ctx.fill();
+  ctx.strokeStyle=hl?col('accent'):col('ink');ctx.lineWidth=hl?2.2:1.3;ctx.stroke();
+  text(s,x,y+1,{size:15,align:'center'});ctx.globalAlpha=1;
+}
+function chips(n,{alpha=1,ids=1,xs=null}={}){for(let i=0;i<n;i++){const x=xs?xs[i]:colX(i,n);drawChip(x,540,lab(TOK[i]),alpha);if(ids>0)text(String(IDS[i]),x,572,{font:FM,size:11,color:'muted',alpha:ids*alpha,align:'center'})}}
+function lanes(n,a){if(a<=0)return;ctx.save();ctx.setLineDash([3,5]);ctx.strokeStyle=col('muted',.45*a);ctx.lineWidth=1;for(let i=0;i<n;i++){const x=colX(i,n);ctx.beginPath();ctx.moveTo(x,525);ctx.lineTo(x,44);ctx.stroke()}ctx.restore();
+  text('Each dashed column is one token’s lane through the model: its residual stream',210,26,{size:12,color:'muted',alpha:a})}
+function layerFrame(a,att,ffn){
+  ctx.globalAlpha=a;rr(205,150,510,250,12);ctx.fillStyle=col('bg',.6);ctx.fill();ctx.strokeStyle=col('ink',.7);ctx.lineWidth=1.6;ctx.stroke();
+  rr(215,290,490,100,8);ctx.fillStyle=col('b-attn',att);ctx.fill();
+  rr(215,160,490,100,8);ctx.fillStyle=col('b-ffn',ffn);ctx.fill();
+  ctx.save();ctx.translate(230,340);ctx.rotate(-Math.PI/2);text('Attention',0,0,{size:12,align:'center',weight:'700'});ctx.restore();
+  ctx.save();ctx.translate(230,210);ctx.rotate(-Math.PI/2);text('Feed-forward',0,0,{size:12,align:'center',weight:'700'});ctx.restore();
+  text('One decoder layer (repeated N times)',210,140,{size:12,color:'muted'});
+  ctx.globalAlpha=1;
+}
+const SX=752;
+function sideTitle(s,y=64,a=1){text(s,SX,y,{font:FD,size:19,weight:'600',alpha:a})}
+
+/* ---------- mini Figure 1 (decoder-only) ---------- */
+const MINI_ACT=[['in'],['emb'],['pos'],['attn'],['ffn'],['attn','ffn','block'],['lin','soft'],['loop','in','soft']];
+function drawMini(scene,t){
+  const act=new Set(MINI_ACT[scene]),on=k=>act.has(k);
+  const cx=96,bw=132,bx=cx-bw/2;
+  text('Figure 1, decoder-only',cx,40,{font:FD,size:13,color:'muted',align:'center'});
+  text('(pre-norm, as in GPT)',cx,57,{font:FD,size:12,color:'muted',align:'center'});
+  ctx.strokeStyle=col('ink',.45);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(cx,552);ctx.lineTo(cx,206);ctx.stroke();
+  arrow(cx,206,cx,198,'ink',.45);
+  const box=(y,h,fill,lines,a,fs=11)=>{ctx.globalAlpha=a?1:.38;rr(bx,y,bw,h,5);ctx.fillStyle=col(fill);ctx.fill();ctx.strokeStyle=col('ink');ctx.lineWidth=a?1.8:1.2;ctx.stroke();
+    if(a){rr(bx-4,y-4,bw+8,h+8,7);ctx.strokeStyle=col('accent');ctx.lineWidth=2;ctx.stroke()}
+    lines.forEach((s,i)=>text(s,cx,y+h/2+(i-(lines.length-1)/2)*13.5,{size:fs,align:'center'}));ctx.globalAlpha=1};
+  const plus=(y,a)=>{ctx.globalAlpha=a?1:.38;ctx.beginPath();ctx.arc(cx,y,7,0,7);ctx.fillStyle=col('surface');ctx.fill();ctx.strokeStyle=col('ink');ctx.lineWidth=1.3;ctx.stroke();ctx.beginPath();ctx.moveTo(cx-4,y);ctx.lineTo(cx+4,y);ctx.moveTo(cx,y-4);ctx.lineTo(cx,y+4);ctx.stroke();ctx.globalAlpha=1};
+  const resid=(y1,y2,a)=>{ctx.strokeStyle=col('ink',a?.9:.35);ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(cx,y1);ctx.lineTo(bx+bw+8,y1);ctx.lineTo(bx+bw+8,y2);ctx.stroke();arrow(bx+bw+8,y2,cx+8,y2,'ink',a?.9:.35)};
+  text('Inputs',cx,592,{size:12,align:'center',alpha:on('in')?1:.45,weight:on('in')?'700':''});
+  box(552,26,'b-emb',['Token Embedding'],on('emb'));
+  plus(532,on('pos'));
+  ctx.globalAlpha=on('pos')?1:.38;ctx.beginPath();ctx.arc(cx-36,532,10,0,7);ctx.strokeStyle=col('ink');ctx.lineWidth=1.2;ctx.stroke();
+  ctx.beginPath();for(let k=0;k<=16;k++){const xx=cx-44+k;const yy=532-4*Math.sin(k/16*2*Math.PI);k?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-26,532);ctx.lineTo(cx-7,532);ctx.stroke();ctx.globalAlpha=1;
+  ctx.globalAlpha=on('block')?1:.6;rr(20,296,152,224,10);ctx.strokeStyle=col('ink');ctx.lineWidth=on('block')?2:1.3;ctx.stroke();ctx.globalAlpha=1;
+  text('N×',176,410,{size:13,alpha:on('block')?1:.5,weight:'700'});
+  box(494,14,'b-norm',['Norm'],on('attn'),10);
+  box(432,54,'b-attn',['Masked','Multi-Head','Attention'],on('attn'));
+  plus(414,on('attn'));resid(522,414,on('attn'));
+  box(374,14,'b-norm',['Norm'],on('ffn'),10);
+  box(326,40,'b-ffn',['Feed','Forward'],on('ffn'));
+  plus(310,on('ffn'));resid(400,310,on('ffn'));
+  box(268,14,'b-norm',['Norm'],on('lin'),10);
+  box(236,24,'b-lin',['Linear'],on('lin'));
+  box(204,24,'b-soft',['Softmax'],on('soft'));
+  text('Output probabilities',cx,184,{size:11,align:'center',alpha:on('soft')?1:.45});
+  if(on('loop')){const a=seg(t,.3,.6);ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle=col('accent',a);ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(cx-56,176);ctx.bezierCurveTo(6,176,6,592,cx-28,592);ctx.stroke();ctx.restore();arrow(cx-34,592,cx-26,592,'accent',a,1.8);
+    ctx.save();ctx.translate(13,384);ctx.rotate(-Math.PI/2);text('append & repeat',0,0,{size:11,color:'accent',align:'center',alpha:a,weight:'700'});ctx.restore()}
+}
+
+/* ---------- scenes ---------- */
+const S={scene:0,t:0,playing:true,head:0,focus:4};
+const DUR=[5200,6500,6500,9500,7500,6500,7500,7500];
+
+function sc0(t){
+  const n=5;ctx.font=`30px ${FD}`;
+  const ws=TOK.slice(0,n).map(s=>ctx.measureText(s).width),tot=ws.reduce((a,b)=>a+b);
+  let sx=460-tot/2;const px=[],bounds=[];
+  ws.forEach((w,i)=>{px.push(sx+w/2);sx+=w;if(i<n-1)bounds.push(sx)});
+  const cm=seg(t,.1,.25)*(1-seg(t,.36,.5));
+  bounds.forEach(b=>{ctx.strokeStyle=col('accent',cm);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(b+ (b===bounds[0]?0:4),278);ctx.lineTo(b+(b===bounds[0]?0:4),322);ctx.stroke()});
+  for(let i=0;i<n;i++){
+    const a=ease(seg(t,.3+i*.06,.62+i*.06));
+    const x=lerp(px[i],colX(i,n),a),y=lerp(300,540,a);
+    if(a<1)text(TOK[i],x,y,{font:FD,size:lerp(30,15,a),align:'center',alpha:1-a});
+    if(a>0)drawChip(x,y,lab(TOK[i]),a);
+  }
+  const ida=seg(t,.8,.95);
+  for(let i=0;i<n;i++)text(String(IDS[i]),colX(i,n),572,{font:FM,size:11,color:'muted',alpha:ida,align:'center'});
+  sideTitle('Tokenizer');
+  const sa=seg(t,.45,.65);
+  wrap('Splits text into pieces from a fixed vocabulary. GPT-2’s has 50,257 tokens.',SX,96,226,18,{size:13,alpha:sa});
+  wrap('The leading space belongs to the token, shown here as “·”. So “·cat” and “cat” are different tokens with different IDs.',SX,156,226,18,{size:13,alpha:sa});
+  wrap('Each token becomes an integer ID. That number is all the model receives.',SX,234,226,18,{size:13,alpha:ida});
+}
+
+function sc1(t){
+  const n=5;chips(n);lanes(n,seg(t,.75,1));
+  sideTitle('Embedding table');
+  text('50,257 rows × d_model',SX,90,{font:FM,size:11,color:'muted'});
+  text('d_model = 768 in GPT-2 small; drawn as 8',SX,108,{font:FM,size:10,color:'muted'});
+  const ty=130;
+  TABLE.forEach((row,r)=>{const y=ty+r*15;row.forEach((v,k)=>{ctx.fillStyle=valColor(v,.75);ctx.fillRect(760+k*20,y,20,12)})});
+  for(let i=0;i<n;i++){
+    const s=seg(t,.06+i*.15,.06+i*.15+.3),hl=seg(s,0,.3),fl=ease(seg(s,.3,1));
+    const ry=ty+ROWMAP[i]*15;
+    if(hl>0){ctx.strokeStyle=col('accent',hl*(1-fl*.6));ctx.lineWidth=2;ctx.strokeRect(758,ry-2,164,16);text(String(IDS[i]),928,ry+6,{font:FM,size:10,color:'accent',alpha:hl})}
+    if(fl>0)drawVec(lerp(840,colX(i,n),fl),lerp(ry+6,455,fl),emb[i]);
+    if(hl>0&&fl===0){ctx.save();ctx.setLineDash([2,4]);ctx.strokeStyle=col('accent',hl*.7);ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(colX(i,n),526);ctx.quadraticCurveTo(colX(i,n)+80,ry+6,756,ry+6);ctx.stroke();ctx.restore()}
+  }
+}
+
+function sc2(t){
+  const n=5;chips(n);lanes(n,1);
+  const p1=seg(t,.05,.28),p2=ease(seg(t,.34,.66)),p3=seg(t,.6,.8);
+  for(let i=0;i<n;i++){
+    const x=colX(i,n);
+    drawVec(x,455,lerpV(emb[i],x0[i],p3),{glow:(p3>0&&p3<1)?.8:0});
+    if(p1>0&&p3<1){const pxp=lerp(x+34,x,p2);
+      if(p2<.4)text('+',x+17,455,{size:15,alpha:p1*(1-p2*2.5),align:'center',weight:'700'});
+      drawVec(pxp,455,PE[i],{alpha:p1*(1-p3),cw:18,ch:10})}
+  }
+  sideTitle('Positional encoding');
+  wrap('Attention on its own ignores word order, so each position gets a fixed pattern added in.',SX,94,226,17,{size:13});
+  const gx=800,gy=152,cw=26,ch=12;
+  text('pos',gx-8,gy-12,{font:FM,size:10,color:'muted',align:'right'});
+  for(let p=0;p<5;p++){text(String(p),gx+p*cw+cw/2,gy-12,{font:FM,size:10,color:'muted',align:'center'});
+    PE[p].forEach((v,k)=>{ctx.fillStyle=valColor(v);ctx.fillRect(gx+p*cw,gy+k*ch,cw-2,ch-1)})}
+  for(let k=0;k<D;k++)text('d'+k,gx-8,gy+k*ch+ch/2,{font:FM,size:9,color:'muted',align:'right'});
+  const ax=780,aw=180,ay=300,ah=60;
+  ctx.strokeStyle=col('line');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ax,ay+ah/2);ctx.lineTo(ax+aw,ay+ah/2);ctx.stroke();
+  const curve=(f,c,dash)=>{ctx.save();ctx.setLineDash(dash);ctx.strokeStyle=col(c);ctx.lineWidth=1.8;ctx.beginPath();for(let q=0;q<=100;q++){const p=q/100*4.5,xx=ax+p/4.5*aw,yy=ay+ah/2-Math.sin(p*f)*ah/2;q?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke();ctx.restore();
+    for(let p=0;p<5;p++){ctx.beginPath();ctx.arc(ax+p/4.5*aw,ay+ah/2-Math.sin(p*f)*ah/2,3,0,7);ctx.fillStyle=col(c);ctx.fill()}};
+  curve(1,'accent',[]);curve(.1,'muted',[4,3]);
+  text('d0 = sin(pos)',ax,ay+ah+16,{font:FM,size:10,color:'accent'});
+  text('d2 = sin(pos / 10)',ax+96,ay+ah+16,{font:FM,size:10,color:'muted'});
+  wrap('Most current LLMs use rotary encoding (RoPE) instead, applied to queries and keys inside attention. Same purpose.',SX,410,226,16,{size:12,color:'muted'});
+}
+
+function arcPt(xq,xk,s,yb){
+  if(xq===xk){const an=-Math.PI/2+s*2*Math.PI;return[xq+13*Math.cos(an),yb+13+13*Math.sin(an)]}
+  const cx=(xq+xk)/2,cy=yb+40+.45*Math.abs(xq-xk),u=1-s;
+  return[u*u*xq+2*u*s*cx+s*s*xk,u*u*yb+2*u*s*cy+s*s*yb];
+}
+function strokeArc(xq,xk,yb,upto,w,c,a){ctx.strokeStyle=col(c,a);ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();const N=40;for(let q=0;q<=N;q++){const p=arcPt(xq,xk,q/N*upto,yb);q?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])}ctx.stroke();ctx.lineCap='butt'}
+
+function sc3(t){
+  const n=5,fi=Math.min(S.focus,n-1),Wh=WTS[S.head];
+  chips(n);lanes(n,1);layerFrame(1,.6,.18);
+  const rise=ease(seg(t,0,.15)),y=lerp(455,340,rise),yb=y+42;
+  const pa=ease(seg(t,.15,.45)),pd=seg(t,.45,.75),p3=ease(seg(t,.75,.95));
+  if(pa>0)for(let i=0;i<n;i++){if(i===fi)continue;for(let j=0;j<=i;j++)strokeArc(colX(i,n),colX(j,n),yb,pa,1+4*Wh[i][j],'accent',.1)}
+  for(let j=0;j<=fi;j++){const w=Wh[fi][j];if(pa>0)strokeArc(colX(fi,n),colX(j,n),yb,pa,1.5+11*w,'accent',.85);
+    if(pd>0&&pd<1){const p=arcPt(colX(fi,n),colX(j,n),1-pd,yb);ctx.beginPath();ctx.arc(p[0],p[1],2.5+6*w,0,7);ctx.fillStyle=col('ink');ctx.fill()}
+    if(pa>.9&&w>=.03){const p=arcPt(colX(fi,n),colX(j,n),.5,yb);text(Math.round(w*100)+'%',p[0],p[1]+(j===fi?10:14),{font:FM,size:11,align:'center',alpha:seg(pa,.9,1),weight:'500'})}}
+  for(let i=0;i<n;i++)drawVec(colX(i,n),y,lerpV(x0[i],x1[i],p3),{glow:i===fi?Math.max(seg(t,.15,.3),0)*.9:(p3>0&&p3<1?.35:0)});
+  if(pa>0){text('looking back from ·'+TOK[fi].trim(),colX(fi,n),y-52,{size:11,color:'accent',align:'center',alpha:pa,weight:'700'})}
+  text('Click any token to see what it attends to',460,108,{size:11,color:'muted',align:'center'});
+  sideTitle('Attention weights');
+  text(HEADS[S.head].name+' head',SX,88,{size:13,color:'accent',weight:'700'});
+  const gx=812,gy=150,cs=30;
+  for(let j=0;j<n;j++)text(lab(TOK[j]),gx+j*cs+cs/2,gy-10,{font:FM,size:10,color:'muted',align:'center'});
+  text('key →',gx+n*cs+4,gy-10,{font:FM,size:10,color:'muted'});
+  text('query ↓',gx-6,gy-28,{font:FM,size:10,color:'muted',align:'right'});
+  for(let i=0;i<n;i++){text(lab(TOK[i]),gx-6,gy+i*cs+cs/2,{font:FM,size:10,color:i===fi?'accent':'muted',align:'right'});
+    for(let j=0;j<n;j++){const x=gx+j*cs,yy=gy+i*cs;
+      if(j>i){ctx.save();ctx.beginPath();ctx.rect(x,yy,cs-2,cs-2);ctx.clip();ctx.strokeStyle=col('line');ctx.lineWidth=1;for(let d=-cs;d<cs;d+=6){ctx.beginPath();ctx.moveTo(x+d,yy+cs);ctx.lineTo(x+d+cs,yy);ctx.stroke()}ctx.restore()}
+      else{ctx.fillStyle=mixc('surface','accent',Math.min(1,Wh[i][j]*1.4),1);ctx.fillRect(x,yy,cs-2,cs-2)}}}
+  ctx.strokeStyle=col('ink');ctx.lineWidth=2;ctx.strokeRect(gx-2,gy+fi*cs-2,n*cs+2,cs+2);
+  wrap('Hatched cells are masked. A token can only look at itself and earlier tokens, never ahead.',SX,gy+n*cs+24,226,17,{size:12,color:'muted'});
+  wrap('Each row sums to 100%. Real models run many heads at once (12 per layer in GPT-2 small).',SX,gy+n*cs+80,226,17,{size:12,color:'muted'});
+}
+
+function sc4(t){
+  const n=5;chips(n);lanes(n,1);layerFrame(1,.18,.6);
+  const rise=ease(seg(t,0,.15)),y=lerp(340,210,rise);
+  const e=ease(seg(t,.15,.38)),r=seg(t,.42,.6),c=ease(seg(t,.64,.84)),u=seg(t,.8,.95);
+  for(let i=0;i<n;i++){const x=colX(i,n);
+    const gw=e<1?lerp(22,52,e):lerp(52,22,c),ga=e<1?e:1-c;
+    if(e<1&&c===0)drawVec(x,y,x1[i],{alpha:1-e,cw:gw});
+    if(ga>0){ctx.globalAlpha=ga;const cwc=gw/4;
+      for(let q=0;q<32;q++){const cc=Math.floor(q/8),rr2=q%8,v=PRE[i][q],vv=v<0?lerp(v,0,r):v;ctx.fillStyle=valColor(vv*.8);ctx.fillRect(x-gw/2+cc*cwc,y-40+rr2*10,cwc-1,9)}
+      ctx.strokeStyle=col('ink');ctx.lineWidth=1.3;ctx.strokeRect(x-gw/2,y-40,gw,80);ctx.globalAlpha=1}
+    if(c>0)drawVec(x,y,lerpV(x1[i],x2[i],u),{alpha:c,cw:gw,glow:u>0&&u<1?.6:0});
+  }
+  sideTitle('Feed-forward network');
+  text('768 → 3,072 → 768  (GPT-2 small)',SX,90,{font:FM,size:11,color:'muted'});
+  wrap('The same small network runs on every token separately. Nothing moves between tokens in this step.',SX,116,226,17,{size:13});
+  wrap('Much of what the model “knows” is thought to be stored in these weights.',SX,186,226,17,{size:13,color:'muted'});
+  const ax=780,ay=270,aw=180,ah=130,sx=v=>ax+(v+3)/6*aw,sy=v=>ay+ah-(v+.5)/3.5*ah;
+  ctx.strokeStyle=col('line');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ax,sy(0));ctx.lineTo(ax+aw,sy(0));ctx.moveTo(sx(0),ay);ctx.lineTo(sx(0),ay+ah);ctx.stroke();
+  const pl=(f,c,dash,lw)=>{ctx.save();ctx.setLineDash(dash);ctx.strokeStyle=col(c);ctx.lineWidth=lw;ctx.beginPath();for(let q=0;q<=80;q++){const v=-3+q/80*6;q?ctx.lineTo(sx(v),sy(f(v))):ctx.moveTo(sx(v),sy(f(v)))}ctx.stroke();ctx.restore()};
+  const gelu=v=>.5*v*(1+Math.tanh(Math.sqrt(2/Math.PI)*(v+.044715*v*v*v)));
+  pl(gelu,'muted',[4,3],1.6);pl(v=>Math.max(0,v),'accent',[],2.2+r*1.5);
+  text('ReLU (paper)',ax,ay+ah+18,{font:FM,size:10,color:'accent'});
+  text('GELU (GPT-2)',ax+96,ay+ah+18,{font:FM,size:10,color:'muted'});
+  wrap('Negative inputs go to zero: the blank cells in the widened block.',SX,ay+ah+44,226,16,{size:12,color:'muted'});
+}
+
+function sc5(t){
+  const n=5;chips(n);lanes(n,1);layerFrame(1-seg(t,.6,1)*.5,.2,.2);
+  const y=lerp(210,85,ease(t)),L=12,lt=t*L,lp=lt%1;
+  if(lp<.5&&t<1){const a=.32*Math.sin(lp*2*Math.PI);for(let i=0;i<n;i++)for(let j=0;j<=i;j++){const w=(WTS[0][i][j]+WTS[1][i][j]+WTS[2][i][j])/3;strokeArc(colX(i,n),colX(j,n),y+42,1,1+5*w,'accent',a)}}
+  const pulse=lp>=.5&&t<1?Math.sin((lp-.5)*2*Math.PI):0;
+  for(let i=0;i<n;i++)drawVec(colX(i,n),y,vecAt(i,t),{cw:22*(1+.9*pulse)});
+  sideTitle('Stack of layers');
+  text('paper 6 · GPT-2 small 12 · Llama 3 70B 80',SX,90,{font:FM,size:10,color:'muted'});
+  const k=Math.min(L,Math.floor(lt)+1);
+  text(`Layer ${k} of ${L}`,SX,122,{font:FD,size:24,weight:'600',color:'accent'});
+  for(let l=0;l<L;l++){const yy=500-l*28,done=lt>=l+1,cur=Math.floor(lt)===l&&t<1,a=done?1:cur?.9:.28;
+    ctx.globalAlpha=a;rr(790,yy-12,140,11,3);ctx.fillStyle=col('b-attn');ctx.fill();ctx.strokeStyle=col('ink',.7);ctx.lineWidth=1;ctx.stroke();
+    rr(790,yy-26,140,11,3);ctx.fillStyle=col('b-ffn');ctx.fill();ctx.stroke();ctx.globalAlpha=1;
+    text(String(l+1),780,yy-12,{font:FM,size:9,color:cur?'accent':'muted',align:'right'})}
+  const my=500-lt*28;if(t<1)arrow(948,my-6,936,my-6,'accent',1,2);
+  wrap('Each layer reads the lane and adds an update. Vectors drift from word identity toward what should come next.',SX,150,226,16,{size:12,color:'muted'});
+}
+
+function predictPanel(p,a=1,pick=-1){
+  sideTitle('Next-token prediction',64,a);
+  ctx.globalAlpha=a;
+  rr(800,105,160,40,6);ctx.fillStyle=col('b-lin');ctx.fill();ctx.strokeStyle=col('ink');ctx.lineWidth=1.4;ctx.stroke();
+  text('Linear',880,125,{size:13,align:'center'});
+  const lg=seg(p,.38,.55);
+  LOGITS.forEach((h,i)=>{ctx.fillStyle=col(i===9?'accent':'muted',i===9?.9:.55);ctx.fillRect(800+i*2.5,212-h*lg,1.8,h*lg)});
+  text('logits: a score per vocab entry',800,224,{font:FM,size:9,color:'muted',alpha:lg});
+  const sg=seg(p,.52,.66);
+  rr(800,238,160,26,6);ctx.fillStyle=col('b-soft');ctx.fill();ctx.strokeStyle=col('ink');ctx.lineWidth=1.4+sg*(1-seg(p,.66,.8))*1.5;ctx.stroke();
+  text('Softmax',880,251,{size:13,align:'center'});
+  const bg=ease(seg(p,.66,.95));
+  TOP5.forEach(([s,pr],r)=>{const yy=292+r*30;
+    text(lab(s),800,yy,{font:FM,size:11,alpha:bg?1:.3});
+    rr(858,yy-8,Math.max(1,92*pr/.38*bg),16,3);ctx.fillStyle=col(r===0?'accent':'muted',r===0?.85:.45);ctx.fill();
+    if(bg>.6)text(Math.round(pr*100)+'%',858+92*pr/.38*bg+6,yy,{font:FM,size:11,alpha:seg(bg,.6,1)});
+    if(r===pick){ctx.strokeStyle=col('ink');ctx.lineWidth=2;rr(794,yy-13,180,26,5);ctx.stroke()}});
+  text('+ 50,252 other tokens share the rest',800,448,{size:11,color:'muted',alpha:bg});
+  text('probabilities are illustrative',800,466,{size:11,color:'muted',alpha:bg});
+  ctx.globalAlpha=1;
+}
+
+function sc6(t){
+  const n=5;chips(n);lanes(n,1-seg(t,0,.2)*.5);layerFrame(.3,.15,.15);
+  const fade=seg(t,0,.2);
+  for(let i=0;i<n-1;i++)drawVec(colX(i,n),85,SS[3][i],{alpha:lerp(1,.2,fade)});
+  const mv1=ease(seg(t,.05,.25)),ent=seg(t,.25,.38);
+  if(ent<1){const x=lerp(colX(n-1,n),770,mv1)+ent*50,y=lerp(85,125,mv1);drawVec(x,y,SS[3][n-1],{alpha:1-ent,glow:.8*(1-ent)})}
+  if(t<.25)text('only the last position predicts',colX(n-1,n),30,{size:11,color:'accent',align:'center',alpha:seg(t,0,.1)*(1-seg(t,.2,.25)),weight:'700'});
+  predictPanel(t);
+  if(t>.3)wrap('Earlier positions are computed too (they make training efficient), but at generation time only the last one’s output is read.',230,446,470,17,{size:12,color:'muted',alpha:seg(t,.3,.45)});
+}
+
+function sc7(t){
+  const pick=t<.22?Math.floor(t*45)%5:0;
+  const f=ease(seg(t,.3,.65));
+  predictPanel(1,lerp(1,.45,seg(t,.65,.85)),pick);
+  layerFrame(.3*(1-seg(t,0,.3))+ .3*seg(t,.7,1),.15,.15);
+  for(let i=0;i<4;i++)drawVec(colX(i,5),85,SS[3][i],{alpha:.2*(1-seg(t,0,.3))});
+  lanes(6,seg(t,.65,.9)*.8);
+  const xs=[0,1,2,3,4].map(i=>lerp(colX(i,5),colX(i,6),f));
+  for(let i=0;i<5;i++){drawChip(xs[i],540,lab(TOK[i]));text(String(IDS[i]),xs[i],572,{font:FM,size:11,color:'muted',align:'center'})}
+  if(t>.22){const nx=lerp(830,colX(5,6),f),ny=lerp(292,540,f);drawChip(nx,ny,lab(TOK[5]),1,1);
+    text(String(IDS[5]),colX(5,6),572,{font:FM,size:11,color:'accent',align:'center',alpha:seg(t,.65,.8)})}
+  const kv=seg(t,.72,.88);
+  if(kv>0)for(let i=0;i<5;i++){ctx.globalAlpha=kv;rr(xs[i]-28,504,56,16,8);ctx.fillStyle=col('b-attn');ctx.fill();ctx.strokeStyle=col('accent');ctx.lineWidth=1;ctx.stroke();text('KV cached',xs[i],512,{font:FM,size:9,align:'center'});ctx.globalAlpha=1}
+  if(kv>0){text('new',colX(5,6),512,{font:FM,size:10,color:'accent',align:'center',alpha:kv,weight:'500'});
+    wrap('Next pass: only ·mat runs through the layers. Earlier tokens reuse their stored keys and values.',230,432,470,17,{size:13,alpha:kv});
+    text('The prompt is now 6 tokens. Repeat until a stop token or a length limit.',230,474,{size:12,color:'muted',alpha:seg(t,.85,1)})}
+  if(t<.3)text('sampling…',800,470+18,{size:11,color:'accent',alpha:1-seg(t,.22,.3)});
+}
+const SCENES=[sc0,sc1,sc2,sc3,sc4,sc5,sc6,sc7];
+
+/* ---------- captions ---------- */
+const CAP=[
+ {tab:'Tokenize',title:'Text becomes tokens',body:'<p>The prompt is cut into tokens from a fixed vocabulary. Common words are usually one token; rare words break into several pieces. Each token is replaced by its ID, an ordinary integer, and that is all the model ever sees.</p>',paper:'“Inputs” at the bottom of Figure 1.'},
+ {tab:'Embed',title:'Each ID looks up a vector',body:'<p>The ID selects one row of a learned table. That row, a list of numbers, becomes the token’s starting vector. Color shows each number’s sign and size.</p><p>From here on, each token travels up its own column. Think of the column as a lane, the <em>residual stream</em>: every later step reads from the lane and adds something back.</p>',paper:'“Output Embedding” (pink). In a decoder-only model the prompt and the generated text share this one embedding.'},
+ {tab:'Position',title:'Add where each token sits',body:'<p>Attention compares tokens by content, so without help it can’t tell “dog bites man” from “man bites dog”. The paper adds a fixed pattern of sine and cosine waves to each vector, a different pattern for every position.</p>',paper:'“Positional Encoding” and the ⊕ beside it.'},
+ {tab:'Attention',title:'Tokens look back at earlier tokens',body:'<p>Every token makes a <em>query</em> (what am I looking for?), a <em>key</em> (what do I contain?) and a <em>value</em> (what do I pass on?). A query is compared with each earlier key; softmax turns the scores into weights; the weighted values flow back and are added to the querying token’s lane.</p><p>The mask is why the arcs only reach leftward. Every token does this at the same time; the faint arcs are the other tokens’ attention.</p>',paper:'“Masked Multi-Head Attention” (orange) and its Add & Norm. The paper’s second attention block, which reads from an encoder, is gone in decoder-only LLMs.'},
+ {tab:'Feed-forward',title:'Each token processes on its own',body:'<p>Each vector is widened about four times, passed through a nonlinearity that zeroes some units, and narrowed back. The result is added to the lane.</p><p>This is the counterpart to attention: attention moves information <em>between</em> tokens, the feed-forward step transforms it <em>within</em> each token.</p>',paper:'“Feed Forward” (blue) and its Add & Norm.'},
+ {tab:'Stack ×N',title:'Repeat, layer after layer',body:'<p>Attention plus feed-forward makes one layer, and the model stacks many with separate weights. The arcs flash and the vectors pulse once per layer as the lanes rise. Each layer adds a small update, so the vector at the top has been refined many times.</p>',paper:'The grey box marked N×. The paper used N = 6.'},
+ {tab:'Predict',title:'The last position predicts the next token',body:'<p>The final vector of the last token goes through a linear layer that produces one score for every token in the vocabulary. Softmax turns those scores into probabilities that sum to 1.</p>',paper:'“Linear” (purple) and “Softmax” (green), topped by “Output Probabilities”.'},
+ {tab:'Sample & loop',title:'Pick one, append it, go again',body:'<p>One token is drawn from the distribution. Temperature controls how often a less likely token wins. The chosen token is appended to the input and the whole pass runs again, one token at a time.</p><p>In practice the keys and values of earlier tokens are cached, so each new pass only processes the newest token.</p>',paper:'“Outputs (shifted right)”: the model’s own output fed back in as input.'}];
+
+const tabs=document.getElementById('tabs');
+CAP.forEach((c,i)=>{const b=document.createElement('button');b.id='tab'+i;b.innerHTML=`<span class="n">${i+1}</span>${c.tab}`;b.onclick=()=>go(i);tabs.appendChild(b)});
+const headsEl=document.getElementById('heads');
+HEADS.forEach((h,i)=>{const b=document.createElement('button');b.id='head'+i;b.textContent=h.name;b.onclick=()=>{S.head=i;syncUI()};headsEl.appendChild(b)});
+
+function syncUI(){
+  const c=CAP[S.scene];
+  document.getElementById('headsWrap').hidden=S.scene!==3;
+  [...tabs.children].forEach((b,i)=>{b.setAttribute('aria-current',i===S.scene?'true':'false');b.classList.toggle('done',i<S.scene)});
+  [...headsEl.children].forEach((b,i)=>b.setAttribute('aria-pressed',i===S.head?'true':'false'));
+  document.getElementById('play').textContent=S.playing?'Pause':(S.scene===CAP.length-1&&S.t>=1?'Replay':'Play');
+  document.getElementById('prev').disabled=S.scene===0;
+  document.getElementById('next').disabled=S.scene===CAP.length-1;
+}
+function go(i){S.scene=clamp(i,0,CAP.length-1);S.t=0;syncUI()}
+document.getElementById('prev').onclick=()=>go(S.scene-1);
+document.getElementById('next').onclick=()=>go(S.scene+1);
+document.getElementById('play').onclick=togglePlay;
+function togglePlay(){if(!S.playing&&S.scene===CAP.length-1&&S.t>=1){S.scene=0;S.t=0}S.playing=!S.playing;syncUI()}
+const scrub=document.getElementById('scrub');
+scrub.addEventListener('input',()=>{S.t=scrub.value/1000;S.playing=false;syncUI()});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'&&e.key!==' ')return;
+  if(e.key==='ArrowRight'){go(S.scene+1);e.preventDefault()}else if(e.key==='ArrowLeft'){go(S.scene-1);e.preventDefault()}else if(e.key===' '){togglePlay();e.preventDefault()}});
+cv.addEventListener('click',e=>{if(S.scene!==3)return;const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*W/r.width;
+  let best=-1,bd=40;for(let i=0;i<5;i++){const d=Math.abs(x-colX(i,5));if(d<bd){bd=d;best=i}}
+  if(best>=0){S.focus=best;if(S.t>.45)S.t=.15;syncUI()}});
+cv.addEventListener('mousemove',e=>{if(S.scene!==3){cv.style.cursor='default';return}const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*W/r.width;cv.style.cursor=[0,1,2,3,4].some(i=>Math.abs(x-colX(i,5))<40)&&x<730?'pointer':'default'});
+
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){S.playing=false;S.t=1}
+
+/* ---------- loop ---------- */
+function resize(){const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.width*H/W*dpr)}
+new ResizeObserver(resize).observe(cv);resize();
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(100,now-last);last=now;
+  if(S.playing){S.t+=dt/DUR[S.scene];
+    if(S.t>=1){if(S.scene<CAP.length-1){S.scene++;S.t=0}else{S.t=1;S.playing=false}syncUI()}}
+  scrub.value=Math.round(S.t*1000);
+  const k=cv.width/W;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.setTransform(k,0,0,k,0,0);
+  ctx.fillStyle=col('surface');ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=col('line');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(192,16);ctx.lineTo(192,H-16);ctx.moveTo(738,16);ctx.lineTo(738,H-16);ctx.stroke();
+  drawMini(S.scene,S.t);
+  if(S.scene>=3&&S.scene<=5){} else if(S.scene<3) layerFrame(.3,.15,.15);
+  SCENES[S.scene](S.t);
+  requestAnimationFrame(frame);
+}
+syncUI();
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>requestAnimationFrame(frame));
+})();
+</script>
+
+</body></html>
