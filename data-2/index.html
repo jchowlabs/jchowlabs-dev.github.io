@@ -14,7 +14,7 @@ body{margin:0}
 :root{
   --paper:#1B202B; --panel:#222836; --screen:#272E3D; --ink:#E3E8EF; --soft:#8E99AA; --line:#363F51; --grid:#2C3444; --chip:#2F3747;
   --accent:#7F95FF; --accentS:#2D3762; --risk:#FF6A5C; --riskS:#4A2526; --ok:#4CC38A; --onAccent:#12161F; --bezel:#0E1117; --base:#3B4557;
-  --note:#F0B84A; --noteBg:#3A4252;
+  --okS:#22402F;
   --f-display:"Saira Condensed","Arial Narrow",sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -112,10 +112,11 @@ svg .mono{font-family:var(--f-mono)}
 .lead-a{stroke:var(--soft)} .lead-b{stroke:var(--risk)}
 .okcard{fill:var(--screen);stroke:var(--ok);stroke-width:1.5}
 .banner{fill:var(--risk)}
-/* narrator bubble — the teacher's voice; warm gold so it reads as an overlay in both modes */
-.narbox{fill:var(--noteBg);stroke:var(--note);stroke-width:1.75}
-.nartail{fill:var(--note)}
-.narttl{fill:var(--note)}
+/* narrator bubble — green while steps run cleanly; red on the step that introduces the exposure */
+.narbox{fill:var(--okS);stroke:var(--ok);stroke-width:1.75}
+.narbox.issue{fill:var(--riskS);stroke:var(--risk)}
+.nartail{fill:var(--ok)} .nartail.issue{fill:var(--risk)}
+.narttl{fill:var(--ok)} .narttl.issue{fill:var(--risk)}
 .caret{fill:var(--ink);animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .spinner{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-dasharray:38 20;transform-box:fill-box;transform-origin:center;animation:spin 1s linear infinite}
@@ -138,9 +139,7 @@ svg .mono{font-family:var(--f-mono)}
     <div class="ctrls">
       <span class="stepno" id="stepno"></span>
       <button type="button" class="btn" id="restart">Restart</button>
-      <button type="button" class="btn" id="prev" aria-label="Previous step">Back</button>
       <button type="button" class="btn primary" id="play">Pause</button>
-      <button type="button" class="btn" id="next" aria-label="Next step">Next</button>
     </div>
   </div>
   <div class="bar" id="bar"><i></i></div>
@@ -301,7 +300,7 @@ const NAR=[
   {f:'erp',   ttl:'Another turn for the budget',   txt:'Same loop again — now the ERP, for the budget.'},
   {f:'drive', ttl:'Searching a big repository',    txt:'Drive has 1,240 files. The search sweeps all of them.'},
   {f:'drive', ttl:'It reads what matched',         txt:'It opens last year’s plan — the file it needed.'},
-  {f:'agent', ttl:'It sorts what it found',        txt:'Useful files stay; the rest are dropped.'},
+  {f:'agent', ttl:'It sorts what it found',        txt:'Useful files stay; the rest are dropped.', issue:true},
   {f:'agent', ttl:'Enough to answer',              txt:'No more tool calls. The loop is done.'},
   {f:'lap',   ttl:'The answer comes back',         txt:'The draft returns to the same chat window.'},
   null
@@ -450,15 +449,15 @@ function render(n){
   narG.innerHTML='';
   const na=NAR[n];
   if(na && !(na.f==='drive'&&B)){
-    const f=FOCUS[na.f],x=f.x,y=f.y,w=f.w,pad=14;
+    const f=FOCUS[na.f],x=f.x,y=f.y,w=f.w,pad=14,sfx=(na.issue&&B)?' issue':'';
     const rows=wrap(na.txt,Math.floor((w-2*pad)/6.1));
     const h=14+18+rows.length*15+12;
     const bg=g(reduce?null:'pop',narG);
     const tx=x+40;
     e('rect',{x,y:y+3,width:w,height:h,rx:8,fill:'#070A0F','fill-opacity':0.55,filter:'url(#nsh)'},bg); // soft shadow (separate, so the box fill stays opaque)
-    e('path',{d:`M${tx-7} ${y} L${tx} ${y-9} L${tx+7} ${y} Z`,class:'nartail'},bg);
-    e('rect',{x,y,width:w,height:h,rx:8,class:'narbox'},bg);
-    e('text',{x:x+pad,y:y+22,'font-size':13,'font-weight':700,class:'narttl'},bg,na.ttl);
+    e('path',{d:`M${tx-7} ${y} L${tx} ${y-9} L${tx+7} ${y} Z`,class:'nartail'+sfx},bg);
+    e('rect',{x,y,width:w,height:h,rx:8,class:'narbox'+sfx},bg);
+    e('text',{x:x+pad,y:y+22,'font-size':13,'font-weight':700,class:'narttl'+sfx},bg,na.ttl);
     rows.forEach((r,i)=>e('text',{x:x+pad,y:y+42+i*15,'font-size':12},bg,r));
   }
 
@@ -478,10 +477,7 @@ function setMode(m){mode=m;document.getElementById('modeA').setAttribute('aria-p
 document.getElementById('modeA').onclick=()=>setMode('a');
 document.getElementById('modeB').onclick=()=>setMode('b');
 playBtn.onclick=()=>{if(!playing&&cur===N-1)go(0);setPlaying(!playing)};
-document.getElementById('next').onclick=()=>{setPlaying(false);go(cur+1)};
-document.getElementById('prev').onclick=()=>{setPlaying(false);go(cur-1)};
 document.getElementById('restart').onclick=()=>{go(0);setPlaying(true)};
-document.addEventListener('keydown',ev=>{if(ev.key==='ArrowRight'){setPlaying(false);go(cur+1)}else if(ev.key==='ArrowLeft'){setPlaying(false);go(cur-1)}});
 
 const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 function tick(now){
