@@ -426,7 +426,7 @@ function tick(now){
   if(playing&&el>dur){if(cur<N-1)go(cur+1);else setPlaying(false)}
   requestAnimationFrame(tick);
 }
-setPlaying(false);go(N-1);requestAnimationFrame(tick);
+setPlaying(playing);go(0);requestAnimationFrame(tick);
 
 /* fit the whole plate inside the visible window; never upscale, scroll below 60% */
 const wrapEl=document.querySelector('.wrap');
