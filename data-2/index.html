@@ -249,7 +249,7 @@ const S=[
  pk:[{d:P.sys('erp'),k:'req'},{d:P.back('erp',2),k:'data',file:1,delay:1600}],scan:'erp',dur:4800},
 {t:'Searching a big repository',b:{a:'Drive holds 1,240 files. The search sweeps through them and returns whatever matches. The HR file is restricted, so it never comes back.',
   b:'Drive holds 1,240 files. The search sweeps through them and returns whatever matches. The HR file was shared with all of Acme by mistake, so it matches like anything else.'},
- think:[['CALL','drive.search “expansion plan headcount”']],wheel:'tool',chip:'Drive',status:'Searching Drive',turn:3,pk:[{d:P.sys('drive'),k:'req'}],scan:1,dur:5600},
+ think:[['CALL','drive.search “expansion plan headcount”']],wheel:'tool',chip:'Drive',status:'Searching Drive',turn:3,pk:[{d:P.sys('drive'),k:'req'}],scan:'drive',dur:5600},
 {t:{a:'It reads what matched',b:'The innocuous read'},b:{a:'The agent opens last year’s plan. That’s the only file worth reading here.',
   b:'The agent opens the HR file for the same reason it opened the plan: it matched the search. Nothing about this step is malicious.'},
  think:[['READ','2026 Growth Plan.docx','a'],['READ','2026 Growth Plan.docx, Workforce Plan 2027.xlsx','b']],wheel:'read',chip:'Drive',status:'Searching Drive',turn:3,
@@ -391,12 +391,12 @@ function render(n){
     if(!B){e('rect',{x:40,y:536,width:340,height:62,rx:8,class:'okcard'},vG);
       e('text',{x:58,y:562,'font-size':13,'font-weight':700,class:'tok'},vG,'✓  Answer delivered');
       e('text',{x:58,y:582,'font-size':12,class:'ts'},vG,'3 tools · 3 turns · nothing sensitive touched');}
-    else{e('rect',{x:40,y:400,width:340,height:62,rx:8,class:'okcard'},vG);
-      e('text',{x:58,y:426,'font-size':13,'font-weight':700,class:'tok'},vG,'✓  In the answer: nothing sensitive');
-      e('text',{x:58,y:446,'font-size':12,class:'ts'},vG,'This is all the user ever sees.');
+    else{e('rect',{x:40,y:360,width:340,height:62,rx:8,class:'okcard'},vG);
+      e('text',{x:58,y:386,'font-size':13,'font-weight':700,class:'tok'},vG,'✓  In the answer: nothing sensitive');
+      e('text',{x:58,y:406,'font-size':12,class:'ts'},vG,'This is all the user ever sees.');
       const bg=g(reduce?null:'pop',vG);
-      e('rect',{x:440,y:636,width:470,height:46,rx:8,class:'banner'},bg);
-      e('text',{x:458,y:664,'font-size':14,'font-weight':700,class:'tw'},bg,'⚠  Seen by the model: yes. Hidden exposure.');}
+      e('rect',{x:440,y:520,width:470,height:46,rx:8,class:'banner'},bg);
+      e('text',{x:458,y:548,'font-size':14,'font-weight':700,class:'tw'},bg,'⚠  Seen by the model: yes. Hidden exposure.');}
   }
 
   /* chrome */
@@ -426,7 +426,7 @@ function tick(now){
   if(playing&&el>dur){if(cur<N-1)go(cur+1);else setPlaying(false)}
   requestAnimationFrame(tick);
 }
-setPlaying(playing);go(0);requestAnimationFrame(tick);
+setPlaying(false);go(N-1);requestAnimationFrame(tick);
 
 /* fit the whole plate inside the visible window; never upscale, scroll below 60% */
 const wrapEl=document.querySelector('.wrap');
