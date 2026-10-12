@@ -172,7 +172,7 @@ const GCOLS=26, GCW=12, GCH=13, GROWS=8, GX0=SX0+20;
 const gy0=k=>CARDY[k]+40;
 const tc=(k,r,c)=>[GX0+c*GCW+(GCW-3)/2, gy0(k)+r*GCH+(GCH-3)/2];
 const HITS={crm:[[1,4],[3,17],[5,9],[6,21]], erp:[[0,7],[2,19],[4,2],[6,13]], drive:[[1,5],[3,20],[5,2],[6,18]]};
-const SEC=[4,19], PLAN=[1,5], SCANSTEP={crm:4, erp:6, drive:7};
+const SEC=[4,19], PLAN=[1,5], SCANSTEP={crm:4, erp:5, drive:6};
 const HUBY=298;  // the conversation box is the hub — flow lines leave/arrive at this height (centered on the systems)
 const SHIFT=24;  // the whole scene (minus the fixed divider) is nudged down this much to sit more centered
 const P={
@@ -258,20 +258,16 @@ const S=[
  think:[['TOOLS','What can I use? CRM, ERP and Drive.']],wheel:'think',status:'Thinking',chipsSeq:1},
 {t:'It makes a plan',b:'The goal turns into a short list of things to find. Each one will take at least one turn of the wheel.',
  think:[['NEED','Pipeline, budget, last year’s plan, team size.']],wheel:'think',status:'Planning'},
-{t:'Use a tool',b:'The model writes a tool request. A connector runs it against the CRM using the user’s own credentials.',
- think:[['CALL','crm.search “open opportunities, new markets”']],wheel:'tool',chip:'CRM',status:'Reading CRM',turn:1,pk:[{d:P.sys('crm'),k:'req'}],scan:'crm'},
-{t:'Read the result',b:'The records come back and land in the context. The model decides what matters and moves on.',
- think:[['KEEP','312 records. Keeping the top 20 by value.']],wheel:'read',chip:'CRM',status:'Reading CRM',turn:1,tray:['crm'],pk:[{d:P.back('crm',1),k:'data',file:1}]},
+{t:'Use a tool',b:'The model requests the CRM with the user’s own credentials, and the records it returns land in the context in the same turn.',
+ think:[['CALL','crm.search “open opportunities, new markets”'],['KEEP','312 records. Keeping the top 20 by value.']],wheel:'read',chip:'CRM',status:'Reading CRM',turn:1,tray:['crm'],
+ pk:[{d:P.sys('crm'),k:'req'},{d:P.back('crm',1),k:'data',file:1,delay:1600}],scan:'crm',dur:4800},
 {t:'Another turn for the budget',b:'Same loop, different system. Think, use a tool, read the result.',
  think:[['CALL','erp.query “2026 budget vs actual”'],['KEEP','Spend is $6.8M of a $7.5M budget.']],wheel:'read',chip:'ERP',status:'Reading ERP',turn:2,tray:['erp'],
  pk:[{d:P.sys('erp'),k:'req'},{d:P.back('erp',2),k:'data',file:1,delay:1600}],scan:'erp',dur:4800},
-{t:'Searching a big repository',b:{a:'Drive holds 1,240 files. The search sweeps through them and returns whatever matches. The HR file is restricted, so it never comes back.',
-  b:'Drive holds 1,240 files. The search sweeps through them and returns whatever matches. The HR file was shared with all of Acme by mistake, so it matches like anything else.'},
- think:[['CALL','drive.search “expansion plan headcount”']],wheel:'tool',chip:'Drive',status:'Searching Drive',turn:3,pk:[{d:P.sys('drive'),k:'req'}],scan:'drive',dur:5600},
-{t:{a:'It reads what matched',b:'The innocuous read'},b:{a:'The agent opens last year’s plan. That’s the only file worth reading here.',
-  b:'The agent opens the HR file for the same reason it opened the plan: it matched the search. Nothing about this step is malicious.'},
- think:[['READ','2026 Growth Plan.docx','a'],['READ','2026 Growth Plan.docx, Workforce Plan 2027.xlsx','b']],wheel:'read',chip:'Drive',status:'Searching Drive',turn:3,
- tray:['plan','secret'],pk:[{d:P.file(PLAN,3),k:'data',file:1},{d:P.file(SEC,4),k:'risk',file:1,delay:500,mode:'b'}],dur:4600},
+{t:'Searching a big repository',b:{a:'Drive holds 1,240 files. The search sweeps through them and the matches land in the context. The HR file is restricted, so it never comes back.',
+  b:'Drive holds 1,240 files. The search sweeps through them and the matches land in the context. The HR file was shared with all of Acme by mistake, so it matches and gets pulled in like anything else.'},
+ think:[['CALL','drive.search “expansion plan headcount”'],['READ','2026 Growth Plan.docx','a'],['READ','2026 Growth Plan.docx, Workforce Plan 2027.xlsx','b']],wheel:'read',chip:'Drive',status:'Searching Drive',turn:3,
+ tray:['plan','secret'],pk:[{d:P.sys('drive'),k:'req'},{d:P.file(PLAN,3),k:'data',file:1,delay:1600},{d:P.file(SEC,4),k:'risk',file:1,delay:2400,mode:'b'}],scan:'drive',dur:{a:5200,b:6400}},
 {t:{a:'It sorts what it found',b:'The aha'},b:{a:'Useful files stay in the context. Everything else is ignored.',
   b:'The agent does the right thing and leaves the file out. But it could only recognize the file by reading it. The contents are already in its context.'},
  think:[['KEEP','Last year’s plan is useful. Skipping 1,239 others.','a'],['KEEP','Last year’s plan is useful.','b'],
@@ -293,13 +289,11 @@ const N=S.length;
 const NAR=[
   {f:'lap',   ttl:'You ask',                      txt:'You type one request. The chat is all you’ll see.'},
   {f:'agent', ttl:'The request reaches the model', txt:'Your prompt leaves the laptop and reaches the model.'},
-  {f:'agent', ttl:'It checks its tools',           txt:'Each system is a tool it can ask for — it can’t open anything itself.'},
+  {f:'agent', ttl:'It checks its tools',           txt:'Each system is a tool it can ask for — it can’t open anything itself.', x:456, y:118, w:442, tx:700},
   {f:'agent', ttl:'It makes a plan',               txt:'The goal becomes a short list of things to find.'},
-  {f:'crm',   ttl:'Use a tool',                    txt:'It queries the CRM — with your credentials, not its own.'},
-  {f:'agent', ttl:'Read the result',               txt:'Results come back and land in the context.'},
+  {f:'crm',   ttl:'Use a tool',                    txt:'It queries the CRM — the matching records land in the context.'},
   {f:'erp',   ttl:'Another turn for the budget',   txt:'Same loop again — now the ERP, for the budget.'},
-  {f:'drive', ttl:'Searching a big repository',    txt:'Drive has 1,240 files. The search sweeps all of them.'},
-  {f:'drive', ttl:'It reads what matched',         txt:'It opens last year’s plan — the file it needed.'},
+  {f:'drive', ttl:'Searching a big repository',    txt:'Drive has 1,240 files; the matches land in the context.'},
   {f:'agent', ttl:'It sorts what it found',        txt:'Useful files stay; the rest are dropped.', issue:true},
   {f:'agent', ttl:'Enough to answer',              txt:'No more tool calls. The loop is done.'},
   {f:'lap',   ttl:'The answer comes back',         txt:'The draft returns to the same chat window.'},
@@ -415,7 +409,7 @@ function render(n){
     e('rect',{x,y:TY+36,width:80,height:46,rx:5,class:'trayt'+(isR?' risk':'')},tg);
     e('text',{x:x+8,y:TY+56,'font-size':11.5,'font-weight':600,class:isR?'tr':''},tg,lab);
     e('text',{x:x+8,y:TY+72,'font-size':10,class:'ts mono'},tg,sub);});
-  const trayAlert=B&&n>=9;
+  const trayAlert=B&&n>=7;
   convBox.setAttribute('class','tray'+(trayAlert?' alert':''));
   if(trayAlert)e('text',{x:458,y:TY+101,'font-size':11,'font-weight':600,class:'tr'},trayG,'Excluded from the answer. Still in the context the model read.');
 
@@ -449,11 +443,11 @@ function render(n){
   narG.innerHTML='';
   const na=NAR[n];
   if(na && !(na.f==='drive'&&B)){
-    const f=FOCUS[na.f],x=f.x,y=f.y,w=f.w,pad=14,sfx=(na.issue&&B)?' issue':'';
+    const f=FOCUS[na.f],x=na.x??f.x,y=na.y??f.y,w=na.w??f.w,pad=14,sfx=(na.issue&&B)?' issue':'';
     const rows=wrap(na.txt,Math.floor((w-2*pad)/6.1));
     const h=14+18+rows.length*15+12;
     const bg=g(reduce?null:'pop',narG);
-    const tx=x+40;
+    const tx=na.tx??(x+40);
     e('rect',{x,y:y+3,width:w,height:h,rx:8,fill:'#070A0F','fill-opacity':0.55,filter:'url(#nsh)'},bg); // soft shadow (separate, so the box fill stays opaque)
     e('path',{d:`M${tx-7} ${y} L${tx} ${y-9} L${tx+7} ${y} Z`,class:'nartail'+sfx},bg);
     e('rect',{x,y,width:w,height:h,rx:8,class:'narbox'+sfx},bg);
