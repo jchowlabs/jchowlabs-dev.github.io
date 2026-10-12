@@ -133,8 +133,8 @@ svg .mono{font-family:var(--f-mono)}
   <div class="top">
     <a class="back" href="../" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
     <div class="seg" role="group" aria-label="Mode">
-      <button type="button" id="modeA" aria-pressed="true">How it works</button>
-      <button type="button" id="modeB" class="b" aria-pressed="false">Sensitive data</button>
+      <button type="button" id="modeA" aria-pressed="false">How it works</button>
+      <button type="button" id="modeB" class="b" aria-pressed="true">Sensitive data</button>
     </div>
     <div class="ctrls">
       <span class="stepno" id="stepno"></span>
@@ -313,7 +313,7 @@ const PROMPT='Put together a strategy doc for our expansion next year.';
 const SLOTS={prompt:['prompt','you',0],crm:['CRM','312 rec',1],erp:['ERP','48 rows',2],plan:['Plan','.docx',3],secret:['Workforce','HR · names',4]};
 
 /* ---------- state ---------- */
-let mode='a',cur=0,playing=!reduce,t0=performance.now(),anims=[],packets=[];
+let mode='b',cur=0,playing=!reduce,t0=performance.now(),anims=[],packets=[];
 
 function cumulative(n){
   const lines=[],tray=[];let turn=0;
