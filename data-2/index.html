@@ -14,6 +14,7 @@ body{margin:0}
 :root{
   --paper:#1B202B; --panel:#222836; --screen:#272E3D; --ink:#E3E8EF; --soft:#8E99AA; --line:#363F51; --grid:#2C3444; --chip:#2F3747;
   --accent:#7F95FF; --accentS:#2D3762; --risk:#FF6A5C; --riskS:#4A2526; --ok:#4CC38A; --onAccent:#12161F; --bezel:#0E1117; --base:#3B4557;
+  --note:#F0B84A; --noteBg:#3A4252;
   --f-display:"Saira Condensed","Arial Narrow",sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -111,9 +112,10 @@ svg .mono{font-family:var(--f-mono)}
 .lead-a{stroke:var(--soft)} .lead-b{stroke:var(--risk)}
 .okcard{fill:var(--screen);stroke:var(--ok);stroke-width:1.5}
 .banner{fill:var(--risk)}
-/* narrator bubble — the teacher's voice; stays accent (neutral) in both modes */
-.narbox{fill:var(--chip);stroke:var(--accent);stroke-width:1.5}
-.nartail{fill:var(--accent)}
+/* narrator bubble — the teacher's voice; warm gold so it reads as an overlay in both modes */
+.narbox{fill:var(--noteBg);stroke:var(--note);stroke-width:1.75}
+.nartail{fill:var(--note)}
+.narttl{fill:var(--note)}
 .caret{fill:var(--ink);animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .spinner{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-dasharray:38 20;transform-box:fill-box;transform-origin:center;animation:spin 1s linear infinite}
@@ -183,6 +185,7 @@ const P={
 
 /* ---------- static scene ---------- */
 const defs=e('defs',{});const pat=e('pattern',{id:'gp',width:24,height:24,patternUnits:'userSpaceOnUse'},defs);e('path',{d:'M24 0H0V24',class:'gridline'},pat);
+const nsh=e('filter',{id:'nsh',x:'-30%',y:'-30%',width:'160%',height:'195%'},defs);e('feGaussianBlur',{stdDeviation:4.5},nsh);
 e('rect',{width:1376,height:688,fill:'url(#gp)'});
 // column divider + its label stay fixed, full-height, centered in the gap between the conversation and the systems
 e('line',{x1:955,y1:20,x2:955,y2:678,class:'boundary'});
@@ -303,13 +306,13 @@ const NAR=[
   {f:'lap',   ttl:'The answer comes back',         txt:'The draft returns to the same chat window.'},
   null
 ];
-/* where each bubble parks. systems sit just below the top (scan) action, offset to the left side. */
+/* where each bubble parks. systems sit as a full-width caption just BELOW their card (clear of the grid). */
 const FOCUS={
-  lap:  {x:54,   y:430,            w:252},
-  agent:{x:456,  y:512,            w:272},
-  crm:  {x:1006, y:CARDY.crm+78,   w:248},
-  erp:  {x:1006, y:CARDY.erp+78,   w:248},
-  drive:{x:1006, y:CARDY.drive+78, w:248}
+  lap:  {x:54,   y:430,              w:252},
+  agent:{x:456,  y:512,              w:272},
+  crm:  {x:SX0,  y:CARDY.crm+SH+4,   w:SW},
+  erp:  {x:SX0,  y:CARDY.erp+SH+4,   w:SW},
+  drive:{x:SX0,  y:CARDY.drive+SH+4, w:SW}
 };
 
 const pick=(v,m)=>v&&typeof v==='object'&&!Array.isArray(v)&&('a' in v||'b' in v)?v[m]:v;
@@ -442,18 +445,20 @@ function render(n){
       e('text',{x:458,y:548,'font-size':14,'font-weight':700,class:'tw'},bg,'⚠  Seen by the model: yes. Hidden exposure.');}
   }
 
-  /* narrator bubble — parked next to whatever is active this step */
+  /* narrator bubble — parked next to whatever is active this step.
+     In sensitive mode the Drive callout already speaks, so skip the gold bubble on Drive there. */
   narG.innerHTML='';
   const na=NAR[n];
-  if(na){
+  if(na && !(na.f==='drive'&&B)){
     const f=FOCUS[na.f],x=f.x,y=f.y,w=f.w,pad=14;
-    const rows=wrap(na.txt,42);
+    const rows=wrap(na.txt,Math.floor((w-2*pad)/6.1));
     const h=14+18+rows.length*15+12;
     const bg=g(reduce?null:'pop',narG);
     const tx=x+40;
+    e('rect',{x,y:y+3,width:w,height:h,rx:8,fill:'#070A0F','fill-opacity':0.55,filter:'url(#nsh)'},bg); // soft shadow (separate, so the box fill stays opaque)
     e('path',{d:`M${tx-7} ${y} L${tx} ${y-9} L${tx+7} ${y} Z`,class:'nartail'},bg);
     e('rect',{x,y,width:w,height:h,rx:8,class:'narbox'},bg);
-    e('text',{x:x+pad,y:y+22,'font-size':13,'font-weight':700,class:'ta'},bg,na.ttl);
+    e('text',{x:x+pad,y:y+22,'font-size':13,'font-weight':700,class:'narttl'},bg,na.ttl);
     rows.forEach((r,i)=>e('text',{x:x+pad,y:y+42+i*15,'font-size':12},bg,r));
   }
 
