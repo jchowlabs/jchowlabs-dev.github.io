@@ -111,6 +111,9 @@ svg .mono{font-family:var(--f-mono)}
 .lead-a{stroke:var(--soft)} .lead-b{stroke:var(--risk)}
 .okcard{fill:var(--screen);stroke:var(--ok);stroke-width:1.5}
 .banner{fill:var(--risk)}
+/* narrator bubble — the teacher's voice; stays accent (neutral) in both modes */
+.narbox{fill:var(--chip);stroke:var(--accent);stroke-width:1.5}
+.nartail{fill:var(--accent)}
 .caret{fill:var(--ink);animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .spinner{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-dasharray:38 20;transform-box:fill-box;transform-origin:center;animation:spin 1s linear infinite}
@@ -242,6 +245,7 @@ const skipLbl=e('text',{x:SX,y:SY-14,'font-size':10.5,'font-weight':600,class:'t
 const fx=g();      // flows
 const pkG=g();    // packets
 const vG=g();     // verdicts
+const narG=g();   // narrator bubbles (drawn on top)
 
 /* ---------- script ---------- */
 const S=[
@@ -281,6 +285,33 @@ const S=[
  answer:1,final:1}
 ];
 const N=S.length;
+
+/* narrator bubbles — a teacher's voice (distinct from the agent feed) that parks next to
+   whatever is active each step. One per step; the final step is left to the verdict cards. */
+const NAR=[
+  {f:'lap',   ttl:'You ask',                      txt:'You type one request. The chat is all you’ll see.'},
+  {f:'agent', ttl:'The request reaches the model', txt:'Your prompt leaves the laptop and reaches the model.'},
+  {f:'agent', ttl:'It checks its tools',           txt:'Each system is a tool it can ask for — it can’t open anything itself.'},
+  {f:'agent', ttl:'It makes a plan',               txt:'The goal becomes a short list of things to find.'},
+  {f:'crm',   ttl:'Use a tool',                    txt:'It queries the CRM — with your credentials, not its own.'},
+  {f:'agent', ttl:'Read the result',               txt:'Results come back and land in the context.'},
+  {f:'erp',   ttl:'Another turn for the budget',   txt:'Same loop again — now the ERP, for the budget.'},
+  {f:'drive', ttl:'Searching a big repository',    txt:'Drive has 1,240 files. The search sweeps all of them.'},
+  {f:'drive', ttl:'It reads what matched',         txt:'It opens last year’s plan — the file it needed.'},
+  {f:'agent', ttl:'It sorts what it found',        txt:'Useful files stay; the rest are dropped.'},
+  {f:'agent', ttl:'Enough to answer',              txt:'No more tool calls. The loop is done.'},
+  {f:'lap',   ttl:'The answer comes back',         txt:'The draft returns to the same chat window.'},
+  null
+];
+/* where each bubble parks. systems sit just below the top (scan) action, offset to the left side. */
+const FOCUS={
+  lap:  {x:54,   y:430,            w:252},
+  agent:{x:456,  y:512,            w:272},
+  crm:  {x:1006, y:CARDY.crm+78,   w:248},
+  erp:  {x:1006, y:CARDY.erp+78,   w:248},
+  drive:{x:1006, y:CARDY.drive+78, w:248}
+};
+
 const pick=(v,m)=>v&&typeof v==='object'&&!Array.isArray(v)&&('a' in v||'b' in v)?v[m]:v;
 const PROMPT='Put together a strategy doc for our expansion next year.';
 const SLOTS={prompt:['prompt','you',0],crm:['CRM','312 rec',1],erp:['ERP','48 rows',2],plan:['Plan','.docx',3],secret:['Workforce','HR · names',4]};
@@ -409,6 +440,21 @@ function render(n){
       const bg=g(reduce?null:'pop',vG);
       e('rect',{x:440,y:520,width:470,height:46,rx:8,class:'banner'},bg);
       e('text',{x:458,y:548,'font-size':14,'font-weight':700,class:'tw'},bg,'⚠  Seen by the model: yes. Hidden exposure.');}
+  }
+
+  /* narrator bubble — parked next to whatever is active this step */
+  narG.innerHTML='';
+  const na=NAR[n];
+  if(na){
+    const f=FOCUS[na.f],x=f.x,y=f.y,w=f.w,pad=14;
+    const rows=wrap(na.txt,42);
+    const h=14+18+rows.length*15+12;
+    const bg=g(reduce?null:'pop',narG);
+    const tx=x+40;
+    e('path',{d:`M${tx-7} ${y} L${tx} ${y-9} L${tx+7} ${y} Z`,class:'nartail'},bg);
+    e('rect',{x,y,width:w,height:h,rx:8,class:'narbox'},bg);
+    e('text',{x:x+pad,y:y+22,'font-size':13,'font-weight':700,class:'ta'},bg,na.ttl);
+    rows.forEach((r,i)=>e('text',{x:x+pad,y:y+42+i*15,'font-size':12},bg,r));
   }
 
   /* chrome */
