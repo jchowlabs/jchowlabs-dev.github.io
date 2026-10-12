@@ -186,7 +186,8 @@ const P={
 const defs=e('defs',{});const pat=e('pattern',{id:'gp',width:24,height:24,patternUnits:'userSpaceOnUse'},defs);e('path',{d:'M24 0H0V24',class:'gridline'},pat);
 const nsh=e('filter',{id:'nsh',x:'-30%',y:'-30%',width:'160%',height:'195%'},defs);e('feGaussianBlur',{stdDeviation:4.5},nsh);
 e('rect',{width:1376,height:688,fill:'url(#gp)'});
-// column divider stays fixed, full-height, centered in the gap between the conversation and the systems
+// column dividers stay fixed, full-height — one in each gap: laptop|agent and agent|systems
+e('line',{x1:393,y1:20,x2:393,y2:678,class:'boundary'});
 e('line',{x1:955,y1:20,x2:955,y2:678,class:'boundary'});
 // everything else lives in a group nudged down a little so the composition sits more vertically centered
 const sceneG=e('g',{transform:'translate(0,'+SHIFT+')'});defP=sceneG;
@@ -209,8 +210,8 @@ const lapG=g(null,laptopG);
 const convBox=e('rect',{x:440,y:74,width:470,height:448,rx:8,class:'tray'});
 const statG=g(); // working indicator (spinner + live status) — replaces the static CONVERSATION label
 e('line',{x1:456,x2:894,y1:TY+2,y2:TY+2,class:'tick'});
-e('text',{x:626,y:99,'font-size':11,class:'ts','text-anchor':'end'},null,'Tools');
-const TOOLS=['CRM','ERP','Drive'];const chips={};let tx=636;
+e('text',{x:714,y:99,'font-size':11,class:'ts','text-anchor':'end'},null,'Tools');
+const TOOLS=['CRM','ERP','Drive'];const chips={};let tx=724;
 TOOLS.forEach(t=>{const w=t.length*7.5+22;chips[t]=e('rect',{x:tx,y:84,width:w,height:21,rx:10.5,class:'chip'});e('text',{x:tx+w/2,y:99,class:'chipt','text-anchor':'middle'},null,t);tx+=w+6});
 const thinkG=g();
 
