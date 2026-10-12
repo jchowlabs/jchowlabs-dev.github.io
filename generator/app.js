@@ -124,7 +124,7 @@
       thread.appendChild(turn);
       var content = turn.querySelector('.content');
       if (reduceMotion) { content.innerHTML = greetingHTML; scrollToEnd(); return; }
-      typeHTML(content, greetingHTML, { speed: 9, chunk: 2 });
+      typeHTML(content, greetingHTML, { speed: 18, chunk: 2 });
     }
 
     if (reduceMotion) { stream(); return; }
