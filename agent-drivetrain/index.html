@@ -22,10 +22,11 @@ body{margin:0}
 
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
 .wrap{box-sizing:border-box;width:100%;max-width:1560px;margin:0 auto;padding-inline:24px;padding-block:16px 20px;display:grid;gap:10px}
-.back{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);text-decoration:none}
-.back:hover{border-color:var(--soft)}
+/* Back-to-home button — subtle circular arrow matching the Alliances page; sits inline in the toolbar. */
+.back{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--soft);text-decoration:none;transition:color .2s,border-color .2s}
+.back:hover{color:var(--ink);border-color:var(--soft)}
 .back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .top{display:flex;flex-wrap:nowrap;align-items:center;gap:12px 20px}
 h1{margin:0;font:700 40px/1 var(--f-display);white-space:nowrap;text-transform:uppercase;letter-spacing:.02em}
 .seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
@@ -122,9 +123,8 @@ svg .mono{font-family:var(--f-mono)}
 </head>
 <body>
 <div class="wrap">
-  <div><a class="back" href="../" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a></div>
   <div class="top">
-    <h1>Agent Drivetrain</h1>
+    <a class="back" href="../" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
     <div class="seg" role="group" aria-label="Mode">
       <button type="button" id="modeA" aria-pressed="true">How it works</button>
       <button type="button" id="modeB" class="b" aria-pressed="false">Sensitive data</button>
@@ -140,7 +140,7 @@ svg .mono{font-family:var(--f-mono)}
   <div class="bar" id="bar"><i></i></div>
 
   <figure class="stage" style="margin:0">
-    <svg id="svg" viewBox="0 0 1376 760" role="img" aria-label="Animated diagram: a prompt on a laptop goes to an AI agent, which loops through tool calls into CRM, ERP, Drive and Email, then returns an answer"></svg>
+    <svg id="svg" viewBox="0 0 1376 688" role="img" aria-label="Animated diagram: a prompt on a laptop goes to an AI agent, which loops through tool calls into CRM, ERP, Drive and Email, then returns an answer"></svg>
   </figure>
 
   <div class="sr-only" aria-live="polite">
@@ -158,12 +158,12 @@ function g(cls,p){return e('g',cls?{class:cls}:{},p)}
 function wrap(t,n){const w=t.split(' '),r=[];let c='';w.forEach(x=>{if(c&&(c+' '+x).length>n){r.push(c);c=x}else c=c?c+' '+x:x});r.push(c);return r}
 
 /* ---------- geometry ---------- */
-const TY=344, slotX=i=>458+i*88, slotC=i=>slotX(i)+40;
+const TY=300, slotX=i=>458+i*88, slotC=i=>slotX(i)+40;
 const GX=980,GY=318,CW=12,CH=14,COLS=29,ROWS=23;
 const HITS=[[3,11],[5,22],[9,6],[16,9],[19,24]], PLAN=[9,6], SEC=[12,19];
 const tc=(r,c)=>[GX+c*CW+4.5,GY+r*CH+5.5];
 const SYSY={email:85,crm:161,erp:237,drive:500};
-const CX=675,CY=606,R=72;
+const CX=675,CY=544,R=72;
 const P={
   lap:`M380 330 C 470 330, 520 ${CY}, ${CX-R} ${CY}`,
   sys:k=>`M${CX+R} ${CY} C 960 ${CY}, 960 ${SYSY[k]}, 964 ${SYSY[k]}`,
@@ -173,12 +173,12 @@ const P={
 
 /* ---------- static scene ---------- */
 const defs=e('defs',{});const pat=e('pattern',{id:'gp',width:24,height:24,patternUnits:'userSpaceOnUse'},defs);e('path',{d:'M24 0H0V24',class:'gridline'},pat);
-e('rect',{width:1376,height:760,fill:'url(#gp)'});
+e('rect',{width:1376,height:688,fill:'url(#gp)'});
 e('text',{x:40,y:34,class:'colhd'},null,'1 · YOUR LAPTOP');
 e('text',{x:440,y:34,class:'colhd'},null,'2 · THE AGENT');
 e('text',{x:964,y:34,class:'colhd'},null,'3 · YOUR SYSTEMS');
-e('line',{x1:930,y1:20,x2:930,y2:740,class:'boundary'});
-e('text',{x:946,y:736,class:'colhd',transform:'rotate(-90 946 736)','font-size':10},null,'CONNECTORS · YOUR CREDENTIALS');
+e('line',{x1:930,y1:20,x2:930,y2:678,class:'boundary'});
+e('text',{x:946,y:674,class:'colhd',transform:'rotate(-90 946 674)','font-size':10},null,'CONNECTORS · YOUR CREDENTIALS');
 
 // laptop
 e('rect',{x:40,y:150,width:340,height:330,rx:14,class:'bezel'});
@@ -191,7 +191,7 @@ e('rect',{x:62,y:424,width:296,height:34,rx:10,class:'pnl'});
 const lapG=g();
 
 // thinking panel
-const convBox=e('rect',{x:440,y:52,width:470,height:408,rx:8,class:'tray'});
+const convBox=e('rect',{x:440,y:52,width:470,height:358,rx:8,class:'tray'});
 e('text',{x:458,y:77,class:'colhd'},null,'CONVERSATION');
 e('line',{x1:456,x2:894,y1:TY+2,y2:TY+2,class:'tick'});
 e('text',{x:626,y:77,'font-size':11,class:'ts','text-anchor':'end'},null,'Tools');
@@ -228,7 +228,7 @@ function mini(k,y){minis[k]=[];for(let i=0;i<27;i++)minis[k].push(e('rect',{x:98
 sys(52,66,'Email','48k messages');mini('email',88);
 sys(128,66,'CRM','accounts · opportunities');mini('crm',164);
 sys(204,66,'ERP','budgets · actuals');mini('erp',240);
-sys(280,470,'Drive','1,240 files · shared across Acme');
+sys(280,372,'Drive','1,240 files · shared across Acme');
 const tiles=[];for(let r=0;r<ROWS;r++){tiles.push([]);for(let c=0;c<COLS;c++)tiles[r].push(e('rect',{x:GX+c*CW,y:GY+r*CH,width:CW-3,height:CH-3,rx:1.5,class:'tile'}))}
 const scanBand=e('rect',{x:GX-6,y:GY,width:COLS*CW+8,height:CH+3,rx:3,class:'scanband',opacity:0});
 const scanLbl=e('text',{x:GX+COLS*CW+4,y:GY-6,'font-size':10.5,class:'ta mono','text-anchor':'end',opacity:0},null,'scanning ▸');
@@ -236,7 +236,7 @@ const scanLbl=e('text',{x:GX+COLS*CW+4,y:GY-6,'font-size':10.5,class:'ta mono','
 const [SX,SY]=tc(SEC[0],SEC[1]);
 const secG=g();secG.id='secG';
 const secRing=e('circle',{cx:SX,cy:SY,r:11},secG);
-const CB=646;const lead=e('line',{x1:SX,y1:SY+11,x2:SX,y2:CB,'stroke-width':1},secG);
+const CB=552;const lead=e('line',{x1:SX,y1:SY+11,x2:SX,y2:CB,'stroke-width':1},secG);
 const callBox=e('rect',{x:1046,y:CB,width:300,height:90,rx:6},secG);
 e('text',{x:1060,y:CB+22,'font-size':12.5,'font-weight':700,id:'cfn'},secG,'Workforce Plan 2027.xlsx');
 e('text',{x:1060,y:CB+40,'font-size':11.5},secG,'Planned layoffs · names · salaries');
@@ -423,8 +423,8 @@ function render(n){
       e('text',{x:58,y:562,'font-size':13,'font-weight':700,class:'tok'},vG,'✓  In the answer: nothing sensitive');
       e('text',{x:58,y:582,'font-size':12,class:'ts'},vG,'This is all the user ever sees.');
       const bg=g(reduce?null:'pop',vG);
-      e('rect',{x:440,y:702,width:470,height:46,rx:8,class:'banner'},bg);
-      e('text',{x:458,y:730,'font-size':14,'font-weight':700,class:'tw'},bg,'⚠  Seen by the model: yes. Hidden exposure.');}
+      e('rect',{x:440,y:636,width:470,height:46,rx:8,class:'banner'},bg);
+      e('text',{x:458,y:664,'font-size':14,'font-weight':700,class:'tw'},bg,'⚠  Seen by the model: yes. Hidden exposure.');}
   }
 
   /* chrome */
