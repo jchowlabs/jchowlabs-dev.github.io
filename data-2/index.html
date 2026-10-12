@@ -204,27 +204,28 @@ const thinkG=g();
 e('text',{x:458,y:TY+24,class:'colhd'},null,'IN CONTEXT · EVERYTHING THE MODEL HAS READ');
 const trayG=g();
 
-// systems
-function sys(y,h,name,sub){e('rect',{x:964,y,width:392,height:h,rx:8,class:'card'});e('text',{x:980,y:y+22,'font-size':13,'font-weight':700},null,name);e('text',{x:1340,y:y+22,'font-size':11,class:'ts','text-anchor':'end'},null,sub)}
-const minis={};
-function mini(k,y,rows){rows=rows||1;minis[k]=[];for(let r=0;r<rows;r++)for(let i=0;i<27;i++)minis[k].push(e('rect',{x:980+i*13,y:y+r*17,width:10,height:13,rx:1.5,class:'minitile'}))}
-sys(52,92,'CRM','accounts · opportunities');mini('crm',84,3);
-sys(156,92,'ERP','budgets · actuals');mini('erp',188,3);
-sys(260,300,'Drive','1,240 files · shared across Acme');
-const tiles=[];for(let r=0;r<ROWS;r++){tiles.push([]);for(let c=0;c<COLS;c++)tiles[r].push(e('rect',{x:GX+c*CW,y:GY+r*CH,width:CW-3,height:CH-3,rx:1.5,class:'tile'}))}
-const scanBand=e('rect',{x:GX-6,y:GY,width:COLS*CW+8,height:CH+3,rx:3,class:'scanband',opacity:0});
-const scanLbl=e('text',{x:GX+COLS*CW+4,y:GY-6,'font-size':10.5,class:'ta mono','text-anchor':'end',opacity:0},null,'scanning ▸');
-// sensitive file marker + callout
-const [SX,SY]=tc(SEC[0],SEC[1]);
+// systems — three equal, scannable grids
+const SYSDEF=[['crm','CRM','accounts · opportunities'],['erp','ERP','budgets · actuals'],['drive','Drive','1,240 files · shared across Acme']];
+const grids={},scanBands={};
+function sys(k,name,sub){const y=CARDY[k],g0=gy0(k);
+  e('rect',{x:SX0,y,width:SW,height:SH,rx:8,class:'card'});
+  e('text',{x:SX0+18,y:y+24,'font-size':13,'font-weight':700},null,name);
+  e('text',{x:SX0+SW-16,y:y+24,'font-size':11,class:'ts','text-anchor':'end'},null,sub);
+  grids[k]=[];for(let r=0;r<GROWS;r++){grids[k].push([]);for(let c=0;c<GCOLS;c++)grids[k][r].push(e('rect',{x:GX0+c*GCW,y:g0+r*GCH,width:GCW-3,height:GCH-3,rx:1.5,class:'tile'}))}
+  scanBands[k]=e('rect',{x:GX0-5,y:g0,width:GCOLS*GCW+4,height:GCH+3,rx:3,class:'scanband',opacity:0});
+}
+SYSDEF.forEach(d=>sys(d[0],d[1],d[2]));
+// sensitive file marker + callout (Drive)
+const [SX,SY]=tc('drive',SEC[0],SEC[1]);
 const secG=g();secG.id='secG';
-const secRing=e('circle',{cx:SX,cy:SY,r:11},secG);
-const CB=470;const lead=e('line',{x1:SX,y1:SY+11,x2:SX,y2:CB,'stroke-width':1},secG);
-const callBox=e('rect',{x:1046,y:CB,width:300,height:90,rx:6},secG);
-e('text',{x:1060,y:CB+22,'font-size':12.5,'font-weight':700,id:'cfn'},secG,'Workforce Plan 2027.xlsx');
-e('text',{x:1060,y:CB+40,'font-size':11.5},secG,'Planned layoffs · names · salaries');
-const callL1=e('text',{x:1060,y:CB+60,'font-size':11.5,'font-weight':700},secG);
-const callL2=e('text',{x:1060,y:CB+77,'font-size':11,class:'ts'},secG);
-const skipLbl=e('text',{x:SX,y:SY-16,'font-size':10.5,'font-weight':600,class:'ts','text-anchor':'middle',opacity:0},null,'locked · skipped');
+const secRing=e('circle',{cx:SX,cy:SY,r:9},secG);
+const CB=CARDY.drive+SH+10;const lead=e('line',{x1:SX,y1:SY+9,x2:SX,y2:CB,'stroke-width':1},secG);
+const callBox=e('rect',{x:SX0+8,y:CB,width:320,height:84,rx:6},secG);
+e('text',{x:SX0+24,y:CB+22,'font-size':12.5,'font-weight':700,id:'cfn'},secG,'Workforce Plan 2027.xlsx');
+e('text',{x:SX0+24,y:CB+40,'font-size':11.5},secG,'Planned layoffs · names · salaries');
+const callL1=e('text',{x:SX0+24,y:CB+59,'font-size':11.5,'font-weight':700},secG);
+const callL2=e('text',{x:SX0+24,y:CB+75,'font-size':11,class:'ts'},secG);
+const skipLbl=e('text',{x:SX,y:SY-14,'font-size':10.5,'font-weight':600,class:'ts','text-anchor':'middle',opacity:0},null,'locked · skipped');
 
 const fx=g();      // flows
 const pkG=g();    // packets
@@ -240,12 +241,12 @@ const S=[
 {t:'It makes a plan',b:'The goal turns into a short list of things to find. Each one will take at least one turn of the wheel.',
  think:[['NEED','Pipeline, budget, last year’s plan, team size.']],wheel:'think',status:'Planning'},
 {t:'Use a tool',b:'The model writes a tool request. A connector runs it against the CRM using the user’s own credentials.',
- think:[['CALL','crm.search “open opportunities, new markets”']],wheel:'tool',chip:'CRM',status:'Reading CRM',turn:1,pk:[{d:P.sys('crm'),k:'req'}],mini:'crm'},
+ think:[['CALL','crm.search “open opportunities, new markets”']],wheel:'tool',chip:'CRM',status:'Reading CRM',turn:1,pk:[{d:P.sys('crm'),k:'req'}],scan:'crm'},
 {t:'Read the result',b:'The records come back and land in the context. The model decides what matters and moves on.',
- think:[['KEEP','312 records. Keeping the top 20 by value.']],wheel:'read',chip:'CRM',status:'Reading CRM',turn:1,tray:['crm'],pk:[{d:P.back('crm',1),k:'data',file:1}],mini:'crm'},
+ think:[['KEEP','312 records. Keeping the top 20 by value.']],wheel:'read',chip:'CRM',status:'Reading CRM',turn:1,tray:['crm'],pk:[{d:P.back('crm',1),k:'data',file:1}]},
 {t:'Another turn for the budget',b:'Same loop, different system. Think, use a tool, read the result.',
  think:[['CALL','erp.query “2026 budget vs actual”'],['KEEP','Spend is $6.8M of a $7.5M budget.']],wheel:'read',chip:'ERP',status:'Reading ERP',turn:2,tray:['erp'],
- pk:[{d:P.sys('erp'),k:'req'},{d:P.back('erp',2),k:'data',file:1,delay:1600}],mini:'erp',dur:4800},
+ pk:[{d:P.sys('erp'),k:'req'},{d:P.back('erp',2),k:'data',file:1,delay:1600}],scan:'erp',dur:4800},
 {t:'Searching a big repository',b:{a:'Drive holds 1,240 files. The search sweeps through them and returns whatever matches. The HR file is restricted, so it never comes back.',
   b:'Drive holds 1,240 files. The search sweeps through them and returns whatever matches. The HR file was shared with all of Acme by mistake, so it matches like anything else.'},
  think:[['CALL','drive.search “expansion plan headcount”']],wheel:'tool',chip:'Drive',status:'Searching Drive',turn:3,pk:[{d:P.sys('drive'),k:'req'}],scan:1,dur:5600},
@@ -339,30 +340,21 @@ function render(n){
     y+=rows.length*18+14;
   });
 
-  /* wheel */
-  arcs.classList.toggle('spin',!!s.wheel&&!reduce);
-  for(const k in stnEl){const on=s.wheel===k;stnEl[k][0].classList.toggle('on',on);stnEl[k][0].setAttribute('r',on?6:4);stnEl[k][1].classList.toggle('on',on)}
-  turnT.textContent=c.turn?'turn '+c.turn:'idle';
-
-  /* minis */
-  ['crm','erp'].forEach(k=>minis[k].forEach((m,i)=>m.classList.toggle('lit',s.mini===k&&i%4===1)));
-
-  /* drive grid */
-  const scanned=n>7?ROWS:(n===7?0:-1);
-  const setTiles=row=>{for(let r=0;r<ROWS;r++)for(let cc=0;cc<COLS;cc++){
-    const t=tiles[r][cc];let cls='tile';const isHit=HITS.some(h=>h[0]===r&&h[1]===cc),isSec=r===SEC[0]&&cc===SEC[1];
-    if(row>=0&&r===Math.floor(row)&&row<ROWS)cls+=' scan';
+  /* system grids + scan — CRM, ERP and Drive all comb through the same way */
+  const setGrid=(k,row)=>{const hits=HITS[k];for(let r=0;r<GROWS;r++)for(let cc=0;cc<GCOLS;cc++){
+    const t=grids[k][r][cc];let cls='tile';const isHit=hits.some(h=>h[0]===r&&h[1]===cc),isSec=k==='drive'&&r===SEC[0]&&cc===SEC[1];
+    if(row>=0&&r===Math.floor(row)&&row<GROWS)cls+=' scan';
     if(row>=0&&r<row){if(isHit)cls+=' hit';if(isSec&&B)cls+=' sec-b';}
     t.setAttribute('class',cls)}};
-  setTiles(scanned);
-  scanBand.setAttribute('opacity',0);scanLbl.setAttribute('opacity',0);skipLbl.setAttribute('opacity',0);
-  const revealed=B&&(n>7||(n===7&&reduce));secG.setAttribute('class',revealed?'shown':'');
-  if(s.scan){
-    if(reduce)setTiles(ROWS);
-    else anims.push(el=>{const row=Math.max(0,(el-900)/3600*ROWS);setTiles(Math.min(row,ROWS));
-      const on=row<ROWS;scanBand.setAttribute('opacity',on?1:0);scanLbl.setAttribute('opacity',on?1:0);
-      const by=GY+Math.min(Math.floor(row),ROWS-1)*CH-2;scanBand.setAttribute('y',by);scanLbl.setAttribute('y',by-5);
-      if(B&&row>SEC[0]+1&&!secG.classList.contains('shown')){secG.classList.add('shown','pop');secG.style.animationDelay='0ms'}});
+  SYSDEF.forEach(d=>{const k=d[0],ss=SCANSTEP[k];setGrid(k,n>ss?GROWS:(n===ss?0:-1));scanBands[k].setAttribute('opacity',0)});
+  skipLbl.setAttribute('opacity',0);
+  const revealed=B&&(n>SCANSTEP.drive||(n===SCANSTEP.drive&&reduce));secG.setAttribute('class',revealed?'shown':'');
+  if(s.scan){const k=s.scan,g0=gy0(k);
+    if(reduce)setGrid(k,GROWS);
+    else anims.push(el=>{const row=Math.max(0,(el-700)/2600*GROWS);setGrid(k,Math.min(row,GROWS));
+      scanBands[k].setAttribute('opacity',row<GROWS?1:0);
+      const by=g0+Math.min(Math.floor(row),GROWS-1)*GCH-2;scanBands[k].setAttribute('y',by);
+      if(k==='drive'&&B&&row>SEC[0]+1&&!secG.classList.contains('shown')){secG.classList.add('shown','pop');secG.style.animationDelay='0ms'}});
   }
   // callout per mode
   secRing.setAttribute('class',B?'secring-b':'secring-a');lead.setAttribute('class',B?'lead-b':'lead-a');callBox.setAttribute('class',B?'callout-b':'callout-a');
