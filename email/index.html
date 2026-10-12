@@ -169,7 +169,7 @@ svg .mono{font-family:var(--f-mono)}
   <div class="bar" id="bar"><i></i></div>
 
   <figure class="stage">
-    <svg id="svg" viewBox="0 0 1376 760" role="img" aria-label="Animated diagram: an inbound email is broken into properties, each property is checked by a Proofpoint classifier, and the combined verdict either delivers the message, blocks it at the gateway, or pulls it from the inbox over the API"></svg>
+    <svg id="svg" viewBox="0 0 1376 728" role="img" aria-label="Animated diagram: an inbound email is broken into properties, each property is checked by a Proofpoint classifier, and the combined verdict either delivers the message, blocks it at the gateway, or pulls it from the inbox over the API"></svg>
   </figure>
 
 </div>
@@ -253,13 +253,11 @@ const DUR={send:3600,route:3400,land:3800,api:3800,unpack:4000,identity:5800,con
 const defs=e('defs',{});
 const pat=e('pattern',{id:'gp',width:24,height:24,patternUnits:'userSpaceOnUse'},defs);e('path',{d:'M24 0H0V24',class:'gridline'},pat);
 const mk=e('marker',{id:'ah',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},defs);e('path',{d:'M0 0L10 5L0 10z',class:'arrowh'},mk);
-e('rect',{width:1376,height:760,fill:'url(#gp)'});
+e('rect',{width:1376,height:728,fill:'url(#gp)'});
 
 // rail
-const RY=118;
-e('rect',{x:40,y:24,width:1296,height:156,rx:8,class:'pnl'});
-e('text',{x:56,y:48,class:'colhd'},null,'MAIL PATH · WHERE INSPECTION HAPPENS');
-const railNote=e('text',{x:1320,y:48,'font-size':12,class:'ts','text-anchor':'end'});
+const RY=86;
+e('rect',{x:40,y:24,width:1296,height:124,rx:8,class:'pnl'});
 const NODES={net:['Internet','sender'],pp:['Proofpoint',''],m365:['Microsoft 365','Exchange Online'],inbox:['Inbox','Jane Doe · Acme']};
 const POS={gw:{net:205,pp:530,m365:855,inbox:1180},api:{net:205,m365:530,inbox:855,pp:1180}};
 const EDGES={gw:[['net','pp','MX record',0],['pp','m365','',0],['m365','inbox','',0]],api:[['net','m365','MX record',0],['m365','inbox','',0],['inbox','pp','API connection',1]]};
@@ -272,7 +270,7 @@ for(const k in NODES){const ng=g('node'+(k==='pp'?' pp':''));
 const railFx=g(),railPk=g(),railMark=g();
 
 // panels
-const PY=200;
+const PY=168;
 e('rect',{x:40,y:PY,width:360,height:540,rx:8,class:'card'});
 e('text',{x:56,y:PY+24,class:'colhd'},null,'1 · THE MESSAGE');
 const msgG=g();
@@ -387,7 +385,6 @@ function render(n){
   const now=performance.now();
 
   /* rail */
-  railNote.textContent=API?'Proofpoint connects beside the mailbox. Inspection happens after delivery.':'Proofpoint sits in the mail path. Inspection happens before delivery.';
   nodeSub.pp.textContent=API?'API · post-delivery':'secure email gateway';
   for(const k in nodeEl){nodeEl[k].style.transform=`translate(${POS[mode][k]}px,0)`;nodeEl[k].setAttribute('class','node'+(k==='pp'?' pp':''))}
   if(lastMode!==mode){edgeG.innerHTML='';const eg=g(lastMode&&!reduce?'edges':null,edgeG);
