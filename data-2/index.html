@@ -186,14 +186,13 @@ const P={
 const defs=e('defs',{});const pat=e('pattern',{id:'gp',width:24,height:24,patternUnits:'userSpaceOnUse'},defs);e('path',{d:'M24 0H0V24',class:'gridline'},pat);
 const nsh=e('filter',{id:'nsh',x:'-30%',y:'-30%',width:'160%',height:'195%'},defs);e('feGaussianBlur',{stdDeviation:4.5},nsh);
 e('rect',{width:1376,height:688,fill:'url(#gp)'});
-// column divider + its label stay fixed, full-height, centered in the gap between the conversation and the systems
+// column divider stays fixed, full-height, centered in the gap between the conversation and the systems
 e('line',{x1:955,y1:20,x2:955,y2:678,class:'boundary'});
-e('text',{x:955,y:674,class:'colhd',transform:'rotate(-90 955 674)','font-size':10},null,'CONNECTORS · YOUR CREDENTIALS');
 // everything else lives in a group nudged down a little so the composition sits more vertically centered
 const sceneG=e('g',{transform:'translate(0,'+SHIFT+')'});defP=sceneG;
-e('text',{x:40,y:34,class:'colhd'},null,'1 · YOUR LAPTOP');
-e('text',{x:440,y:34,class:'colhd'},null,'2 · THE AGENT');
-e('text',{x:964,y:34,class:'colhd'},null,'3 · YOUR SYSTEMS');
+e('text',{x:193,y:34,class:'colhd','text-anchor':'middle'},null,'1 · YOUR LAPTOP');
+e('text',{x:675,y:34,class:'colhd','text-anchor':'middle'},null,'2 · THE AGENT');
+e('text',{x:1176,y:34,class:'colhd','text-anchor':'middle'},null,'3 · YOUR SYSTEMS');
 
 // laptop (grouped, lowered so it sits centered on the same horizontal band as the conversation + systems)
 const laptopG=g();laptopG.setAttribute('transform','translate(40,169) scale(0.9) translate(-40,-150)');
