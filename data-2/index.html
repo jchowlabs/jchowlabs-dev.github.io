@@ -145,7 +145,7 @@ svg .mono{font-family:var(--f-mono)}
   <div class="bar" id="bar"><i></i></div>
 
   <figure class="stage" style="margin:0">
-    <svg id="svg" viewBox="0 0 1376 688" role="img" aria-label="Animated diagram: a prompt on a laptop goes to an AI agent, which loops through tool calls into CRM, ERP, Drive and Email, then returns an answer"></svg>
+    <svg id="svg" viewBox="0 0 1376 688" role="img" aria-label="Animated diagram: a prompt on a laptop goes to an AI agent, which loops through tool calls into CRM, ERP and Drive, then returns an answer"></svg>
   </figure>
 
   <div class="sr-only" aria-live="polite">
@@ -164,7 +164,7 @@ function g(cls,p){return e('g',cls?{class:cls}:{},p)}
 function wrap(t,n){const w=t.split(' '),r=[];let c='';w.forEach(x=>{if(c&&(c+' '+x).length>n){r.push(c);c=x}else c=c?c+' '+x:x});r.push(c);return r}
 
 /* ---------- geometry ---------- */
-const TY=388, slotX=i=>458+i*88, slotC=i=>slotX(i)+40;
+const TY=410, slotX=i=>458+i*88, slotC=i=>slotX(i)+40;
 /* systems: three equal, scannable grids (narrower + shifted right, leaving room for the flow lines) */
 const SX0=1000, SW=352, SH=156, SGAP=12;
 const CARDY={crm:52, erp:52+SH+SGAP, drive:52+2*(SH+SGAP)};
@@ -173,7 +173,7 @@ const gy0=k=>CARDY[k]+40;
 const tc=(k,r,c)=>[GX0+c*GCW+(GCW-3)/2, gy0(k)+r*GCH+(GCH-3)/2];
 const HITS={crm:[[1,4],[3,17],[5,9],[6,21]], erp:[[0,7],[2,19],[4,2],[6,13]], drive:[[1,5],[3,20],[5,2],[6,18]]};
 const SEC=[4,19], PLAN=[1,5], SCANSTEP={crm:4, erp:6, drive:7};
-const HUBY=276;  // the conversation box is the hub — flow lines leave/arrive at this height
+const HUBY=298;  // the conversation box is the hub — flow lines leave/arrive at this height (centered on the systems)
 const SHIFT=24;  // the whole scene (minus the fixed divider) is nudged down this much to sit more centered
 const P={
   lap:`M346 ${HUBY} C 392 ${HUBY}, 408 ${HUBY}, 440 ${HUBY}`,
@@ -196,7 +196,7 @@ e('text',{x:440,y:34,class:'colhd'},null,'2 · THE AGENT');
 e('text',{x:964,y:34,class:'colhd'},null,'3 · YOUR SYSTEMS');
 
 // laptop (grouped, lowered so it sits centered on the same horizontal band as the conversation + systems)
-const laptopG=g();laptopG.setAttribute('transform','translate(40,147) scale(0.9) translate(-40,-150)');
+const laptopG=g();laptopG.setAttribute('transform','translate(40,169) scale(0.9) translate(-40,-150)');
 e('rect',{x:40,y:150,width:340,height:286,rx:14,class:'bezel'},laptopG);
 e('rect',{x:52,y:162,width:316,height:262,rx:4,class:'screen'},laptopG);
 e('path',{d:'M14 436 H406 L392 456 H28 Z',class:'base'},laptopG);
@@ -207,12 +207,12 @@ e('rect',{x:62,y:380,width:296,height:34,rx:10,class:'pnl'},laptopG);
 const lapG=g(null,laptopG);
 
 // thinking panel
-const convBox=e('rect',{x:440,y:52,width:470,height:448,rx:8,class:'tray'});
-e('text',{x:458,y:77,class:'colhd'},null,'CONVERSATION');
+const convBox=e('rect',{x:440,y:74,width:470,height:448,rx:8,class:'tray'});
+e('text',{x:458,y:99,class:'colhd'},null,'CONVERSATION');
 e('line',{x1:456,x2:894,y1:TY+2,y2:TY+2,class:'tick'});
-e('text',{x:626,y:77,'font-size':11,class:'ts','text-anchor':'end'},null,'Tools');
-const TOOLS=['Email','CRM','ERP','Drive'];const chips={};let tx=636;
-TOOLS.forEach(t=>{const w=t.length*7.5+22;chips[t]=e('rect',{x:tx,y:62,width:w,height:21,rx:10.5,class:'chip'});e('text',{x:tx+w/2,y:77,class:'chipt','text-anchor':'middle'},null,t);tx+=w+6});
+e('text',{x:626,y:99,'font-size':11,class:'ts','text-anchor':'end'},null,'Tools');
+const TOOLS=['CRM','ERP','Drive'];const chips={};let tx=636;
+TOOLS.forEach(t=>{const w=t.length*7.5+22;chips[t]=e('rect',{x:tx,y:84,width:w,height:21,rx:10.5,class:'chip'});e('text',{x:tx+w/2,y:99,class:'chipt','text-anchor':'middle'},null,t);tx+=w+6});
 const thinkG=g();
 
 // (the model "wheel" was removed — the agent conversation box is now the hub for every flow line)
@@ -255,7 +255,7 @@ const S=[
 {t:'The request reaches the model',b:'The prompt leaves the laptop for the model provider. The model reads it and starts reasoning about what to do.',
  think:[['GOAL','A strategy doc for next year’s expansion.']],wheel:'think',status:'Thinking',tray:['prompt'],pk:[{d:P.lap,k:'req'}]},
 {t:'It checks its tools',b:'Each connected system shows up as a tool the model can ask for. The model can’t open anything itself. It can only request these tools.',
- think:[['TOOLS','What can I use? Email, CRM, ERP and Drive.']],wheel:'think',status:'Thinking',chipsSeq:1},
+ think:[['TOOLS','What can I use? CRM, ERP and Drive.']],wheel:'think',status:'Thinking',chipsSeq:1},
 {t:'It makes a plan',b:'The goal turns into a short list of things to find. Each one will take at least one turn of the wheel.',
  think:[['NEED','Pipeline, budget, last year’s plan, team size.']],wheel:'think',status:'Planning'},
 {t:'Use a tool',b:'The model writes a tool request. A connector runs it against the CRM using the user’s own credentials.',
@@ -369,8 +369,8 @@ function render(n){
   /* thinking feed: last 3 lines of the current run */
   thinkG.innerHTML='';
   const vis=c.lines.slice(-4);
-  if(c.lines.length>4)e('text',{x:458,y:106,'font-size':11,class:'ts mono',opacity:.6},thinkG,'· · · earlier steps');
-  let y=134;const ops=[[1],[.65,1],[.4,.7,1],[.3,.5,.75,1]][vis.length-1]||[];
+  if(c.lines.length>4)e('text',{x:458,y:128,'font-size':11,class:'ts mono',opacity:.6},thinkG,'· · · earlier steps');
+  let y=156;const ops=[[1],[.65,1],[.4,.7,1],[.3,.5,.75,1]][vis.length-1]||[];
   vis.forEach((l,i)=>{
     const newest=i===vis.length-1&&l.step===n, risk=l.tag==='AHA';
     const lg=g(null,thinkG);lg.setAttribute('opacity',ops[i]);
@@ -433,15 +433,15 @@ function render(n){
   /* verdicts */
   vG.innerHTML='';
   if(s.final){
-    if(!B){e('rect',{x:40,y:536,width:340,height:62,rx:8,class:'okcard'},vG);
-      e('text',{x:58,y:562,'font-size':13,'font-weight':700,class:'tok'},vG,'✓  Answer delivered');
-      e('text',{x:58,y:582,'font-size':12,class:'ts'},vG,'3 tools · 3 turns · nothing sensitive touched');}
-    else{e('rect',{x:40,y:536,width:340,height:62,rx:8,class:'okcard'},vG);
-      e('text',{x:58,y:562,'font-size':13,'font-weight':700,class:'tok'},vG,'✓  In the answer: nothing sensitive');
-      e('text',{x:58,y:582,'font-size':12,class:'ts'},vG,'This is all the user ever sees.');
+    if(!B){e('rect',{x:40,y:460,width:340,height:62,rx:8,class:'okcard'},vG);
+      e('text',{x:58,y:486,'font-size':13,'font-weight':700,class:'tok'},vG,'✓  Answer delivered');
+      e('text',{x:58,y:506,'font-size':12,class:'ts'},vG,'3 tools · 3 turns · nothing sensitive touched');}
+    else{e('rect',{x:40,y:460,width:340,height:62,rx:8,class:'okcard'},vG);
+      e('text',{x:58,y:486,'font-size':13,'font-weight':700,class:'tok'},vG,'✓  In the answer: nothing sensitive');
+      e('text',{x:58,y:506,'font-size':12,class:'ts'},vG,'This is all the user ever sees.');
       const bg=g(reduce?null:'pop',vG);
-      e('rect',{x:440,y:520,width:470,height:46,rx:8,class:'banner'},bg);
-      e('text',{x:458,y:548,'font-size':14,'font-weight':700,class:'tw'},bg,'⚠  Seen by the model: yes. Hidden exposure.');}
+      e('rect',{x:440,y:542,width:470,height:46,rx:8,class:'banner'},bg);
+      e('text',{x:458,y:570,'font-size':14,'font-weight':700,class:'tw'},bg,'⚠  Seen by the model: yes. Hidden exposure.');}
   }
 
   /* narrator bubble — parked next to whatever is active this step.
