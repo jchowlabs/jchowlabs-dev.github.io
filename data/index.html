@@ -22,12 +22,13 @@ body{margin:0}
 
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
 .wrap{box-sizing:border-box;width:100%;max-width:1560px;margin:0 auto;padding-inline:24px;padding-block:16px 20px;display:grid;gap:10px}
+@media (max-width:600px){.wrap{padding-inline:16px}}
 /* Back-to-home button — subtle circular arrow matching the Alliances page; sits inline in the toolbar. */
 .back{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--soft);text-decoration:none;transition:color .2s,border-color .2s}
 .back:hover{color:var(--ink);border-color:var(--soft)}
 .back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.top{display:flex;flex-wrap:nowrap;align-items:center;gap:12px 20px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
 h1{margin:0;font:700 40px/1 var(--f-display);white-space:nowrap;text-transform:uppercase;letter-spacing:.02em}
 .seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
 .seg button{border:0;border-radius:0;background:transparent;color:var(--soft);font:600 13px var(--f-body);padding:8px 14px;cursor:pointer}
@@ -43,7 +44,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
 .bar.b i{background:var(--risk)}
 .stage{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
-.stage svg{display:block;width:100%;height:auto}
+.stage svg{display:block;width:100%;min-width:980px;height:auto}
 .cap{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:8px 28px;align-items:baseline;padding-block:4px}
 @media (max-width:760px){.cap{grid-template-columns:1fr}}
 .cap h2{margin:0;font:700 24px/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;text-wrap:balance}
