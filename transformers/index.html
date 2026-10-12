@@ -32,13 +32,14 @@
 }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:24px 24px}
-.wrap{width:min(1240px,max(960px,calc((100vh - 248px) * 1.6667)));margin:0 auto;display:grid;gap:14px}
+.wrap{width:min(1240px,max(860px,calc((100vh - 210px) * 1.6667)));margin:0 auto;display:grid;gap:14px}
+header{display:flex;align-items:center;gap:14px}
 header h1{font-family:var(--f-display);font-weight:600;font-size:34px;line-height:1.15;margin:0;letter-spacing:-.01em}
-/* Back-to-home button, upper-left corner — circular arrow, matches Email Security / Agent Drivetrain. */
-.back{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none}
-.back:hover{border-color:var(--muted)}
+/* Back-to-home button, upper-left — subtle circular arrow matching the Alliances page; inline with the title. */
+.back{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);text-decoration:none;transition:color .2s,border-color .2s}
+.back:hover{color:var(--ink);border-color:var(--muted)}
 .back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .plate{background:var(--surface);border:1px solid var(--line);border-radius:10px}
 canvas{display:block;width:100%;border-radius:10px;aspect-ratio:1000/600;cursor:default}
 .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -65,8 +66,7 @@ kbd{font-family:var(--f-mono);font-size:12px;border:1px solid var(--line);border
 </style>
 
 <div class="wrap">
-  <div><a class="back" href="../" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a></div>
-  <header><h1>Transformer in Motion</h1></header>
+  <header><a class="back" href="../" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a><h1>Transformer in Motion</h1></header>
   <nav class="tabs" id="tabs" aria-label="Steps"></nav>
   <div class="controls">
     <button id="prev" aria-label="Previous step">← Prev</button>
@@ -175,6 +175,7 @@ function drawMini(scene,t){
   const cx=96,bw=132,bx=cx-bw/2;
   text('Figure 1, decoder-only',cx,40,{font:FD,size:13,color:'muted',align:'center'});
   text('(pre-norm, as in GPT)',cx,57,{font:FD,size:12,color:'muted',align:'center'});
+  ctx.save();ctx.translate(0,-60);  /* lift the schematic up to close the empty gap under the caption */
   ctx.strokeStyle=col('ink',.45);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(cx,552);ctx.lineTo(cx,206);ctx.stroke();
   arrow(cx,206,cx,198,'ink',.45);
   const box=(y,h,fill,lines,a,fs=11)=>{ctx.globalAlpha=a?1:.38;rr(bx,y,bw,h,5);ctx.fillStyle=col(fill);ctx.fill();ctx.strokeStyle=col('ink');ctx.lineWidth=a?1.8:1.2;ctx.stroke();
@@ -202,6 +203,7 @@ function drawMini(scene,t){
   text('Output probabilities',cx,184,{size:11,align:'center',alpha:on('soft')?1:.45});
   if(on('loop')){const a=seg(t,.3,.6);ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle=col('accent',a);ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(cx-56,176);ctx.bezierCurveTo(6,176,6,592,cx-28,592);ctx.stroke();ctx.restore();arrow(cx-34,592,cx-26,592,'accent',a,1.8);
     ctx.save();ctx.translate(13,384);ctx.rotate(-Math.PI/2);text('append & repeat',0,0,{size:11,color:'accent',align:'center',alpha:a,weight:'700'});ctx.restore()}
+  ctx.restore();
 }
 
 /* ---------- scenes ---------- */
