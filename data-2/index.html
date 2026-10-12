@@ -90,7 +90,7 @@ svg .mono{font-family:var(--f-mono)}
 .minitile{fill:var(--grid)}
 .minitile.lit{fill:var(--accent)}
 .scanband{fill:none;stroke:var(--accent);stroke-width:1.5}
-.flow{fill:none;stroke-width:2.5;stroke-dasharray:8 6;stroke-linecap:round;animation:dash 1s linear infinite}
+.flow{fill:none;stroke-width:2.5;stroke-dasharray:8 6;stroke-linecap:round;animation:dash 1s linear infinite;transition:opacity .3s}
 .flow.k-req,.flow.k-data,.flow.k-ans{stroke:var(--accent)}
 .flow.k-risk{stroke:var(--risk);stroke-width:3}
 @keyframes dash{to{stroke-dashoffset:-14}}
@@ -413,15 +413,16 @@ function render(n){
   convBox.setAttribute('class','tray'+(trayAlert?' alert':''));
   if(trayAlert)e('text',{x:458,y:TY+101,'font-size':11,'font-weight':600,class:'tr'},trayG,'Excluded from the answer. Still in the context the model read.');
 
-  /* flows + packets */
+  /* flows + packets — each line stays hidden until its own packet sets off, so the request and the
+     return (and Drive's two file pulls) play as separate beats instead of all appearing at once */
   fx.innerHTML='';pkG.innerHTML='';
   (s.pk||[]).forEach(p=>{if(p.mode&&p.mode!==mode)return;
-    e('path',{d:p.d,class:'flow k-'+p.k},fx);
+    const line=e('path',{d:p.d,class:'flow k-'+p.k,opacity:reduce?1:0},fx);
     if(reduce)return;
     const path=e('path',{d:p.d,fill:'none',stroke:'none'},pkG);
     const halo=e('circle',{r:11,class:'pkh k-'+p.k,opacity:0},pkG);
     const dot=p.file?e('rect',{width:12,height:14,rx:2,class:'pk k-'+p.k,opacity:0},pkG):e('circle',{r:6,class:'pk k-'+p.k,opacity:0},pkG);
-    packets.push({path,len:path.getTotalLength(),halo,dot,file:p.file,delay:p.delay||0,dur:p.dur||1500,rev:!!p.rev});
+    packets.push({path,len:path.getTotalLength(),halo,dot,file:p.file,delay:p.delay||0,dur:p.dur||1500,rev:!!p.rev,line});
   });
 
   /* verdicts */
@@ -478,6 +479,7 @@ function tick(now){
   const el=now-t0;
   anims.forEach(f=>f(el));
   packets.forEach(p=>{const t=(el-p.delay)/p.dur;
+    if(p.line)p.line.setAttribute('opacity',el>=p.delay?1:0);
     if(t<0||t>1){p.dot.setAttribute('opacity',0);p.halo.setAttribute('opacity',0);return}
     const pt=p.path.getPointAtLength((p.rev?1-ease(t):ease(t))*p.len);
     if(p.file){p.dot.setAttribute('x',pt.x-6);p.dot.setAttribute('y',pt.y-7)}else{p.dot.setAttribute('cx',pt.x);p.dot.setAttribute('cy',pt.y)}
