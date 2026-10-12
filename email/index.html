@@ -274,7 +274,6 @@ e('text',{x:56,y:PY+22,class:'colhd'},null,'1 · THE MESSAGE');
 const msgG=g();
 e('rect',{x:440,y:PY,width:490,height:460,rx:8,class:'card'});
 e('text',{x:456,y:PY+22,class:'colhd'},null,'2 · PROOFPOINT CLASSIFIERS');
-const ppNote=e('text',{x:914,y:PY+22,'font-size':10,class:'ta','text-anchor':'end','font-weight':600});
 // combined verdict — pulled to the top of the column, just under the title
 e('text',{x:456,y:PY+46,class:'colhd'},null,'COMBINED VERDICT');
 const verT=e('text',{x:914,y:PY+46,'text-anchor':'end','font-size':14,'font-weight':700,style:'font-family:var(--f-display);letter-spacing:.06em'});
@@ -414,7 +413,6 @@ function render(n){
 
   /* message pop on send */
   msgG.setAttribute('class',id==='send'&&!reduce?'pop':'');
-  ppNote.textContent=API?'reading via API':'inline in the mail path';
 
   /* classifiers */
   const grpStep=['identity','content'];

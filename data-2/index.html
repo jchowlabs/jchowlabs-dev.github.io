@@ -153,16 +153,20 @@ function wrap(t,n){const w=t.split(' '),r=[];let c='';w.forEach(x=>{if(c&&(c+' '
 
 /* ---------- geometry ---------- */
 const TY=388, slotX=i=>458+i*88, slotC=i=>slotX(i)+40;
-const GX=980,GY=292,CW=12,CH=14,COLS=29,ROWS=16;
-const HITS=[[2,11],[4,22],[8,6],[11,15],[13,24]], PLAN=[8,6], SEC=[6,19];
-const tc=(r,c)=>[GX+c*CW+4.5,GY+r*CH+5.5];
-const SYSY={crm:98,erp:202,drive:400};
-const CX=675,CY=565,R=36;
+/* systems: three equal, scannable grids (narrower + shifted right, leaving room for the flow lines) */
+const SX0=1000, SW=352, SH=156, SGAP=12;
+const CARDY={crm:52, erp:52+SH+SGAP, drive:52+2*(SH+SGAP)};
+const GCOLS=26, GCW=12, GCH=13, GROWS=8, GX0=SX0+20;
+const gy0=k=>CARDY[k]+40;
+const tc=(k,r,c)=>[GX0+c*GCW+(GCW-3)/2, gy0(k)+r*GCH+(GCH-3)/2];
+const HITS={crm:[[1,4],[3,17],[5,9],[6,21]], erp:[[0,7],[2,19],[4,2],[6,13]], drive:[[1,5],[3,20],[5,2],[6,18]]};
+const SEC=[4,19], PLAN=[1,5], SCANSTEP={crm:4, erp:6, drive:7};
+const HUBY=276;  // the conversation box is the hub — flow lines leave/arrive at this height
 const P={
-  lap:`M380 270 C 470 270, 520 ${CY}, ${CX-R} ${CY}`,
-  sys:k=>`M${CX+R} ${CY} C 960 ${CY}, 960 ${SYSY[k]}, 964 ${SYSY[k]}`,
-  back:(k,i)=>`M964 ${SYSY[k]} C 938 ${SYSY[k]}, 938 ${TY+59}, 912 ${TY+59} L ${slotC(i)} ${TY+59}`,
-  file:(rc,i)=>{const [x,y]=tc(rc[0],rc[1]);return `M${x} ${y} C ${x-140} ${y}, 938 ${TY+59}, 912 ${TY+59} L ${slotC(i)} ${TY+59}`}
+  lap:`M346 188 C 400 188, 410 ${HUBY}, 440 ${HUBY}`,
+  sys:k=>`M910 ${HUBY} C 948 ${HUBY}, 948 ${CARDY[k]+SH/2}, ${SX0} ${CARDY[k]+SH/2}`,
+  back:(k,i)=>`M${SX0} ${CARDY[k]+SH/2} C 948 ${CARDY[k]+SH/2}, 948 ${TY+59}, 912 ${TY+59} L ${slotC(i)} ${TY+59}`,
+  file:(rc,i)=>{const [x,y]=tc('drive',rc[0],rc[1]);return `M${x} ${y} C ${x-160} ${y}, 948 ${TY+59}, 912 ${TY+59} L ${slotC(i)} ${TY+59}`}
 };
 
 /* ---------- static scene ---------- */
@@ -175,7 +179,7 @@ e('line',{x1:930,y1:20,x2:930,y2:678,class:'boundary'});
 e('text',{x:946,y:674,class:'colhd',transform:'rotate(-90 946 674)','font-size':10},null,'CONNECTORS · YOUR CREDENTIALS');
 
 // laptop (grouped so the whole thing can be nudged up to align with the other columns)
-const laptopG=g();laptopG.setAttribute('transform','translate(0,-60)');
+const laptopG=g();laptopG.setAttribute('transform','translate(40,80) scale(0.9) translate(-40,-150)');
 e('rect',{x:40,y:150,width:340,height:286,rx:14,class:'bezel'},laptopG);
 e('rect',{x:52,y:162,width:316,height:262,rx:4,class:'screen'},laptopG);
 e('path',{d:'M14 436 H406 L392 456 H28 Z',class:'base'},laptopG);
@@ -194,23 +198,7 @@ const TOOLS=['Email','CRM','ERP','Drive'];const chips={};let tx=636;
 TOOLS.forEach(t=>{const w=t.length*7.5+22;chips[t]=e('rect',{x:tx,y:62,width:w,height:21,rx:10.5,class:'chip'});e('text',{x:tx+w/2,y:77,class:'chipt','text-anchor':'middle'},null,t);tx+=w+6});
 const thinkG=g();
 
-// wheel
-e('circle',{cx:CX,cy:CY,r:R+8,class:'ring-outer'});
-for(let i=0;i<48;i++){const a=i/48*Math.PI*2;e('line',{x1:CX+(R+5)*Math.cos(a),y1:CY+(R+5)*Math.sin(a),x2:CX+(R+8)*Math.cos(a),y2:CY+(R+8)*Math.sin(a),class:'tick'})}
-e('circle',{cx:CX,cy:CY,r:R,class:'wheel'});
-const arcs=g('arcs');
-[[-60,10],[60,130],[180,250]].forEach(([a1,a2])=>{const p=a=>[CX+R*Math.cos(a*Math.PI/180),CY+R*Math.sin(a*Math.PI/180)];const [x1,y1]=p(a1),[x2,y2]=p(a2);
-  e('path',{d:`M${x1} ${y1} A${R} ${R} 0 0 1 ${x2} ${y2}`,class:'arc'},arcs);
-  const a=a2*Math.PI/180,tx2=-Math.sin(a),ty2=Math.cos(a);
-  e('path',{d:`M${x2+tx2*4} ${y2+ty2*4} l${-tx2*5-Math.cos(a)*3} ${-ty2*5-Math.sin(a)*3} M${x2+tx2*4} ${y2+ty2*4} l${-tx2*5+Math.cos(a)*3} ${-ty2*5+Math.sin(a)*3}`,class:'arc','stroke-width':1.5},arcs)});
-e('circle',{cx:CX,cy:CY,r:19,class:'hub'});
-e('text',{x:CX,y:CY-1,'font-size':9,'font-weight':700,'text-anchor':'middle',style:'font-family:var(--f-display);letter-spacing:.04em'},null,'MODEL');
-const turnT=e('text',{x:CX,y:CY+9,'font-size':6,class:'ts mono','text-anchor':'middle'});
-const STN={think:['Think',-90],tool:['Use a tool',30],read:['Read result',150]},stnEl={};
-for(const k in STN){const [n,deg]=STN[k],a=deg*Math.PI/180,x=CX+R*Math.cos(a),y=CY+R*Math.sin(a);
-  const c=e('circle',{cx:x,cy:y,r:5,class:'stn'});
-  const lx=CX+(R+15)*Math.cos(a),ly=CY+(R+15)*Math.sin(a)+4;
-  const t=e('text',{x:lx,y:ly,class:'stnl','text-anchor':deg===30?'start':deg===150?'end':'middle'},null,n);stnEl[k]=[c,t]}
+// (the model "wheel" was removed — the agent conversation box is now the hub for every flow line)
 
 // tray
 e('text',{x:458,y:TY+24,class:'colhd'},null,'IN CONTEXT · EVERYTHING THE MODEL HAS READ');
