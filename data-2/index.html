@@ -207,7 +207,7 @@ const lapG=g(null,laptopG);
 
 // thinking panel
 const convBox=e('rect',{x:440,y:74,width:470,height:448,rx:8,class:'tray'});
-e('text',{x:458,y:99,class:'colhd'},null,'CONVERSATION');
+const statG=g(); // working indicator (spinner + live status) — replaces the static CONVERSATION label
 e('line',{x1:456,x2:894,y1:TY+2,y2:TY+2,class:'tick'});
 e('text',{x:626,y:99,'font-size':11,class:'ts','text-anchor':'end'},null,'Tools');
 const TOOLS=['CRM','ERP','Drive'];const chips={};let tx=636;
@@ -358,6 +358,12 @@ function render(n){
   /* chips */
   TOOLS.forEach((t,i)=>{let on=s.chip===t;chips[t].classList.toggle('on',on)});
   if(s.chipsSeq){if(reduce)TOOLS.forEach(t=>chips[t].classList.add('on'));else anims.push(el=>TOOLS.forEach((t,i)=>chips[t].classList.toggle('on',el>700+i*450)))}
+
+  /* working indicator — spins through the agent's live status, settles to a check once it answers */
+  statG.innerHTML='';
+  if(s.answer){e('text',{x:458,y:99,class:'colhd tok'},statG,'✓ ANSWERED');}
+  else if(s.status){e('circle',{cx:466,cy:95,r:7,class:'spinner'},statG);e('text',{x:482,y:99,class:'colhd'},statG,s.status.toUpperCase());}
+  else{e('text',{x:458,y:99,class:'colhd'},statG,'CONVERSATION');}
 
   /* thinking feed: last 3 lines of the current run */
   thinkG.innerHTML='';
