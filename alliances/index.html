@@ -372,7 +372,7 @@ function partner(p){
   const ucs=p.usecases.map((u,n)=>{
     const th=u.theme&&u.theme!==lastTheme?(lastTheme=u.theme,`<div class="theme eyebrow">${esc(titleCase(u.theme))}</div>`):'';
     return `${th}<article class="uc" id="uc${n+1}">
-      <div class="uc-head"><div class="uc-n">${n+1}</div><div><h3>${esc(u.title)}</h3><p>${esc(u.sub)}</p></div></div>
+      <div class="uc-head"><div class="uc-n">${n+1}</div><div><h3>${esc(u.title)}</h3></div></div>
       ${visual(u)}
       <div class="rows"><div class="row"><div class="lab">Why it matters</div><div class="val">${paras(u.value)}</div></div><div class="row"><div class="lab">Mechanics</div><div class="val">${paras(u.how)}</div></div></div>
       ${u.caveats&&u.caveats.length?`<div class="caveats"><h4>Keep in mind</h4><ul>${u.caveats.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>`:''}
