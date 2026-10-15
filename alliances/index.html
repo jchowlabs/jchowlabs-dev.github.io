@@ -395,7 +395,7 @@ function partner(p){
   const why=p.why.length?`<h3 class="sub-h">Why together</h3><div class="matrix"><div class="corner"></div><div class="colh">${esc(p.why[0][1])}</div><div class="colh">${esc(p.why[0][2])}</div>${p.why.slice(1).map(r=>`<div class="rowh">${esc(r[0])}</div><div class="cell"><div class="who">${esc(p.why[0][1])}</div>${paras(r[1])}</div><div class="cell"><div class="who">${esc(p.why[0][2])}</div>${paras(r[2])}</div>`).join('')}</div>`:'';
   const li=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
   const acc=[
-    p.personas&&p.personas.length&&['prep-personas','Ideal customer & personas',
+    p.personas&&p.personas.length&&['prep-personas','Personas',
       `<table class="ptab"><thead><tr><th>Persona</th><th>What they care about</th><th>What resonates</th></tr></thead><tbody>${p.personas.map(x=>{const m=String(x.role).match(/^(.*?)\s*\(([^)]*)\)\s*$/);const role=m?`<span class="pr">${esc(m[1])}</span><span class="pb">${esc(m[2])}</span>`:`<span class="pr">${esc(x.role)}</span>`;return `<tr><td data-l="Persona">${role}</td><td data-l="What they care about">${esc(x.care)}</td><td data-l="What resonates">${esc(x.resonates)}</td></tr>`}).join('')}</tbody></table>`],
     p.motions.length&&['prep-motions','Who to talk to, and when',`<ul class="mot">${p.motions.map(x=>{const m=String(x).match(/^((?:Primary|Secondary)\s+[\u2014-]+\s+[^.]*\.|Qualification:)\s*([\s\S]*)$/);return m?`<li><b>${esc(m[1].replace(/\.$/,':'))}</b> ${esc(m[2])}</li>`:`<li>${esc(x)}</li>`}).join('')}</ul>`],
     p.signals.length&&['prep-signals','Buying signals',li(p.signals)],
