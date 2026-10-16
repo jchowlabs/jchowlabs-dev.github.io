@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jchowlabs</title>
+  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Back to the directory -->
+  <a class="home-link" href="../" aria-label="Back to jchowlabs">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></svg>
+  </a>
+
+  <main class="viewer">
+    <!-- Slide stage -->
+    <div class="stage">
+      <img id="slide" class="slide" alt="" draggable="false">
+    </div>
+
+    <!-- Simple navigation dock -->
+    <div class="dock">
+      <button id="prevBtn" class="nav-btn" type="button" aria-label="Previous slide">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span id="counter" class="counter">1 / 41</span>
+      <button id="nextBtn" class="nav-btn" type="button" aria-label="Next slide">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+  </main>
+
+  <script src="/analytics.js" defer></script>
+  <script src="app.js?v=2"></script>
+  <script src="voice.js?v=2"></script>
+</body>
+</html>
