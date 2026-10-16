@@ -20,10 +20,7 @@
    ============================================================ */
 (function () {
   'use strict';
-  // TODO: set this to the ElevenLabs agent id for the Protect deck coach.
-  // Left empty on purpose — the widget shows "Unavailable" until it's set
-  // (do NOT reuse the Falcon agent id; this deck has its own agent/KB).
-  var VOICE_AGENT_ID = ''; // ElevenLabs agent id — Protect deck coach
+  var VOICE_AGENT_ID = 'agent_6401m51ex0v9ekxbmj5m7v5ebsgn'; // ElevenLabs agent id — Protect deck coach
   var SDK_URL = './vendor/elevenlabs-client-0.15.2.js';      // vendored, pinned, same-origin (no runtime CDN)
 
   var isMobile = /Mobi|Android.*Mobile|iPhone|iPod/i.test(navigator.userAgent || '');
